@@ -24,19 +24,22 @@ import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 import uk.gov.hmrc.selfassessmentapi.controllers.api.unearnedincome.BenefitType.BenefitType
 import uk.gov.hmrc.selfassessmentapi.controllers.api.unearnedincome.DividendType._
 import uk.gov.hmrc.selfassessmentapi.controllers.api.unearnedincome.SavingsIncomeType._
-import uk.gov.hmrc.selfassessmentapi.controllers.api.unearnedincome.{Benefit, Dividend, SavingsIncome}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.unearnedincome.{
+  Benefit,
+  Dividend,
+  SavingsIncome
+}
 import uk.gov.hmrc.selfassessmentapi.controllers.api.{TaxYear, _}
 
 case class UnearnedIncomesSavingsIncomeSummary(summaryId: SummaryId,
                                                `type`: SavingsIncomeType,
-                                               amount: BigDecimal) extends Summary {
+                                               amount: BigDecimal)
+    extends Summary {
 
   val arrayName = UnearnedIncomesSavingsIncomeSummary.arrayName
 
   def toSavingsIncome: SavingsIncome =
-    SavingsIncome(id = Some(summaryId),
-      `type` = `type`,
-      amount = amount)
+    SavingsIncome(id = Some(summaryId), `type` = `type`, amount = amount)
 
   def toBsonDocument = BSONDocument(
     "summaryId" -> summaryId,
@@ -51,7 +54,9 @@ object UnearnedIncomesSavingsIncomeSummary {
 
   implicit val format = Json.format[UnearnedIncomesSavingsIncomeSummary]
 
-  def toMongoSummary(income: SavingsIncome, id: Option[SummaryId] = None): UnearnedIncomesSavingsIncomeSummary = {
+  def toMongoSummary(
+      income: SavingsIncome,
+      id: Option[SummaryId] = None): UnearnedIncomesSavingsIncomeSummary = {
     UnearnedIncomesSavingsIncomeSummary(
       summaryId = id.getOrElse(BSONObjectID.generate.stringify),
       `type` = income.`type`,
@@ -63,15 +68,16 @@ object UnearnedIncomesSavingsIncomeSummary {
 case class UnearnedIncomesBenefitSummary(summaryId: SummaryId,
                                          `type`: BenefitType,
                                          amount: BigDecimal,
-                                         taxDeduction: BigDecimal) extends Summary {
+                                         taxDeduction: BigDecimal)
+    extends Summary {
 
   val arrayName = UnearnedIncomesBenefitSummary.arrayName
 
   def toBenefit: Benefit =
     Benefit(id = Some(summaryId),
-      `type` = `type`,
-      amount = amount,
-      taxDeduction = taxDeduction)
+            `type` = `type`,
+            amount = amount,
+            taxDeduction = taxDeduction)
 
   def toBsonDocument = BSONDocument(
     "summaryId" -> summaryId,
@@ -87,7 +93,9 @@ object UnearnedIncomesBenefitSummary {
 
   implicit val format = Json.format[UnearnedIncomesBenefitSummary]
 
-  def toMongoSummary(income: Benefit, id: Option[SummaryId] = None): UnearnedIncomesBenefitSummary = {
+  def toMongoSummary(
+      income: Benefit,
+      id: Option[SummaryId] = None): UnearnedIncomesBenefitSummary = {
     UnearnedIncomesBenefitSummary(
       summaryId = id.getOrElse(BSONObjectID.generate.stringify),
       `type` = income.`type`,
@@ -99,13 +107,12 @@ object UnearnedIncomesBenefitSummary {
 
 case class UnearnedIncomesDividendSummary(summaryId: SummaryId,
                                           `type`: DividendType,
-                                          amount: BigDecimal) extends Summary {
+                                          amount: BigDecimal)
+    extends Summary {
   val arrayName = UnearnedIncomesDividendSummary.arrayName
 
   def toDividend: Dividend =
-    Dividend(id = Some(summaryId),
-      `type` = `type`,
-      amount = amount)
+    Dividend(id = Some(summaryId), `type` = `type`, amount = amount)
 
   def toBsonDocument = BSONDocument(
     "summaryId" -> summaryId,
@@ -120,7 +127,9 @@ object UnearnedIncomesDividendSummary {
 
   implicit val format = Json.format[UnearnedIncomesDividendSummary]
 
-  def toMongoSummary(dividend: Dividend, id: Option[SummaryId] = None): UnearnedIncomesDividendSummary = {
+  def toMongoSummary(
+      dividend: Dividend,
+      id: Option[SummaryId] = None): UnearnedIncomesDividendSummary = {
     UnearnedIncomesDividendSummary(
       summaryId = id.getOrElse(BSONObjectID.generate.stringify),
       `type` = dividend.`type`,
@@ -135,13 +144,16 @@ case class UnearnedIncome(id: BSONObjectID,
                           taxYear: TaxYear,
                           lastModifiedDateTime: DateTime,
                           createdDateTime: DateTime,
-                          savings: Seq[UnearnedIncomesSavingsIncomeSummary] = Nil,
+                          savings: Seq[UnearnedIncomesSavingsIncomeSummary] =
+                            Nil,
                           dividends: Seq[UnearnedIncomesDividendSummary] = Nil,
-                          benefits: Seq[UnearnedIncomesBenefitSummary] = Nil) extends SourceMetadata {
+                          benefits: Seq[UnearnedIncomesBenefitSummary] = Nil)
+    extends SourceMetadata {
 
   def toUnearnedIncome = unearnedincome.UnearnedIncome(id = Some(sourceId))
 
-  def taxedSavingsInterest = savings.filter(_.`type` == InterestFromBanksTaxed).map(_.amount).sum
+  def taxedSavingsInterest =
+    savings.filter(_.`type` == InterestFromBanksTaxed).map(_.amount).sum
 }
 
 object UnearnedIncome {
@@ -149,13 +161,18 @@ object UnearnedIncome {
   implicit val localDateFormat = ReactiveMongoFormats.localDateFormats
 
   implicit val mongoFormats = ReactiveMongoFormats.mongoEntity({
-    implicit val BSONObjectIDFormat: Format[BSONObjectID] = ReactiveMongoFormats.objectIdFormats
-    implicit val dateTimeFormat: Format[DateTime] = ReactiveMongoFormats.dateTimeFormats
-    implicit val localDateFormat: Format[LocalDate] = ReactiveMongoFormats.localDateFormats
+    implicit val BSONObjectIDFormat: Format[BSONObjectID] =
+      ReactiveMongoFormats.objectIdFormats
+    implicit val dateTimeFormat: Format[DateTime] =
+      ReactiveMongoFormats.dateTimeFormats
+    implicit val localDateFormat: Format[LocalDate] =
+      ReactiveMongoFormats.localDateFormats
     Format(Json.reads[UnearnedIncome], Json.writes[UnearnedIncome])
   })
 
-  def create(saUtr: SaUtr, taxYear: TaxYear, se: unearnedincome.UnearnedIncome): UnearnedIncome = {
+  def create(saUtr: SaUtr,
+             taxYear: TaxYear,
+             se: unearnedincome.UnearnedIncome): UnearnedIncome = {
     val id = BSONObjectID.generate
     val now = DateTime.now(DateTimeZone.UTC)
     UnearnedIncome(
@@ -165,6 +182,6 @@ object UnearnedIncome {
       taxYear = taxYear,
       lastModifiedDateTime = now,
       createdDateTime = now
-      )
+    )
   }
 }

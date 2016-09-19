@@ -21,8 +21,7 @@ import play.api.libs.json.Reads._
 import play.api.libs.json._
 import uk.gov.hmrc.selfassessmentapi.controllers.api._
 
-case class TaxPaid(id: Option[SummaryId] = None,
-                   amount: BigDecimal)
+case class TaxPaid(id: Option[SummaryId] = None, amount: BigDecimal)
 
 object TaxPaid extends JsonMarshaller[TaxPaid] {
 
@@ -30,7 +29,8 @@ object TaxPaid extends JsonMarshaller[TaxPaid] {
   implicit val reads: Reads[TaxPaid] = (
     Reads.pure(None) and
       (__ \ "amount").read[BigDecimal](positiveAmountValidator("amount"))
-    ) (TaxPaid.apply _)
+  )(TaxPaid.apply _)
 
-  override def example(id: Option[SummaryId] = None) = TaxPaid(id, BigDecimal(1000))
+  override def example(id: Option[SummaryId] = None) =
+    TaxPaid(id, BigDecimal(1000))
 }

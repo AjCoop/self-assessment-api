@@ -25,14 +25,17 @@ class BalancingChargeSpec extends JsonSpec {
 
   "format" should {
     "round trip valid BalancingCharge json" in {
-      roundTripJson(BalancingCharge(None, BalancingChargeType.Other, BigDecimal(100.12)))
-      roundTripJson(BalancingCharge(None, BalancingChargeType.BPRA, BigDecimal(100.12)))
+      roundTripJson(
+        BalancingCharge(None, BalancingChargeType.Other, BigDecimal(100.12)))
+      roundTripJson(
+        BalancingCharge(None, BalancingChargeType.BPRA, BigDecimal(100.12)))
     }
   }
 
   "validate" should {
     "reject an amount which is more than 2 decimal places" in {
-      val balancingCharge = BalancingCharge(None, BalancingChargeType.Other, BigDecimal(100.123))
+      val balancingCharge =
+        BalancingCharge(None, BalancingChargeType.Other, BigDecimal(100.123))
       assertValidationError[BalancingCharge](
         balancingCharge,
         Map("/amount" -> INVALID_MONETARY_AMOUNT),
@@ -40,7 +43,8 @@ class BalancingChargeSpec extends JsonSpec {
     }
 
     "reject an negative amount" in {
-      val balancingCharge = BalancingCharge(None, BalancingChargeType.BPRA, BigDecimal(-100.12))
+      val balancingCharge =
+        BalancingCharge(None, BalancingChargeType.BPRA, BigDecimal(-100.12))
       assertValidationError[BalancingCharge](
         balancingCharge,
         Map("/amount" -> INVALID_MONETARY_AMOUNT),
@@ -48,13 +52,11 @@ class BalancingChargeSpec extends JsonSpec {
     }
 
     "reject invalid Balancing charge category" in {
-      val json = Json.parse(
-        """
+      val json = Json.parse("""
           |{"type": "BAZ",
           |"amount" : 10000.45
           |}
-        """.
-          stripMargin)
+        """.stripMargin)
 
       assertValidationError[BalancingCharge](
         json,

@@ -22,21 +22,29 @@ import play.api.libs.json._
 import uk.gov.hmrc.selfassessmentapi.controllers.api._
 
 case class Allowances(annualInvestmentAllowance: Option[BigDecimal] = None,
-                      businessPremisesRenovationAllowance: Option[BigDecimal] = None,
+                      businessPremisesRenovationAllowance: Option[BigDecimal] =
+                        None,
                       otherCapitalAllowance: Option[BigDecimal] = None,
-                      wearAndTearAllowance: Option[BigDecimal] = None
-                     ) {
+                      wearAndTearAllowance: Option[BigDecimal] = None) {
 
-  def total: BigDecimal = Sum(annualInvestmentAllowance, businessPremisesRenovationAllowance, otherCapitalAllowance, wearAndTearAllowance)
+  def total: BigDecimal =
+    Sum(annualInvestmentAllowance,
+        businessPremisesRenovationAllowance,
+        otherCapitalAllowance,
+        wearAndTearAllowance)
 }
 
 object Allowances {
   implicit val writes = Json.writes[Allowances]
 
   implicit val reads: Reads[Allowances] = (
-    (__ \ "annualInvestmentAllowance").readNullable[BigDecimal](positiveAmountValidator("annualInvestmentAllowance")) and
-      (__ \ "businessPremisesRenovationAllowance").readNullable[BigDecimal](positiveAmountValidator("businessPremisesRenovationAllowance")) and
-      (__ \ "otherCapitalAllowance").readNullable[BigDecimal](positiveAmountValidator("otherCapitalAllowance")) and
-      (__ \ "wearAndTearAllowance").readNullable[BigDecimal](positiveAmountValidator("wearAndTearAllowance"))
-    ) (Allowances.apply _)
+    (__ \ "annualInvestmentAllowance").readNullable[BigDecimal](
+      positiveAmountValidator("annualInvestmentAllowance")) and
+      (__ \ "businessPremisesRenovationAllowance").readNullable[BigDecimal](
+        positiveAmountValidator("businessPremisesRenovationAllowance")) and
+      (__ \ "otherCapitalAllowance").readNullable[BigDecimal](
+        positiveAmountValidator("otherCapitalAllowance")) and
+      (__ \ "wearAndTearAllowance").readNullable[BigDecimal](
+        positiveAmountValidator("wearAndTearAllowance"))
+  )(Allowances.apply _)
 }

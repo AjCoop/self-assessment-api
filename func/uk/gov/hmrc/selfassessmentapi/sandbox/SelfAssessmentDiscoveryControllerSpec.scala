@@ -25,7 +25,8 @@ class SelfAssessmentDiscoveryControllerSpec extends BaseFunctionalSpec {
         .statusIs(200)
         .contentTypeIsHalJson()
         .bodyHasLink("self", s"/self-assessment/$saUtr/$taxYear")
-        .bodyHasLink("liability", s"/self-assessment/$saUtr/$taxYear/liability")
+        .bodyHasLink("liability",
+                     s"/self-assessment/$saUtr/$taxYear/liability")
         .bodyHasLinksForAllSourceTypes(saUtr, taxYear)
     }
   }

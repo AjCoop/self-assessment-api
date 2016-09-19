@@ -23,13 +23,20 @@ import scala.concurrent.Future
 
 trait SourceService[T] {
 
-  def create(saUtr: SaUtr, taxYear: TaxYear, source: T) : Future[SourceId]
+  def create(saUtr: SaUtr, taxYear: TaxYear, source: T): Future[SourceId]
 
-  def findById(saUtr: SaUtr, taxYear: TaxYear, sourceId: SourceId) : Future[Option[T]]
+  def findById(saUtr: SaUtr,
+               taxYear: TaxYear,
+               sourceId: SourceId): Future[Option[T]]
 
-  def list(saUtr: SaUtr, taxYear: TaxYear) : Future[Seq[T]]
+  def list(saUtr: SaUtr, taxYear: TaxYear): Future[Seq[T]]
 
-  def update(saUtr: SaUtr, taxYear: TaxYear, sourceId: SourceId, source: T): Future[Boolean]
+  def update(saUtr: SaUtr,
+             taxYear: TaxYear,
+             sourceId: SourceId,
+             source: T): Future[Boolean]
 
-  def delete(saUtr: SaUtr, taxYear: TaxYear, sourceId: SourceId): Future[Boolean]
+  def delete(saUtr: SaUtr,
+             taxYear: TaxYear,
+             sourceId: SourceId): Future[Boolean]
 }

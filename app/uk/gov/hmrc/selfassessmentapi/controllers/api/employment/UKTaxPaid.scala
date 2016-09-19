@@ -18,19 +18,23 @@ package uk.gov.hmrc.selfassessmentapi.controllers.api.employment
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
-import uk.gov.hmrc.selfassessmentapi.controllers.api.{SummaryId, JsonMarshaller}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.{
+  SummaryId,
+  JsonMarshaller
+}
 import uk.gov.hmrc.selfassessmentapi.controllers.api._
 
 case class UkTaxPaid(id: Option[SummaryId] = None, amount: BigDecimal)
 
-object UkTaxPaid extends JsonMarshaller[UkTaxPaid]{
+object UkTaxPaid extends JsonMarshaller[UkTaxPaid] {
 
   implicit val writes = Json.writes[UkTaxPaid]
   implicit val reads: Reads[UkTaxPaid] = (
     Reads.pure(None) and
       (__ \ "amount").read[BigDecimal](amountValidator("amount"))
-    ) (UkTaxPaid.apply _)
+  )(UkTaxPaid.apply _)
 
-  override def example(id: Option[SummaryId]) = UkTaxPaid(id, BigDecimal(10000.00))
+  override def example(id: Option[SummaryId]) =
+    UkTaxPaid(id, BigDecimal(10000.00))
 
 }

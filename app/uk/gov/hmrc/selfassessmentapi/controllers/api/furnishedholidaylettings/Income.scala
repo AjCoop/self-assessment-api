@@ -21,8 +21,7 @@ import play.api.libs.json.Reads._
 import play.api.libs.json._
 import uk.gov.hmrc.selfassessmentapi.controllers.api._
 
-case class Income(id: Option[SummaryId] = None,
-                  amount: BigDecimal)
+case class Income(id: Option[SummaryId] = None, amount: BigDecimal)
 
 object Income extends JsonMarshaller[Income] {
 
@@ -30,7 +29,7 @@ object Income extends JsonMarshaller[Income] {
   implicit val reads: Reads[Income] = (
     Reads.pure(None) and
       (__ \ "amount").read[BigDecimal](positiveAmountValidator("amount"))
-    ) (Income.apply _)
+  )(Income.apply _)
 
   override def example(id: Option[SummaryId]) = Income(id, BigDecimal(1000))
 }

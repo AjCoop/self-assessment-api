@@ -30,26 +30,42 @@ trait JsonSpec extends UnitSpec {
 
   def assertValidationPasses[T](o: T)(implicit format: Format[T]): Unit = {
     val json = Json.toJson(o)(format)
-    json.validate[T](format).fold(
-      invalid => fail(invalid.seq.mkString(", ")),
-      valid =>  valid shouldEqual o
-    )
+    json
+      .validate[T](format)
+      .fold(
+        invalid => fail(invalid.seq.mkString(", ")),
+        valid => valid shouldEqual o
+      )
   }
 
-  def assertValidationError[T](o: T, expectedErrors: Map[String, ErrorCode])(implicit format: Format[T]): Unit = {
-    assertValidationError(o, expectedErrors, s"Validation errors expected for fields: ${expectedErrors.toSeq}, but no validation errors were returned")
+  def assertValidationError[T](o: T, expectedErrors: Map[String, ErrorCode])(
+      implicit format: Format[T]): Unit = {
+    assertValidationError(
+      o,
+      expectedErrors,
+      s"Validation errors expected for fields: ${expectedErrors.toSeq}, but no validation errors were returned")
   }
 
-  def assertValidationError[T](o: T, expectedErrors: Map[String, ErrorCode], failureMessage: String)(implicit format: Format[T]): Unit = {
+  def assertValidationError[T](
+      o: T,
+      expectedErrors: Map[String, ErrorCode],
+      failureMessage: String)(implicit format: Format[T]): Unit = {
     val json = Json.toJson(o)(format)
     assertValidationError[T](json, expectedErrors, failureMessage)
   }
 
-  def assertValidationError[T](json: JsValue, expectedErrors: Map[String, ErrorCode], failureMessage: String)(implicit format: Format[T]): Unit = {
-    json.validate[T](format).fold(
-      invalid =>  invalid.flatMap(x => x._2.map(error => x._1.toString -> error.args.head)) should contain theSameElementsAs expectedErrors,
-      valid => fail(failureMessage)
-    )
+  def assertValidationError[T](
+      json: JsValue,
+      expectedErrors: Map[String, ErrorCode],
+      failureMessage: String)(implicit format: Format[T]): Unit = {
+    json
+      .validate[T](format)
+      .fold(
+        invalid =>
+          invalid.flatMap(x =>
+            x._2.map(error => x._1.toString -> error.args.head)) should contain theSameElementsAs expectedErrors,
+        valid => fail(failureMessage)
+      )
   }
 
 }

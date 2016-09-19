@@ -22,7 +22,7 @@ import play.api.libs.json._
 import uk.gov.hmrc.selfassessmentapi.controllers.api._
 
 case class PrivateUseAdjustment(id: Option[SummaryId] = None,
-                           amount: BigDecimal)
+                                amount: BigDecimal)
 
 object PrivateUseAdjustment extends JsonMarshaller[PrivateUseAdjustment] {
 
@@ -30,7 +30,8 @@ object PrivateUseAdjustment extends JsonMarshaller[PrivateUseAdjustment] {
   implicit val reads: Reads[PrivateUseAdjustment] = (
     Reads.pure(None) and
       (__ \ "amount").read[BigDecimal](positiveAmountValidator("amount"))
-    ) (PrivateUseAdjustment.apply _)
+  )(PrivateUseAdjustment.apply _)
 
-  override def example(id: Option[SummaryId]) = PrivateUseAdjustment(id, BigDecimal(1000))
+  override def example(id: Option[SummaryId]) =
+    PrivateUseAdjustment(id, BigDecimal(1000))
 }

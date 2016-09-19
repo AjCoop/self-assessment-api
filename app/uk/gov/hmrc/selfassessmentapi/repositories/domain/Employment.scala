@@ -23,23 +23,30 @@ import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 import uk.gov.hmrc.selfassessmentapi.controllers.api.employment.BenefitType.BenefitType
 import uk.gov.hmrc.selfassessmentapi.controllers.api.employment.ExpenseType.ExpenseType
-import uk.gov.hmrc.selfassessmentapi.controllers.api.{SourceId, SummaryId, TaxYear}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.{
+  SourceId,
+  SummaryId,
+  TaxYear
+}
 import uk.gov.hmrc.selfassessmentapi.controllers._
 import uk.gov.hmrc.selfassessmentapi.controllers.api._
 import uk.gov.hmrc.selfassessmentapi.controllers.api.employment._
 import uk.gov.hmrc.selfassessmentapi.controllers.api.employment.IncomeType.IncomeType
 
-case class EmploymentIncomeSummary(summaryId: SummaryId, `type`: IncomeType, amount: BigDecimal)
-    extends Summary with AmountHolder {
+case class EmploymentIncomeSummary(summaryId: SummaryId,
+                                   `type`: IncomeType,
+                                   amount: BigDecimal)
+    extends Summary
+    with AmountHolder {
   val arrayName = EmploymentIncomeSummary.arrayName
 
   def toIncome: Income =
     Income(id = Some(summaryId), `type` = `type`, amount = amount)
 
   def toBsonDocument = BSONDocument(
-      "summaryId" -> summaryId,
-      "amount" -> BSONDouble(amount.doubleValue()),
-      "type" -> BSONString(`type`.toString)
+    "summaryId" -> summaryId,
+    "amount" -> BSONDouble(amount.doubleValue()),
+    "type" -> BSONString(`type`.toString)
   )
 }
 
@@ -49,26 +56,30 @@ object EmploymentIncomeSummary {
 
   implicit val format = Json.format[EmploymentIncomeSummary]
 
-  def toMongoSummary(income: Income, id: Option[SummaryId] = None): EmploymentIncomeSummary = {
+  def toMongoSummary(income: Income,
+                     id: Option[SummaryId] = None): EmploymentIncomeSummary = {
     EmploymentIncomeSummary(
-        summaryId = id.getOrElse(BSONObjectID.generate.stringify),
-        `type` = income.`type`,
-        amount = income.amount
+      summaryId = id.getOrElse(BSONObjectID.generate.stringify),
+      `type` = income.`type`,
+      amount = income.amount
     )
   }
 }
 
-case class EmploymentExpenseSummary(summaryId: SummaryId, `type`: ExpenseType, amount: BigDecimal)
-    extends Summary with AmountHolder {
+case class EmploymentExpenseSummary(summaryId: SummaryId,
+                                    `type`: ExpenseType,
+                                    amount: BigDecimal)
+    extends Summary
+    with AmountHolder {
   val arrayName = EmploymentExpenseSummary.arrayName
 
   def toExpense: Expense =
     Expense(id = Some(summaryId), `type` = `type`, amount = amount)
 
   def toBsonDocument = BSONDocument(
-      "summaryId" -> summaryId,
-      "amount" -> BSONDouble(amount.doubleValue()),
-      "type" -> BSONString(`type`.toString)
+    "summaryId" -> summaryId,
+    "amount" -> BSONDouble(amount.doubleValue()),
+    "type" -> BSONString(`type`.toString)
   )
 }
 
@@ -78,26 +89,31 @@ object EmploymentExpenseSummary {
 
   implicit val format = Json.format[EmploymentExpenseSummary]
 
-  def toMongoSummary(expense: Expense, id: Option[SummaryId] = None): EmploymentExpenseSummary = {
+  def toMongoSummary(
+      expense: Expense,
+      id: Option[SummaryId] = None): EmploymentExpenseSummary = {
     EmploymentExpenseSummary(
-        summaryId = id.getOrElse(BSONObjectID.generate.stringify),
-        `type` = expense.`type`,
-        amount = expense.amount
+      summaryId = id.getOrElse(BSONObjectID.generate.stringify),
+      `type` = expense.`type`,
+      amount = expense.amount
     )
   }
 }
 
-case class EmploymentBenefitSummary(summaryId: SummaryId, `type`: BenefitType, amount: BigDecimal)
-    extends Summary with AmountHolder {
+case class EmploymentBenefitSummary(summaryId: SummaryId,
+                                    `type`: BenefitType,
+                                    amount: BigDecimal)
+    extends Summary
+    with AmountHolder {
   val arrayName = EmploymentBenefitSummary.arrayName
 
   def toBenefit: Benefit =
     Benefit(id = Some(summaryId), `type` = `type`, amount = amount)
 
   def toBsonDocument = BSONDocument(
-      "summaryId" -> summaryId,
-      "amount" -> BSONDouble(amount.doubleValue()),
-      "type" -> BSONString(`type`.toString)
+    "summaryId" -> summaryId,
+    "amount" -> BSONDouble(amount.doubleValue()),
+    "type" -> BSONString(`type`.toString)
   )
 }
 
@@ -107,24 +123,27 @@ object EmploymentBenefitSummary {
 
   implicit val format = Json.format[EmploymentBenefitSummary]
 
-  def toMongoSummary(benefit: Benefit, id: Option[SummaryId] = None): EmploymentBenefitSummary = {
+  def toMongoSummary(
+      benefit: Benefit,
+      id: Option[SummaryId] = None): EmploymentBenefitSummary = {
     EmploymentBenefitSummary(
-        summaryId = id.getOrElse(BSONObjectID.generate.stringify),
-        `type` = benefit.`type`,
-        amount = benefit.amount
+      summaryId = id.getOrElse(BSONObjectID.generate.stringify),
+      `type` = benefit.`type`,
+      amount = benefit.amount
     )
   }
 }
 
-case class EmploymentUkTaxPaidSummary(summaryId: SummaryId, amount: BigDecimal) extends Summary {
+case class EmploymentUkTaxPaidSummary(summaryId: SummaryId, amount: BigDecimal)
+    extends Summary {
   val arrayName = EmploymentUkTaxPaidSummary.arrayName
 
   def toUkTaxPaid: UkTaxPaid =
     UkTaxPaid(id = Some(summaryId), amount = amount)
 
   def toBsonDocument = BSONDocument(
-      "summaryId" -> summaryId,
-      "amount" -> BSONDouble(amount.doubleValue())
+    "summaryId" -> summaryId,
+    "amount" -> BSONDouble(amount.doubleValue())
   )
 }
 
@@ -134,10 +153,12 @@ object EmploymentUkTaxPaidSummary {
 
   implicit val format = Json.format[EmploymentUkTaxPaidSummary]
 
-  def toMongoSummary(uKTaxPaid: UkTaxPaid, id: Option[SummaryId] = None): EmploymentUkTaxPaidSummary = {
+  def toMongoSummary(
+      uKTaxPaid: UkTaxPaid,
+      id: Option[SummaryId] = None): EmploymentUkTaxPaidSummary = {
     EmploymentUkTaxPaidSummary(
-        summaryId = id.getOrElse(BSONObjectID.generate.stringify),
-        amount = uKTaxPaid.amount
+      summaryId = id.getOrElse(BSONObjectID.generate.stringify),
+      amount = uKTaxPaid.amount
     )
   }
 }
@@ -162,20 +183,25 @@ object Employment {
   implicit val localDateFormat = ReactiveMongoFormats.localDateFormats
 
   implicit val mongoFormats = ReactiveMongoFormats.mongoEntity({
-    implicit val BSONObjectIDFormat: Format[BSONObjectID] = ReactiveMongoFormats.objectIdFormats
-    implicit val dateTimeFormat: Format[DateTime] = ReactiveMongoFormats.dateTimeFormats
-    implicit val localDateFormat: Format[LocalDate] = ReactiveMongoFormats.localDateFormats
+    implicit val BSONObjectIDFormat: Format[BSONObjectID] =
+      ReactiveMongoFormats.objectIdFormats
+    implicit val dateTimeFormat: Format[DateTime] =
+      ReactiveMongoFormats.dateTimeFormats
+    implicit val localDateFormat: Format[LocalDate] =
+      ReactiveMongoFormats.localDateFormats
     Format(Json.reads[Employment], Json.writes[Employment])
   })
 
-  def create(saUtr: SaUtr, taxYear: TaxYear, employment: api.employment.Employment): Employment = {
+  def create(saUtr: SaUtr,
+             taxYear: TaxYear,
+             employment: api.employment.Employment): Employment = {
     val id = BSONObjectID.generate
     val now = DateTime.now(DateTimeZone.UTC)
     Employment(id = id,
-                    sourceId = id.stringify,
-                    saUtr = saUtr,
-                    taxYear = taxYear,
-                    lastModifiedDateTime = now,
-                    createdDateTime = now)
+               sourceId = id.stringify,
+               saUtr = saUtr,
+               taxYear = taxYear,
+               lastModifiedDateTime = now,
+               createdDateTime = now)
   }
 }

@@ -20,10 +20,11 @@ import play.api.test.FakeApplication
 import uk.gov.hmrc.selfassessmentapi.TestApplication
 import uk.gov.hmrc.selfassessmentapi.config.MicroserviceGlobal
 
-
 class DeleteExpiredDataJobDisabledSpec extends TestApplication {
 
-  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.scheduling.deleteExpiredDataJob.enabled" -> false))
+  override lazy val app = FakeApplication(
+    additionalConfiguration =
+      Map("Test.scheduling.deleteExpiredDataJob.enabled" -> false))
 
   "DeleteExpiredDataJob" should {
 

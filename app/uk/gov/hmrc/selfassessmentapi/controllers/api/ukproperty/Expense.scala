@@ -25,10 +25,11 @@ import uk.gov.hmrc.selfassessmentapi.controllers.definition.EnumJson
 
 object ExpenseType extends Enumeration {
   type ExpenseType = Value
-  val PremisesRunningCosts, RepairsAndMaintenance, FinancialCosts, ProfessionalFees, CostOfServices, Other = Value
-  implicit val types = EnumJson.enumFormat(ExpenseType, Some("UK Property Expense type is invalid"))
+  val PremisesRunningCosts, RepairsAndMaintenance, FinancialCosts,
+  ProfessionalFees, CostOfServices, Other = Value
+  implicit val types = EnumJson
+    .enumFormat(ExpenseType, Some("UK Property Expense type is invalid"))
 }
-
 
 case class Expense(id: Option[SummaryId] = None,
                    `type`: ExpenseType,
@@ -41,7 +42,8 @@ object Expense extends JsonMarshaller[Expense] {
     Reads.pure(None) and
       (__ \ "type").read[ExpenseType] and
       (__ \ "amount").read[BigDecimal](positiveAmountValidator("amount"))
-    ) (Expense.apply _)
+  )(Expense.apply _)
 
-  override def example(id: Option[SummaryId]) = Expense(id, ExpenseType.PremisesRunningCosts, BigDecimal(1000))
+  override def example(id: Option[SummaryId]) =
+    Expense(id, ExpenseType.PremisesRunningCosts, BigDecimal(1000))
 }

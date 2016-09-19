@@ -21,13 +21,17 @@ import play.api.libs.json._
 import play.api.mvc.{Request, Result}
 import uk.gov.hmrc.api.controllers.ErrorNotFound
 import uk.gov.hmrc.play.http.HeaderCarrier
-import uk.gov.hmrc.selfassessmentapi.controllers.api.{ValidationErrors, ErrorCode}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.{
+  ValidationErrors,
+  ErrorCode
+}
 import uk.gov.hmrc.selfassessmentapi.controllers.api.ErrorCode._
 
 import scala.concurrent.Future
 
 trait BaseController
-  extends uk.gov.hmrc.play.microservice.controller.BaseController with HalSupport {
+    extends uk.gov.hmrc.play.microservice.controller.BaseController
+    with HalSupport {
 
   val context: String
 
@@ -37,14 +41,19 @@ trait BaseController
     HeaderCarrier.fromHeadersAndSession(request.headers, None)
 
   override protected def withJsonBody[T](f: (T) => Future[Result])(
-    implicit request: Request[JsValue], m: Manifest[T], reads: Reads[T]) =
+      implicit request: Request[JsValue],
+      m: Manifest[T],
+      reads: Reads[T]) =
     request.body.validate[T] match {
       case JsSuccess(payload, _) => f(payload)
-      case JsError(errors) => Future.successful(BadRequest(Json.toJson(invalidRequest(errors))))
+      case JsError(errors) =>
+        Future.successful(BadRequest(Json.toJson(invalidRequest(errors))))
     }
 
   def invalidRequest(errors: ValidationErrors) =
-    InvalidRequest(ErrorCode.INVALID_REQUEST, "Validation failed", invalidPartsSeq(errors))
+    InvalidRequest(ErrorCode.INVALID_REQUEST,
+                   "Validation failed",
+                   invalidPartsSeq(errors))
 
   def invalidRequest(message: String) =
     ErrorBadRequest(ErrorCode.INVALID_REQUEST, message)

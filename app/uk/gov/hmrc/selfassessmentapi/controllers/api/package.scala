@@ -21,7 +21,9 @@ import play.api.libs.json._
 import uk.gov.hmrc.selfassessmentapi.controllers.api.CountryCodes.{apply => _}
 import uk.gov.hmrc.selfassessmentapi.controllers.api.ErrorCode
 import uk.gov.hmrc.selfassessmentapi.controllers.api.ErrorCode._
-import uk.gov.hmrc.selfassessmentapi.controllers.api.UkCountryCodes.{apply => _}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.UkCountryCodes.{
+  apply => _
+}
 import uk.gov.hmrc.selfassessmentapi.repositories.domain.AmountHolder
 
 import scala.math.BigDecimal.RoundingMode
@@ -34,16 +36,33 @@ package object api {
   type LiabilityCalculationErrorId = String
   type ValidationErrors = Seq[(JsPath, Seq[ValidationError])]
 
-  def lengthValidator = Reads.of[String].filter(ValidationError("field length exceeded the max 100 chars", MAX_FIELD_LENGTH_EXCEEDED))(_.length <= 100)
+  def lengthValidator =
+    Reads
+      .of[String]
+      .filter(ValidationError("field length exceeded the max 100 chars",
+                              MAX_FIELD_LENGTH_EXCEEDED))(_.length <= 100)
 
-  def positiveAmountValidator(fieldName: String) = Reads.of[BigDecimal].filter(ValidationError(s"$fieldName should be non-negative number up to 2 decimal values",
-    INVALID_MONETARY_AMOUNT))(x => x >= 0 && x.scale < 3)
+  def positiveAmountValidator(fieldName: String) =
+    Reads
+      .of[BigDecimal]
+      .filter(
+        ValidationError(
+          s"$fieldName should be non-negative number up to 2 decimal values",
+          INVALID_MONETARY_AMOUNT))(x => x >= 0 && x.scale < 3)
 
-  def amountValidator(fieldName: String) = Reads.of[BigDecimal].filter(ValidationError(s"$fieldName should be a number up to 2 decimal values",
-    INVALID_MONETARY_AMOUNT))(x => x.scale < 3)
+  def amountValidator(fieldName: String) =
+    Reads
+      .of[BigDecimal]
+      .filter(
+        ValidationError(
+          s"$fieldName should be a number up to 2 decimal values",
+          INVALID_MONETARY_AMOUNT))(x => x.scale < 3)
 
-  def maxAmountValidator(fieldName: String, maxAmount: BigDecimal) = Reads.of[BigDecimal].filter(ValidationError(s"$fieldName cannot be greater than $maxAmount",
-    MAX_MONETARY_AMOUNT))(_ <= maxAmount)
+  def maxAmountValidator(fieldName: String, maxAmount: BigDecimal) =
+    Reads
+      .of[BigDecimal]
+      .filter(ValidationError(s"$fieldName cannot be greater than $maxAmount",
+                              MAX_MONETARY_AMOUNT))(_ <= maxAmount)
 
   object Sum {
     def apply(values: Option[BigDecimal]*) = values.flatten.sum
@@ -54,12 +73,14 @@ package object api {
   }
 
   object CapAt {
-    def apply(n: Option[BigDecimal], cap: BigDecimal): Option[BigDecimal] = n map {
-      case x if x > cap => cap
-      case x => x
-    }
+    def apply(n: Option[BigDecimal], cap: BigDecimal): Option[BigDecimal] =
+      n map {
+        case x if x > cap => cap
+        case x => x
+      }
 
-    def apply(n: BigDecimal, cap: BigDecimal): BigDecimal = apply(Some(n), cap).get
+    def apply(n: BigDecimal, cap: BigDecimal): BigDecimal =
+      apply(Some(n), cap).get
   }
 
   object PositiveOrZero {
@@ -70,19 +91,22 @@ package object api {
   }
 
   object ValueOrZero {
-    def apply(maybeValue: Option[BigDecimal]): BigDecimal = maybeValue.getOrElse(0)
+    def apply(maybeValue: Option[BigDecimal]): BigDecimal =
+      maybeValue.getOrElse(0)
   }
 
   object RoundDown {
-    def apply(n: BigDecimal): BigDecimal = n.setScale(0, BigDecimal.RoundingMode.DOWN)
+    def apply(n: BigDecimal): BigDecimal =
+      n.setScale(0, BigDecimal.RoundingMode.DOWN)
   }
 
   object RoundUp {
-    def apply(n: BigDecimal): BigDecimal = n.setScale(0, BigDecimal.RoundingMode.UP)
+    def apply(n: BigDecimal): BigDecimal =
+      n.setScale(0, BigDecimal.RoundingMode.UP)
   }
 
   object FlooredAt {
-    def apply(one: BigDecimal, two: BigDecimal) = if(one >= two) one else two
+    def apply(one: BigDecimal, two: BigDecimal) = if (one >= two) one else two
   }
 
   object RoundDownToEven {
@@ -93,9 +117,8 @@ package object api {
     def apply(n: BigDecimal) = n.setScale(2, RoundingMode.UP)
   }
 
-  object RoundDownToPennies  {
+  object RoundDownToPennies {
     def apply(n: BigDecimal) = n.setScale(2, RoundingMode.DOWN)
   }
 
 }
-

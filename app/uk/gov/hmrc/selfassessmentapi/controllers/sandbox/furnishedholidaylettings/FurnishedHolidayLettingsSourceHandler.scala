@@ -17,39 +17,60 @@
 package uk.gov.hmrc.selfassessmentapi.controllers.sandbox.furnishedholidaylettings
 
 import uk.gov.hmrc.selfassessmentapi.controllers.api.{SummaryType, SourceTypes}
-import uk.gov.hmrc.selfassessmentapi.controllers.{SourceHandler, SummaryHandler}
+import uk.gov.hmrc.selfassessmentapi.controllers.{
+  SourceHandler,
+  SummaryHandler
+}
 import SourceTypes.FurnishedHolidayLettings
 import uk.gov.hmrc.selfassessmentapi.controllers.api.furnishedholidaylettings.SummaryTypes._
-import uk.gov.hmrc.selfassessmentapi.controllers.api.furnishedholidaylettings.{Income, _}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.furnishedholidaylettings.{
+  Income,
+  _
+}
 import uk.gov.hmrc.selfassessmentapi.controllers.api.{_}
-import uk.gov.hmrc.selfassessmentapi.repositories.sandbox.{SandboxSourceRepository, SandboxSummaryRepository}
+import uk.gov.hmrc.selfassessmentapi.repositories.sandbox.{
+  SandboxSourceRepository,
+  SandboxSummaryRepository
+}
 
-object FurnishedHolidayLettingsSourceHandler extends SourceHandler(FurnishedHolidayLetting, FurnishedHolidayLettings.name) {
+object FurnishedHolidayLettingsSourceHandler
+    extends SourceHandler(FurnishedHolidayLetting,
+                          FurnishedHolidayLettings.name) {
 
-  override def summaryHandler(summaryType: SummaryType): Option[SummaryHandler[_]] = {
+  override def summaryHandler(
+      summaryType: SummaryType): Option[SummaryHandler[_]] = {
     summaryType match {
-      case PrivateUseAdjustments => Some(SummaryHandler(new SandboxSummaryRepository[PrivateUseAdjustment] {
-        override def example(id: Option[SummaryId]) = PrivateUseAdjustment.example(id)
-        override implicit val writes = PrivateUseAdjustment.writes
-      }, PrivateUseAdjustment, PrivateUseAdjustments.name))
-      case Incomes => Some(SummaryHandler(new SandboxSummaryRepository[Income] {
-        override def example(id: Option[SummaryId]) = Income.example(id)
-        override implicit val writes = Income.writes
-      }, Income, Incomes.name))
-      case Expenses => Some(SummaryHandler(new SandboxSummaryRepository[Expense] {
-        override def example(id: Option[SummaryId]) = Expense.example(id)
-        override implicit val writes = Expense.writes
-      }, Expense, Expenses.name))
-      case BalancingCharges => Some(SummaryHandler(new SandboxSummaryRepository[BalancingCharge] {
-        override def example(id: Option[SummaryId]) = BalancingCharge.example(id)
-        override implicit val writes = BalancingCharge.writes
-      }, BalancingCharge, BalancingCharges.name))
+      case PrivateUseAdjustments =>
+        Some(
+          SummaryHandler(new SandboxSummaryRepository[PrivateUseAdjustment] {
+            override def example(id: Option[SummaryId]) =
+              PrivateUseAdjustment.example(id)
+            override implicit val writes = PrivateUseAdjustment.writes
+          }, PrivateUseAdjustment, PrivateUseAdjustments.name))
+      case Incomes =>
+        Some(SummaryHandler(new SandboxSummaryRepository[Income] {
+          override def example(id: Option[SummaryId]) = Income.example(id)
+          override implicit val writes = Income.writes
+        }, Income, Incomes.name))
+      case Expenses =>
+        Some(SummaryHandler(new SandboxSummaryRepository[Expense] {
+          override def example(id: Option[SummaryId]) = Expense.example(id)
+          override implicit val writes = Expense.writes
+        }, Expense, Expenses.name))
+      case BalancingCharges =>
+        Some(SummaryHandler(new SandboxSummaryRepository[BalancingCharge] {
+          override def example(id: Option[SummaryId]) =
+            BalancingCharge.example(id)
+          override implicit val writes = BalancingCharge.writes
+        }, BalancingCharge, BalancingCharges.name))
       case _ => None
     }
   }
 
-  override val repository = new SandboxSourceRepository[FurnishedHolidayLetting] {
-    override implicit val writes = FurnishedHolidayLetting.writes
-    override def example(id: SourceId) = FurnishedHolidayLetting.example().copy(id = Some(id))
-  }
+  override val repository =
+    new SandboxSourceRepository[FurnishedHolidayLetting] {
+      override implicit val writes = FurnishedHolidayLetting.writes
+      override def example(id: SourceId) =
+        FurnishedHolidayLetting.example().copy(id = Some(id))
+    }
 }

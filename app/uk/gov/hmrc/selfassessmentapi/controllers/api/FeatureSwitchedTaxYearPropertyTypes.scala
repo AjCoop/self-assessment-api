@@ -27,12 +27,19 @@ import uk.gov.hmrc.selfassessmentapi.controllers.api.taxrefundedorsetoff.TaxRefu
 trait FeatureSwitchedTaxYearPropertyTypes {
   val featureSwitch: FeatureSwitch
 
-  def types = Seq(PensionContributions, CharitableGivings, BlindPersons,
-    TaxRefundedOrSetOffs, StudentLoans, ChildBenefits).filter(featureSwitch.isEnabled)
+  def types =
+    Seq(PensionContributions,
+        CharitableGivings,
+        BlindPersons,
+        TaxRefundedOrSetOffs,
+        StudentLoans,
+        ChildBenefits).filter(featureSwitch.isEnabled)
 
-  def fromName(name: String): Option[TaxYearPropertyType] = types.find(_.name == name)
+  def fromName(name: String): Option[TaxYearPropertyType] =
+    types.find(_.name == name)
 }
 
-object FeatureSwitchedTaxYearPropertyTypes extends FeatureSwitchedTaxYearPropertyTypes {
+object FeatureSwitchedTaxYearPropertyTypes
+    extends FeatureSwitchedTaxYearPropertyTypes {
   override val featureSwitch = FeatureSwitch(AppContext.featureSwitch)
 }

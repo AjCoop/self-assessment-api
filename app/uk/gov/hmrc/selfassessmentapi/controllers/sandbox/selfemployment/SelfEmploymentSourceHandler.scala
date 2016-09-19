@@ -18,40 +18,57 @@ package uk.gov.hmrc.selfassessmentapi.controllers.sandbox.selfemployment
 
 import play.api.libs.json.Writes
 import uk.gov.hmrc.selfassessmentapi.controllers.api.SummaryType
-import uk.gov.hmrc.selfassessmentapi.controllers.{SourceHandler, SummaryHandler}
+import uk.gov.hmrc.selfassessmentapi.controllers.{
+  SourceHandler,
+  SummaryHandler
+}
 import uk.gov.hmrc.selfassessmentapi.controllers.api.selfemployment.SourceType.SelfEmployments
 import uk.gov.hmrc.selfassessmentapi.controllers.api.selfemployment.SummaryTypes._
 import uk.gov.hmrc.selfassessmentapi.controllers.api.selfemployment.{Income, _}
 import uk.gov.hmrc.selfassessmentapi.controllers.api.{_}
-import uk.gov.hmrc.selfassessmentapi.repositories.sandbox.{SandboxSourceRepository, SandboxSummaryRepository}
+import uk.gov.hmrc.selfassessmentapi.repositories.sandbox.{
+  SandboxSourceRepository,
+  SandboxSummaryRepository
+}
 
-object SelfEmploymentSourceHandler extends SourceHandler(SelfEmployment, SelfEmployments.name) {
+object SelfEmploymentSourceHandler
+    extends SourceHandler(SelfEmployment, SelfEmployments.name) {
 
-  override def summaryHandler(summaryType: SummaryType): Option[SummaryHandler[_]] = {
+  override def summaryHandler(
+      summaryType: SummaryType): Option[SummaryHandler[_]] = {
     summaryType match {
-      case Incomes => Some(SummaryHandler(new SandboxSummaryRepository[Income] {
-        override def example(id: Option[SummaryId]) = Income.example(id)
-        override implicit val writes: Writes[Income] = Income.writes
-      }, Income, Incomes.name))
-      case Expenses => Some(SummaryHandler(new SandboxSummaryRepository[Expense] {
-        override def example(id: Option[SummaryId]): Expense = Expense.example(id)
-        override implicit val writes: Writes[Expense] = Expense.writes
-      }, Expense, Expenses.name))
-      case BalancingCharges => Some(SummaryHandler(new SandboxSummaryRepository[BalancingCharge] {
-        override def example(id: Option[SummaryId]) = BalancingCharge.example(id)
-        override implicit val writes = BalancingCharge.writes
-      }, BalancingCharge, BalancingCharges.name))
-      case GoodsAndServicesOwnUses => Some(SummaryHandler(new SandboxSummaryRepository[GoodsAndServicesOwnUse] {
-        override def example(id: Option[SummaryId]) = GoodsAndServicesOwnUse.example(id)
-        override implicit val writes = GoodsAndServicesOwnUse.writes
-      }, GoodsAndServicesOwnUse, GoodsAndServicesOwnUses.name))
+      case Incomes =>
+        Some(SummaryHandler(new SandboxSummaryRepository[Income] {
+          override def example(id: Option[SummaryId]) = Income.example(id)
+          override implicit val writes: Writes[Income] = Income.writes
+        }, Income, Incomes.name))
+      case Expenses =>
+        Some(SummaryHandler(new SandboxSummaryRepository[Expense] {
+          override def example(id: Option[SummaryId]): Expense =
+            Expense.example(id)
+          override implicit val writes: Writes[Expense] = Expense.writes
+        }, Expense, Expenses.name))
+      case BalancingCharges =>
+        Some(SummaryHandler(new SandboxSummaryRepository[BalancingCharge] {
+          override def example(id: Option[SummaryId]) =
+            BalancingCharge.example(id)
+          override implicit val writes = BalancingCharge.writes
+        }, BalancingCharge, BalancingCharges.name))
+      case GoodsAndServicesOwnUses =>
+        Some(
+          SummaryHandler(new SandboxSummaryRepository[GoodsAndServicesOwnUse] {
+            override def example(id: Option[SummaryId]) =
+              GoodsAndServicesOwnUse.example(id)
+            override implicit val writes = GoodsAndServicesOwnUse.writes
+          }, GoodsAndServicesOwnUse, GoodsAndServicesOwnUses.name))
       case _ => None
     }
   }
 
   override val repository = new SandboxSourceRepository[SelfEmployment] {
     override implicit val writes = SelfEmployment.writes
-    override def example(id: SourceId) = SelfEmployment.example().copy(id = Some(id))
+    override def example(id: SourceId) =
+      SelfEmployment.example().copy(id = Some(id))
 
   }
 }

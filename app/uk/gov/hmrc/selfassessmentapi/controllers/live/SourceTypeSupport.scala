@@ -26,13 +26,17 @@ import uk.gov.hmrc.selfassessmentapi.controllers.live.ukproperty.UKPropertySourc
 import uk.gov.hmrc.selfassessmentapi.controllers.live.unearnedincome.UnearnedIncomeSourceHandler
 import SourceTypes._
 
-trait SourceTypeSupport extends uk.gov.hmrc.selfassessmentapi.controllers.SourceTypeSupport {
-  def sourceHandler(sourceType: SourceType): SourceHandler[_] = sourceType match {
-    case SelfEmployments => SelfEmploymentSourceHandler
-    case UnearnedIncomes => UnearnedIncomeSourceHandler
-    case FurnishedHolidayLettings => FurnishedHolidayLettingsSourceHandler
-    case Employments => EmploymentSourceHandler
-    case UKProperties => UKPropertySourceHandler
-    case _ => throw new NotImplementedException(s"${sourceType.name} is not implemented")
-  }
+trait SourceTypeSupport
+    extends uk.gov.hmrc.selfassessmentapi.controllers.SourceTypeSupport {
+  def sourceHandler(sourceType: SourceType): SourceHandler[_] =
+    sourceType match {
+      case SelfEmployments => SelfEmploymentSourceHandler
+      case UnearnedIncomes => UnearnedIncomeSourceHandler
+      case FurnishedHolidayLettings => FurnishedHolidayLettingsSourceHandler
+      case Employments => EmploymentSourceHandler
+      case UKProperties => UKPropertySourceHandler
+      case _ =>
+        throw new NotImplementedException(
+          s"${sourceType.name} is not implemented")
+    }
 }

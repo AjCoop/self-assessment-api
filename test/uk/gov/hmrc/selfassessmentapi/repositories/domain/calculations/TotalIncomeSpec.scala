@@ -22,19 +22,27 @@ class TotalIncomeSpec extends UnitSpec {
 
   "total income" should {
     "calculate total income" in {
-      Totals.IncomeReceived(totalNonSavings = 200, totalSavings = 250, totalDividends = 3000) shouldBe 3450
+      Totals.IncomeReceived(totalNonSavings = 200,
+                            totalSavings = 250,
+                            totalDividends = 3000) shouldBe 3450
     }
 
     "calculate total income if there is no income from self employments" in {
-      Totals.IncomeReceived(totalNonSavings = 0, totalSavings = 0, totalDividends = 0) shouldBe 0
+      Totals.IncomeReceived(totalNonSavings = 0,
+                            totalSavings = 0,
+                            totalDividends = 0) shouldBe 0
     }
 
     "calculate total income if there is no income from self employments but has interest from UK banks and building societies" in {
-      Totals.IncomeReceived(totalNonSavings = 0, totalSavings = 250, totalDividends = 0) shouldBe 250
+      Totals.IncomeReceived(totalNonSavings = 0,
+                            totalSavings = 250,
+                            totalDividends = 0) shouldBe 250
     }
 
     "calculate total income if there is no income from self employments but has dividends from unearned income" in {
-      Totals.IncomeReceived(totalNonSavings = 0, totalSavings = 0, totalDividends = 3000) shouldBe 3000
+      Totals.IncomeReceived(totalNonSavings = 0,
+                            totalSavings = 0,
+                            totalDividends = 3000) shouldBe 3000
     }
   }
 

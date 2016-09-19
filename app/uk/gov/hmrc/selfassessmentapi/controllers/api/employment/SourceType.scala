@@ -18,17 +18,24 @@ package uk.gov.hmrc.selfassessmentapi.controllers.api.employment
 
 import play.api.libs.json.Json._
 import uk.gov.hmrc.selfassessmentapi.controllers.api._
-import uk.gov.hmrc.selfassessmentapi.controllers.api.employment.SummaryTypes.{Benefits, Expenses, Incomes, UkTaxesPaid}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.employment.SummaryTypes.{
+  Benefits,
+  Expenses,
+  Incomes,
+  UkTaxesPaid
+}
 
 object SourceType {
 
   case object Employments extends SourceType {
 
     override val name: String = "employments"
-    override val summaryTypes : Set[SummaryType] = Set(Incomes, Benefits, Expenses, UkTaxesPaid)
-    override def example(sourceId: Option[SourceId] = None) = toJson(Employment.example(sourceId))
+    override val summaryTypes: Set[SummaryType] =
+      Set(Incomes, Benefits, Expenses, UkTaxesPaid)
+    override def example(sourceId: Option[SourceId] = None) =
+      toJson(Employment.example(sourceId))
 
-    override def description(action: String): String =  s"$action an employment"
+    override def description(action: String): String = s"$action an employment"
     override val title: String = "Sample employment"
     override val fieldDescriptions = Seq()
   }

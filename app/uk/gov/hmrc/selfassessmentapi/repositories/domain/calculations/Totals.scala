@@ -22,38 +22,52 @@ import uk.gov.hmrc.selfassessmentapi.controllers.api.PositiveOrZero
 object Totals {
 
   object IncomeReceived {
-    def apply(selfAssessment: SelfAssessment): BigDecimal = apply(NonSavings.TotalIncome(selfAssessment),
-      Savings.TotalIncome(selfAssessment), Dividends.TotalIncome(selfAssessment))
+    def apply(selfAssessment: SelfAssessment): BigDecimal =
+      apply(NonSavings.TotalIncome(selfAssessment),
+            Savings.TotalIncome(selfAssessment),
+            Dividends.TotalIncome(selfAssessment))
 
-    def apply(totalNonSavings: BigDecimal, totalSavings: BigDecimal, totalDividends: BigDecimal): BigDecimal =
+    def apply(totalNonSavings: BigDecimal,
+              totalSavings: BigDecimal,
+              totalDividends: BigDecimal): BigDecimal =
       totalNonSavings + totalSavings + totalDividends
   }
 
   object TaxableIncome {
-    def apply(selfAssessment: SelfAssessment): BigDecimal = apply(Totals.IncomeReceived(selfAssessment), Deductions.Total(selfAssessment))
+    def apply(selfAssessment: SelfAssessment): BigDecimal =
+      apply(Totals.IncomeReceived(selfAssessment),
+            Deductions.Total(selfAssessment))
 
-    def apply(totalIncomeReceived: BigDecimal, totalDeduction: BigDecimal): BigDecimal = PositiveOrZero(totalIncomeReceived - totalDeduction)
+    def apply(totalIncomeReceived: BigDecimal,
+              totalDeduction: BigDecimal): BigDecimal =
+      PositiveOrZero(totalIncomeReceived - totalDeduction)
   }
 
   object TaxDeducted {
-    def apply(selfAssessment: SelfAssessment) = Savings.TotalTaxPaid(selfAssessment) + UKProperty.TotalTaxPaid(selfAssessment) +
-      Employment.TotalTaxPaid(selfAssessment) + PensionSavingsCharges.TotalTaxPaid(selfAssessment)
+    def apply(selfAssessment: SelfAssessment) =
+      Savings.TotalTaxPaid(selfAssessment) + UKProperty.TotalTaxPaid(
+        selfAssessment) +
+        Employment.TotalTaxPaid(selfAssessment) + PensionSavingsCharges
+        .TotalTaxPaid(selfAssessment)
   }
 
   object TaxDue {
     def apply(selfAssessment: SelfAssessment) = PositiveOrZero(
-      Totals.IncomeTax(selfAssessment) + PensionSavingsCharges.IncomeTax(selfAssessment) - Totals.TaxDeducted(selfAssessment)
+      Totals.IncomeTax(selfAssessment) + PensionSavingsCharges.IncomeTax(
+        selfAssessment) - Totals.TaxDeducted(selfAssessment)
     )
   }
 
   object IncomeTax {
-    def apply(selfAssessment: SelfAssessment) = NonSavings.IncomeTax(selfAssessment) + Savings.IncomeTax(selfAssessment) +
-      Dividends.IncomeTax(selfAssessment)
+    def apply(selfAssessment: SelfAssessment) =
+      NonSavings.IncomeTax(selfAssessment) + Savings.IncomeTax(selfAssessment) +
+        Dividends.IncomeTax(selfAssessment)
   }
 
   object TaxOverpaid {
-    def apply(selfAssessment: SelfAssessment) = PositiveOrZero(
-      Totals.TaxDeducted(selfAssessment) - Totals.IncomeTax(selfAssessment) - PensionSavingsCharges.IncomeTax(selfAssessment))
+    def apply(selfAssessment: SelfAssessment) =
+      PositiveOrZero(Totals.TaxDeducted(selfAssessment) - Totals.IncomeTax(
+        selfAssessment) - PensionSavingsCharges.IncomeTax(selfAssessment))
   }
 
 }

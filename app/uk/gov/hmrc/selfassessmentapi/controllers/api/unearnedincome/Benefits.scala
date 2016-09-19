@@ -19,7 +19,10 @@ package uk.gov.hmrc.selfassessmentapi.controllers.api.unearnedincome
 import play.api.data.validation.ValidationError
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
-import uk.gov.hmrc.selfassessmentapi.controllers.api.{JsonMarshaller, ErrorCode}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.{
+  JsonMarshaller,
+  ErrorCode
+}
 import uk.gov.hmrc.selfassessmentapi.controllers.definition.EnumJson.enumFormat
 import ErrorCode._
 import uk.gov.hmrc.selfassessmentapi.controllers.api._
@@ -27,11 +30,17 @@ import uk.gov.hmrc.selfassessmentapi.controllers.api.unearnedincome.BenefitType.
 
 object BenefitType extends Enumeration {
   type BenefitType = Value
-  val StatePension, StatePensionLumpSum, PensionsAnnuitiesPayments, TaxableIncapacityBenefit, JobSeekersAllowance, OtherTaxableStatePensions = Value
-  implicit val format = enumFormat(BenefitType, Some("Unearned Income Benefit type is invalid"))
+  val StatePension, StatePensionLumpSum, PensionsAnnuitiesPayments,
+  TaxableIncapacityBenefit, JobSeekersAllowance, OtherTaxableStatePensions =
+    Value
+  implicit val format =
+    enumFormat(BenefitType, Some("Unearned Income Benefit type is invalid"))
 }
 
-case class Benefit(id: Option[String] = None, `type`: BenefitType, amount: BigDecimal, taxDeduction: BigDecimal)
+case class Benefit(id: Option[String] = None,
+                   `type`: BenefitType,
+                   amount: BigDecimal,
+                   taxDeduction: BigDecimal)
 
 object Benefit extends JsonMarshaller[Benefit] {
 
@@ -41,10 +50,17 @@ object Benefit extends JsonMarshaller[Benefit] {
     Reads.pure(None) and
       (__ \ "type").read[BenefitType] and
       (__ \ "amount").read[BigDecimal](positiveAmountValidator("amount")) and
-      (__ \ "taxDeduction").read[BigDecimal](positiveAmountValidator("taxDeduction"))
-    ) (Benefit.apply _).filter(ValidationError("taxDeduction must be less than or equal to the amount", INVALID_TAX_DEDUCTION_AMOUNT)) {
-    benefits => benefits.taxDeduction <= benefits.amount
+      (__ \ "taxDeduction").read[BigDecimal](
+        positiveAmountValidator("taxDeduction"))
+  )(Benefit.apply _).filter(
+    ValidationError("taxDeduction must be less than or equal to the amount",
+                    INVALID_TAX_DEDUCTION_AMOUNT)) { benefits =>
+    benefits.taxDeduction <= benefits.amount
   }
 
-  override def example(id: Option[SummaryId]) = Benefit(id, BenefitType.StatePension, BigDecimal(1000.00), BigDecimal(400.00))
+  override def example(id: Option[SummaryId]) =
+    Benefit(id,
+            BenefitType.StatePension,
+            BigDecimal(1000.00),
+            BigDecimal(400.00))
 }

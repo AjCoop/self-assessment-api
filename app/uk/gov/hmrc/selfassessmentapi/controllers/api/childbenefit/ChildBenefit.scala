@@ -20,21 +20,32 @@ import org.joda.time.LocalDate
 import play.api.data.validation.ValidationError
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{Json, _}
-import uk.gov.hmrc.selfassessmentapi.controllers.api.{JsonMarshaller, ErrorCode}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.{
+  JsonMarshaller,
+  ErrorCode
+}
 import ErrorCode.VALUE_BELOW_MINIMUM
 import uk.gov.hmrc.selfassessmentapi.controllers.api._
 
-case class ChildBenefit(amount: BigDecimal, numberOfChildren: Int, dateBenefitStopped: Option[LocalDate] = None)
-
+case class ChildBenefit(amount: BigDecimal,
+                        numberOfChildren: Int,
+                        dateBenefitStopped: Option[LocalDate] = None)
 
 object ChildBenefit extends JsonMarshaller[ChildBenefit] {
   override implicit val writes = Json.writes[ChildBenefit]
   override implicit val reads = (
     (__ \ "amount").read[BigDecimal](positiveAmountValidator("amount")) and
-    (__ \ "numberOfChildren").read[Int].filter(ValidationError("numberOfChildren must be greater than 0", VALUE_BELOW_MINIMUM))(_ >= 0) and
-    (__ \ "dateBenefitStopped").readNullable[LocalDate]
-  )(ChildBenefit.apply _).filter(ValidationError("If the amount is greater than 0, the numberOfChildren must also be greater than 0", VALUE_BELOW_MINIMUM))
-   {benefit => if (benefit.amount > 0) benefit.numberOfChildren > 0 else true}
+      (__ \ "numberOfChildren")
+        .read[Int]
+        .filter(ValidationError("numberOfChildren must be greater than 0",
+                                VALUE_BELOW_MINIMUM))(_ >= 0) and
+      (__ \ "dateBenefitStopped").readNullable[LocalDate]
+  )(ChildBenefit.apply _).filter(ValidationError(
+    "If the amount is greater than 0, the numberOfChildren must also be greater than 0",
+    VALUE_BELOW_MINIMUM)) { benefit =>
+    if (benefit.amount > 0) benefit.numberOfChildren > 0 else true
+  }
 
-  override def example(id: Option[String]): ChildBenefit = ChildBenefit(1234.34, 3, Some(new LocalDate(2016, 4, 5)))
+  override def example(id: Option[String]): ChildBenefit =
+    ChildBenefit(1234.34, 3, Some(new LocalDate(2016, 4, 5)))
 }

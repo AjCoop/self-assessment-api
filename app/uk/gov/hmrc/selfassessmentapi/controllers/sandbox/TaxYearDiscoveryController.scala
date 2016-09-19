@@ -40,36 +40,58 @@ object TaxYearDiscoveryController extends BaseController with Links {
   override val context: String = AppContext.apiGatewayLinkContext
   private val service = TaxYearPropertiesService()
 
-  final def discoverTaxYear(utr: SaUtr, taxYear: TaxYear) = Action.async { request =>
-    Future.successful(Ok(halResource(toJson(service.findTaxYearProperties(utr, taxYear)), discoveryLinks(utr, taxYear))))
+  final def discoverTaxYear(utr: SaUtr, taxYear: TaxYear) = Action.async {
+    request =>
+      Future.successful(
+        Ok(halResource(toJson(service.findTaxYearProperties(utr, taxYear)),
+                       discoveryLinks(utr, taxYear))))
   }
 
-  private def taxYearValidationErrors(path: String, yearFromBody : LocalDate, yearFromUrl: String) = {
-    val endOfTaxYear = new LocalDate(parseInt(yearFromUrl.split("-")(0)) + 1, 4, 5)
+  private def taxYearValidationErrors(path: String,
+                                      yearFromBody: LocalDate,
+                                      yearFromUrl: String) = {
+    val endOfTaxYear =
+      new LocalDate(parseInt(yearFromUrl.split("-")(0)) + 1, 4, 5)
     if (yearFromBody.isAfter(endOfTaxYear)) {
-      Some(InvalidPart(BENEFIT_STOPPED_DATE_INVALID, s"The dateBenefitStopped must be before the end of the tax year: $yearFromUrl", path))
+      Some(
+        InvalidPart(
+          BENEFIT_STOPPED_DATE_INVALID,
+          s"The dateBenefitStopped must be before the end of the tax year: $yearFromUrl",
+          path))
     } else None
   }
 
-  private def validateRequest(taxYearProperties: TaxYearProperties, taxYear: String) = {
+  private def validateRequest(taxYearProperties: TaxYearProperties,
+                              taxYear: String) = {
     for {
-        childBenefit <- taxYearProperties.childBenefit
-        dateBenefitStopped <- childBenefit.dateBenefitStopped
-        taxYearValidationResult <- taxYearValidationErrors("/taxYearProperties/childBenefit/dateBenefitStopped",
-                                                           dateBenefitStopped, taxYear)
+      childBenefit <- taxYearProperties.childBenefit
+      dateBenefitStopped <- childBenefit.dateBenefitStopped
+      taxYearValidationResult <- taxYearValidationErrors(
+        "/taxYearProperties/childBenefit/dateBenefitStopped",
+        dateBenefitStopped,
+        taxYear)
     } yield taxYearValidationResult
   }
 
-  final def update(utr: SaUtr, taxYear: TaxYear) = Action.async(parse.json) { implicit request =>
-    withJsonBody[TaxYearProperties] {
-      taxYearProperties =>
+  final def update(utr: SaUtr, taxYear: TaxYear) = Action.async(parse.json) {
+    implicit request =>
+      withJsonBody[TaxYearProperties] { taxYearProperties =>
         validateRequest(taxYearProperties, taxYear.taxYear) match {
-          case Some(invalidPart) => Future.successful(BadRequest(Json.toJson(InvalidRequest(ErrorCode.INVALID_REQUEST, "Invalid request", Seq(invalidPart)))))
-          case None => service.updateTaxYearProperties(utr, taxYear, taxYearProperties).map { updated =>
-            if (updated) Ok(halResource(obj(), discoveryLinks(utr, taxYear)))
-            else NotImplemented(Json.toJson(ErrorFeatureSwitched))
-          }
+          case Some(invalidPart) =>
+            Future.successful(
+              BadRequest(
+                Json.toJson(InvalidRequest(ErrorCode.INVALID_REQUEST,
+                                           "Invalid request",
+                                           Seq(invalidPart)))))
+          case None =>
+            service
+              .updateTaxYearProperties(utr, taxYear, taxYearProperties)
+              .map { updated =>
+                if (updated)
+                  Ok(halResource(obj(), discoveryLinks(utr, taxYear)))
+                else NotImplemented(Json.toJson(ErrorFeatureSwitched))
+              }
         }
-    }
+      }
   }
 }

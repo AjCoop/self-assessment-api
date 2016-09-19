@@ -20,14 +20,19 @@ import uk.gov.hmrc.selfassessmentapi.controllers.api.furnishedholidaylettings.Pr
 import uk.gov.hmrc.selfassessmentapi.controllers.api.furnishedholidaylettings.PropertyLocationType.PropertyLocationType
 import uk.gov.hmrc.selfassessmentapi.repositories.domain._
 
-case class SelfAssessment(employments: Seq[Employment] = Seq(),
-                          selfEmployments: Seq[SelfEmployment] = Seq(),
-                          unearnedIncomes: Seq[UnearnedIncome] = Seq(),
-                          ukProperties: Seq[UKProperties] = Seq(),
-                          taxYearProperties: Option[TaxYearProperties] = None,
-                          furnishedHolidayLettings: Seq[FurnishedHolidayLettings] = Seq()) {
-  private def furnishedHolidayLettingsFor(propertyLocationType: PropertyLocationType) = furnishedHolidayLettings.filter(_.propertyLocation == propertyLocationType)
-  def eeaFurnishedHolidayLettings = furnishedHolidayLettingsFor(PropertyLocationType.EEA)
-  def ukFurnishedHolidayLettings = furnishedHolidayLettingsFor(PropertyLocationType.UK)
+case class SelfAssessment(
+    employments: Seq[Employment] = Seq(),
+    selfEmployments: Seq[SelfEmployment] = Seq(),
+    unearnedIncomes: Seq[UnearnedIncome] = Seq(),
+    ukProperties: Seq[UKProperties] = Seq(),
+    taxYearProperties: Option[TaxYearProperties] = None,
+    furnishedHolidayLettings: Seq[FurnishedHolidayLettings] = Seq()) {
+  private def furnishedHolidayLettingsFor(
+      propertyLocationType: PropertyLocationType) =
+    furnishedHolidayLettings.filter(_.propertyLocation == propertyLocationType)
+  def eeaFurnishedHolidayLettings =
+    furnishedHolidayLettingsFor(PropertyLocationType.EEA)
+  def ukFurnishedHolidayLettings =
+    furnishedHolidayLettingsFor(PropertyLocationType.UK)
 
 }

@@ -25,19 +25,29 @@ import uk.gov.hmrc.selfassessmentapi.MongoEmbeddedDatabase
 import uk.gov.hmrc.selfassessmentapi.controllers.api.JsonMarshaller
 import uk.gov.hmrc.selfassessmentapi.controllers.api.ukproperty.IncomeType.RentIncome
 import uk.gov.hmrc.selfassessmentapi.controllers.api.ukproperty.{UKProperty, _}
-import uk.gov.hmrc.selfassessmentapi.repositories.domain.{UKProperties, UKPropertiesIncomeSummary}
-import uk.gov.hmrc.selfassessmentapi.repositories.{SourceRepository, SummaryRepository}
+import uk.gov.hmrc.selfassessmentapi.repositories.domain.{
+  UKProperties,
+  UKPropertiesIncomeSummary
+}
+import uk.gov.hmrc.selfassessmentapi.repositories.{
+  SourceRepository,
+  SummaryRepository
+}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class UKPropertiesRepositorySpec extends MongoEmbeddedDatabase with BeforeAndAfterEach {
+class UKPropertiesRepositorySpec
+    extends MongoEmbeddedDatabase
+    with BeforeAndAfterEach {
 
   private val mongoRepository = new UKPropertiesMongoRepository()
-  private val ukPropertiesRepository: SourceRepository[UKProperty] = mongoRepository
-  private val summariesMap: Map[JsonMarshaller[_], SummaryRepository[_]] = Map(Income -> mongoRepository.IncomeRepository,
-    Expense -> mongoRepository.ExpenseRepository, BalancingCharge -> mongoRepository.BalancingChargeRepository,
+  private val ukPropertiesRepository: SourceRepository[UKProperty] =
+    mongoRepository
+  private val summariesMap: Map[JsonMarshaller[_], SummaryRepository[_]] = Map(
+    Income -> mongoRepository.IncomeRepository,
+    Expense -> mongoRepository.ExpenseRepository,
+    BalancingCharge -> mongoRepository.BalancingChargeRepository,
     PrivateUseAdjustment -> mongoRepository.PrivateUseAdjustmentRepository)
-
 
   override def beforeEach() {
     await(mongoRepository.drop)
@@ -52,7 +62,8 @@ class UKPropertiesRepositorySpec extends MongoEmbeddedDatabase with BeforeAndAft
     "create and retrieve using generated id" in {
       val source = ukProperty()
       val id = await(ukPropertiesRepository.create(saUtr, taxYear, source))
-      val found: UKProperty = await(ukPropertiesRepository.findById(saUtr, taxYear, id)).get
+      val found: UKProperty =
+        await(ukPropertiesRepository.findById(saUtr, taxYear, id)).get
 
       found.rentARoomRelief shouldBe source.rentARoomRelief
     }
@@ -70,7 +81,8 @@ class UKPropertiesRepositorySpec extends MongoEmbeddedDatabase with BeforeAndAft
     "return false when uk property is not deleted" in {
       val source = ukProperty()
       val id = await(ukPropertiesRepository.create(saUtr, taxYear, source))
-      val result = await(ukPropertiesRepository.delete(generateSaUtr(), taxYear, id))
+      val result =
+        await(ukPropertiesRepository.delete(generateSaUtr(), taxYear, id))
 
       result shouldBe false
     }
@@ -84,10 +96,10 @@ class UKPropertiesRepositorySpec extends MongoEmbeddedDatabase with BeforeAndAft
         id = await(ukPropertiesRepository.create(saUtr, taxYear, source))
       } yield source.copy(id = Some(id))
 
-
       await(ukPropertiesRepository.delete(saUtr, taxYear))
 
-      val found: Seq[UKProperty] = await(ukPropertiesRepository.list(saUtr, taxYear))
+      val found: Seq[UKProperty] =
+        await(ukPropertiesRepository.list(saUtr, taxYear))
 
       found shouldBe empty
     }
@@ -95,15 +107,16 @@ class UKPropertiesRepositorySpec extends MongoEmbeddedDatabase with BeforeAndAft
     "not delete uk properties for different utr" in {
       val saUtr2: SaUtr = generateSaUtr()
       await(ukPropertiesRepository.create(saUtr, taxYear, ukProperty()))
-      val source2 = await(ukPropertiesRepository.create(saUtr2, taxYear, ukProperty()))
+      val source2 =
+        await(ukPropertiesRepository.create(saUtr2, taxYear, ukProperty()))
 
       await(ukPropertiesRepository.delete(saUtr, taxYear))
-      val found: Seq[UKProperty] = await(ukPropertiesRepository.list(saUtr2, taxYear))
+      val found: Seq[UKProperty] =
+        await(ukPropertiesRepository.list(saUtr2, taxYear))
 
       found.flatMap(_.id) should contain theSameElementsAs Seq(source2)
     }
   }
-
 
   "list" should {
     "retrieve all uk properties for utr/tax year" in {
@@ -113,17 +126,20 @@ class UKPropertiesRepositorySpec extends MongoEmbeddedDatabase with BeforeAndAft
         id = await(ukPropertiesRepository.create(saUtr, taxYear, source))
       } yield source.copy(id = Some(id))
 
-
-      val found: Seq[UKProperty] = await(ukPropertiesRepository.list(saUtr, taxYear))
+      val found: Seq[UKProperty] =
+        await(ukPropertiesRepository.list(saUtr, taxYear))
 
       found should contain theSameElementsAs sources
     }
 
     "not include uk properties for different utr" in {
-      val source1 = await(ukPropertiesRepository.create(saUtr, taxYear, ukProperty()))
-      await(ukPropertiesRepository.create(generateSaUtr(), taxYear, ukProperty()))
+      val source1 =
+        await(ukPropertiesRepository.create(saUtr, taxYear, ukProperty()))
+      await(
+        ukPropertiesRepository.create(generateSaUtr(), taxYear, ukProperty()))
 
-      val found: Seq[UKProperty] = await(ukPropertiesRepository.list(saUtr, taxYear))
+      val found: Seq[UKProperty] =
+        await(ukPropertiesRepository.list(saUtr, taxYear))
 
       found.flatMap(_.id) should contain theSameElementsAs Seq(source1)
     }
@@ -131,11 +147,14 @@ class UKPropertiesRepositorySpec extends MongoEmbeddedDatabase with BeforeAndAft
 
   "update" should {
     def verifyUpdate(original: UKProperty, updated: UKProperty) = {
-      val sourceId = await(ukPropertiesRepository.create(saUtr, taxYear, original))
-      val result = await(ukPropertiesRepository.update(saUtr, taxYear, sourceId, updated))
+      val sourceId =
+        await(ukPropertiesRepository.create(saUtr, taxYear, original))
+      val result =
+        await(ukPropertiesRepository.update(saUtr, taxYear, sourceId, updated))
       result shouldEqual true
 
-      val found = await(ukPropertiesRepository.findById(saUtr, taxYear, sourceId))
+      val found =
+        await(ukPropertiesRepository.findById(saUtr, taxYear, sourceId))
       found shouldEqual Some(updated.copy(id = Some(sourceId)))
 
     }
@@ -149,8 +168,8 @@ class UKPropertiesRepositorySpec extends MongoEmbeddedDatabase with BeforeAndAft
         wearAndTearAllowance = Some(7777.77)
       )
 
-      val adjustments = Adjustments(
-        lossBroughtForward = Some(BigDecimal(10.00)))
+      val adjustments =
+        Adjustments(lossBroughtForward = Some(BigDecimal(10.00)))
 
       val updatedSource = source.copy(
         allowances = Some(allowances),
@@ -181,16 +200,26 @@ class UKPropertiesRepositorySpec extends MongoEmbeddedDatabase with BeforeAndAft
     }
 
     "return false when the uk property does not exist" in {
-      val result = await(ukPropertiesRepository.update(saUtr, taxYear, UUID.randomUUID().toString, ukProperty()))
+      val result = await(
+        ukPropertiesRepository
+          .update(saUtr, taxYear, UUID.randomUUID().toString, ukProperty()))
       result shouldEqual false
     }
 
     "not remove incomes" in {
 
-      val source = UKProperties.create(saUtr, taxYear, ukProperty()).copy(incomes = Seq(UKPropertiesIncomeSummary(BSONObjectID.generate.stringify,  RentIncome, 10)))
+      val source = UKProperties
+        .create(saUtr, taxYear, ukProperty())
+        .copy(
+          incomes = Seq(
+            UKPropertiesIncomeSummary(BSONObjectID.generate.stringify,
+                                      RentIncome,
+                                      10)))
       await(mongoRepository.insert(source))
-      val found = await(mongoRepository.findById(saUtr, taxYear, source.sourceId)).get
-      await(ukPropertiesRepository.update(saUtr, taxYear, source.sourceId, found))
+      val found =
+        await(mongoRepository.findById(saUtr, taxYear, source.sourceId)).get
+      await(
+        ukPropertiesRepository.update(saUtr, taxYear, source.sourceId, found))
 
       val found1 = await(mongoRepository.findById(source.id))
 
@@ -199,14 +228,17 @@ class UKPropertiesRepositorySpec extends MongoEmbeddedDatabase with BeforeAndAft
 
     "update last modified" in {
       val source = ukProperty()
-      val sourceId = await(ukPropertiesRepository.create(saUtr, taxYear, source))
+      val sourceId =
+        await(ukPropertiesRepository.create(saUtr, taxYear, source))
       val found = await(mongoRepository.findById(BSONObjectID(sourceId)))
       await(ukPropertiesRepository.update(saUtr, taxYear, sourceId, source))
 
       val found1 = await(mongoRepository.findById(BSONObjectID(sourceId)))
 
       // Added the equals clauses as it was failing locally once, can fail if the test runs faster and has the same time for create and update
-      found1.get.lastModifiedDateTime.isEqual(found.get.lastModifiedDateTime) || found1.get.lastModifiedDateTime.isAfter(found.get.lastModifiedDateTime) shouldBe true
+      found1.get.lastModifiedDateTime
+        .isEqual(found.get.lastModifiedDateTime) || found1.get.lastModifiedDateTime
+        .isAfter(found.get.lastModifiedDateTime) shouldBe true
     }
   }
 
@@ -215,9 +247,11 @@ class UKPropertiesRepositorySpec extends MongoEmbeddedDatabase with BeforeAndAft
   "create summary" should {
     "add a summary to an empty list when source exists and return id" in {
       for ((summaryItem, repo) <- summariesMap) {
-        val sourceId = await(ukPropertiesRepository.create(saUtr, taxYear, ukProperty()))
+        val sourceId =
+          await(ukPropertiesRepository.create(saUtr, taxYear, ukProperty()))
         val summary = summaryItem.example()
-        val summaryId = await(repo.create(saUtr, taxYear, sourceId, cast(summary)))
+        val summaryId =
+          await(repo.create(saUtr, taxYear, sourceId, cast(summary)))
 
         summaryId.isDefined shouldEqual true
         val dbSummaries = await(repo.list(saUtr, taxYear, sourceId))
@@ -229,23 +263,32 @@ class UKPropertiesRepositorySpec extends MongoEmbeddedDatabase with BeforeAndAft
 
     "add a summary to the existing list when source exists and return id" in {
       for ((summaryItem, repo) <- summariesMap) {
-        val sourceId = await(ukPropertiesRepository.create(saUtr, taxYear, ukProperty()))
+        val sourceId =
+          await(ukPropertiesRepository.create(saUtr, taxYear, ukProperty()))
         val summary = summaryItem.example()
         val summary1 = summaryItem.example()
-        val summaryId = await(repo.create(saUtr, taxYear, sourceId, cast(summary)))
-        val summaryId1 = await(repo.create(saUtr, taxYear, sourceId, cast(summary1)))
+        val summaryId =
+          await(repo.create(saUtr, taxYear, sourceId, cast(summary)))
+        val summaryId1 =
+          await(repo.create(saUtr, taxYear, sourceId, cast(summary1)))
 
         val summaries = await(repo.list(saUtr, taxYear, sourceId))
 
         val found = summaries.get
-        found should contain theSameElementsAs Seq(summaryItem.example(id = summaryId), summaryItem.example(id = summaryId1))
+        found should contain theSameElementsAs Seq(
+          summaryItem.example(id = summaryId),
+          summaryItem.example(id = summaryId1))
       }
     }
 
     "return none when source does not exist" in {
       for ((summaryItem, repo) <- summariesMap) {
         val summary = summaryItem.example()
-        val summaryId = await(repo.create(saUtr, taxYear, BSONObjectID.generate.stringify, cast(summary)))
+        val summaryId = await(
+          repo.create(saUtr,
+                      taxYear,
+                      BSONObjectID.generate.stringify,
+                      cast(summary)))
         summaryId shouldEqual None
       }
     }
@@ -254,22 +297,33 @@ class UKPropertiesRepositorySpec extends MongoEmbeddedDatabase with BeforeAndAft
   "find summary by id" should {
     "return none if the source does not exist" in {
       for ((summaryItem, repo) <- summariesMap) {
-        await(repo.findById(saUtr, taxYear, BSONObjectID.generate.stringify, BSONObjectID.generate.stringify)) shouldEqual None
+        await(
+          repo.findById(saUtr,
+                        taxYear,
+                        BSONObjectID.generate.stringify,
+                        BSONObjectID.generate.stringify)) shouldEqual None
       }
     }
 
     "return none if the summary does not exist" in {
       for ((summaryItem, repo) <- summariesMap) {
-        val sourceId = await(ukPropertiesRepository.create(saUtr, taxYear, ukProperty()))
-        await(repo.findById(saUtr, taxYear, sourceId, BSONObjectID.generate.stringify)) shouldEqual None
+        val sourceId =
+          await(ukPropertiesRepository.create(saUtr, taxYear, ukProperty()))
+        await(
+          repo.findById(saUtr,
+                        taxYear,
+                        sourceId,
+                        BSONObjectID.generate.stringify)) shouldEqual None
       }
     }
 
     "return the summary if found" in {
       for ((summaryItem, repo) <- summariesMap) {
-        val sourceId = await(ukPropertiesRepository.create(saUtr, taxYear, ukProperty()))
+        val sourceId =
+          await(ukPropertiesRepository.create(saUtr, taxYear, ukProperty()))
         val summary = summaryItem.example()
-        val summaryId = await(repo.create(saUtr, taxYear, sourceId, cast(summary))).get
+        val summaryId =
+          await(repo.create(saUtr, taxYear, sourceId, cast(summary))).get
         val found = await(repo.findById(saUtr, taxYear, sourceId, summaryId))
 
         found shouldEqual Some(summaryItem.example(id = Some(summaryId)))
@@ -280,7 +334,8 @@ class UKPropertiesRepositorySpec extends MongoEmbeddedDatabase with BeforeAndAft
   "list summaries" should {
     "return empty list when source has no summaries" in {
       for ((summaryItem, repo) <- summariesMap) {
-        val sourceId = await(ukPropertiesRepository.create(saUtr, taxYear, ukProperty()))
+        val sourceId =
+          await(ukPropertiesRepository.create(saUtr, taxYear, ukProperty()))
         await(repo.list(saUtr, taxYear, sourceId)) shouldEqual Some(Seq.empty)
       }
     }
@@ -295,19 +350,24 @@ class UKPropertiesRepositorySpec extends MongoEmbeddedDatabase with BeforeAndAft
   "delete summary" should {
     "return true when the summary has been deleted" in {
       for ((summaryItem, repo) <- summariesMap) {
-        val sourceId = await(ukPropertiesRepository.create(saUtr, taxYear, ukProperty()))
+        val sourceId =
+          await(ukPropertiesRepository.create(saUtr, taxYear, ukProperty()))
         val summary = summaryItem.example()
-        val summaryId = await(repo.create(saUtr, taxYear, sourceId, cast(summary))).get
+        val summaryId =
+          await(repo.create(saUtr, taxYear, sourceId, cast(summary))).get
         await(repo.delete(saUtr, taxYear, sourceId, summaryId)) shouldEqual true
       }
     }
 
     "only delete the specified summary" in {
       for ((summaryItem, repo) <- summariesMap) {
-        val sourceId = await(ukPropertiesRepository.create(saUtr, taxYear, ukProperty()))
+        val sourceId =
+          await(ukPropertiesRepository.create(saUtr, taxYear, ukProperty()))
         val summary = summaryItem.example()
-        val summaryId = await(repo.create(saUtr, taxYear, sourceId, cast(summary))).get
-        val summaryId1 = await(repo.create(saUtr, taxYear, sourceId, cast(summary)))
+        val summaryId =
+          await(repo.create(saUtr, taxYear, sourceId, cast(summary))).get
+        val summaryId1 =
+          await(repo.create(saUtr, taxYear, sourceId, cast(summary)))
         await(repo.delete(saUtr, taxYear, sourceId, summaryId))
 
         val found = await(repo.list(saUtr, taxYear, sourceId)).get
@@ -318,14 +378,23 @@ class UKPropertiesRepositorySpec extends MongoEmbeddedDatabase with BeforeAndAft
 
     "return false when the source does not exist" in {
       for ((summaryItem, repo) <- summariesMap) {
-        await(repo.delete(saUtr, taxYear, BSONObjectID.generate.stringify, BSONObjectID.generate.stringify)) shouldEqual false
+        await(
+          repo.delete(saUtr,
+                      taxYear,
+                      BSONObjectID.generate.stringify,
+                      BSONObjectID.generate.stringify)) shouldEqual false
       }
     }
 
     "return false when the summary does not exist" in {
       for ((summaryItem, repo) <- summariesMap) {
-        val sourceId = await(ukPropertiesRepository.create(saUtr, taxYear, ukProperty()))
-        await(repo.delete(saUtr, taxYear, sourceId, BSONObjectID.generate.stringify)) shouldEqual false
+        val sourceId =
+          await(ukPropertiesRepository.create(saUtr, taxYear, ukProperty()))
+        await(
+          repo.delete(saUtr,
+                      taxYear,
+                      sourceId,
+                      BSONObjectID.generate.stringify)) shouldEqual false
       }
     }
   }
@@ -333,12 +402,19 @@ class UKPropertiesRepositorySpec extends MongoEmbeddedDatabase with BeforeAndAft
   "update income" should {
     "return true when the income has been updated" in {
       for ((summaryItem, repo) <- summariesMap) {
-        val sourceId = await(ukPropertiesRepository.create(saUtr, taxYear, ukProperty()))
+        val sourceId =
+          await(ukPropertiesRepository.create(saUtr, taxYear, ukProperty()))
         val summary = summaryItem.example()
-        val summaryId = await(repo.create(saUtr, taxYear, sourceId, cast(summary))).get
+        val summaryId =
+          await(repo.create(saUtr, taxYear, sourceId, cast(summary))).get
 
         val summaryToUpdate = summaryItem.example()
-        await(repo.update(saUtr, taxYear, sourceId, summaryId, cast(summaryToUpdate))) shouldEqual true
+        await(
+          repo.update(saUtr,
+                      taxYear,
+                      sourceId,
+                      summaryId,
+                      cast(summaryToUpdate))) shouldEqual true
 
         val found = await(repo.findById(saUtr, taxYear, sourceId, summaryId))
 
@@ -348,31 +424,52 @@ class UKPropertiesRepositorySpec extends MongoEmbeddedDatabase with BeforeAndAft
 
     "only update the specified income" in {
       for ((summaryItem, repo) <- summariesMap) {
-        val sourceId = await(ukPropertiesRepository.create(saUtr, taxYear, ukProperty()))
+        val sourceId =
+          await(ukPropertiesRepository.create(saUtr, taxYear, ukProperty()))
         val summary1 = summaryItem.example()
-        val summaryId1 = await(repo.create(saUtr, taxYear, sourceId, cast(summary1))).get
+        val summaryId1 =
+          await(repo.create(saUtr, taxYear, sourceId, cast(summary1))).get
         val summary2 = summaryItem.example()
-        val summaryId2 = await(repo.create(saUtr, taxYear, sourceId, cast(summary2))).get
+        val summaryId2 =
+          await(repo.create(saUtr, taxYear, sourceId, cast(summary2))).get
 
         val summaryToUpdate = summaryItem.example()
-        await(repo.update(saUtr, taxYear, sourceId, summaryId2, cast(summaryToUpdate))) shouldEqual true
+        await(
+          repo.update(saUtr,
+                      taxYear,
+                      sourceId,
+                      summaryId2,
+                      cast(summaryToUpdate))) shouldEqual true
 
         val found = await(repo.list(saUtr, taxYear, sourceId)).get
 
-        found should contain theSameElementsAs Seq(summaryItem.example(id = Some(summaryId1)), summaryItem.example(id = Some(summaryId2)))
+        found should contain theSameElementsAs Seq(
+          summaryItem.example(id = Some(summaryId1)),
+          summaryItem.example(id = Some(summaryId2)))
       }
     }
 
     "return false when the source does not exist" in {
       for ((summaryItem, repo) <- summariesMap) {
-        await(repo.update(saUtr, taxYear, BSONObjectID.generate.stringify, BSONObjectID.generate.stringify, cast(summaryItem.example()))) shouldEqual false
+        await(
+          repo.update(saUtr,
+                      taxYear,
+                      BSONObjectID.generate.stringify,
+                      BSONObjectID.generate.stringify,
+                      cast(summaryItem.example()))) shouldEqual false
       }
     }
 
     "return false when the income does not exist" in {
-      val sourceId = await(ukPropertiesRepository.create(saUtr, taxYear, ukProperty()))
+      val sourceId =
+        await(ukPropertiesRepository.create(saUtr, taxYear, ukProperty()))
       for ((summaryItem, repo) <- summariesMap) {
-        await(repo.update(saUtr, taxYear, sourceId, BSONObjectID.generate.stringify, cast(summaryItem.example()))) shouldEqual false
+        await(
+          repo.update(saUtr,
+                      taxYear,
+                      sourceId,
+                      BSONObjectID.generate.stringify,
+                      cast(summaryItem.example()))) shouldEqual false
       }
     }
   }

@@ -40,7 +40,8 @@ class SelfAssessmentApiDefinition(apiContext: String, apiStatus: APIStatus) {
       ),
       api = APIDefinition(
         name = "Self Assessment",
-        description = "An API for providing self assessment data and obtaining liability estimations",
+        description =
+          "An API for providing self assessment data and obtaining liability estimations",
         context = apiContext,
         versions = Seq(
           APIVersion(
@@ -71,7 +72,8 @@ class SelfAssessmentApiDefinition(apiContext: String, apiStatus: APIStatus) {
                 authType = AuthType.USER,
                 throttlingTier = ResourceThrottlingTier.UNLIMITED,
                 scope = Some(readScope)
-              ),Endpoint(
+              ),
+              Endpoint(
                 uriPattern = "/{utr}/{taxYear}",
                 endpointName = "Update Tax Year",
                 method = HttpMethod.PUT,
@@ -128,7 +130,8 @@ class SelfAssessmentApiDefinition(apiContext: String, apiStatus: APIStatus) {
                 scope = Some(writeScope)
               ),
               Endpoint(
-                uriPattern = "/{utr}/{taxYear}/{source}/{sourceId}/{summary}/{summaryId}",
+                uriPattern =
+                  "/{utr}/{taxYear}/{source}/{sourceId}/{summary}/{summaryId}",
                 endpointName = "Update Summary",
                 method = HttpMethod.PUT,
                 authType = AuthType.USER,
@@ -136,7 +139,8 @@ class SelfAssessmentApiDefinition(apiContext: String, apiStatus: APIStatus) {
                 scope = Some(writeScope)
               ),
               Endpoint(
-                uriPattern = "/{utr}/{taxYear}/{source}/{sourceId}/{summary}/{summaryId}",
+                uriPattern =
+                  "/{utr}/{taxYear}/{source}/{sourceId}/{summary}/{summaryId}",
                 endpointName = "Delete Summary",
                 method = HttpMethod.DELETE,
                 authType = AuthType.USER,
@@ -144,7 +148,8 @@ class SelfAssessmentApiDefinition(apiContext: String, apiStatus: APIStatus) {
                 scope = Some(writeScope)
               ),
               Endpoint(
-                uriPattern = "/{utr}/{taxYear}/{source}/{sourceId}/{summary}/{summaryId}",
+                uriPattern =
+                  "/{utr}/{taxYear}/{source}/{sourceId}/{summary}/{summaryId}",
                 endpointName = "Retrieve Summary",
                 method = HttpMethod.GET,
                 authType = AuthType.USER,
@@ -185,12 +190,19 @@ class SelfAssessmentApiDefinition(apiContext: String, apiStatus: APIStatus) {
   private def buildWhiteListingAccess(): Option[Access] = {
     val featureSwitch = FeatureSwitch(AppContext.featureSwitch)
     featureSwitch.isWhiteListingEnabled match {
-      case true =>  Some(Access("PRIVATE", featureSwitch.whiteListedApplicationIds))
+      case true =>
+        Some(Access("PRIVATE", featureSwitch.whiteListedApplicationIds))
       case false => None
     }
   }
 }
 
-object PublishedSelfAssessmentApiDefinition extends SelfAssessmentApiDefinition(AppContext.apiGatewayRegistrationContext, APIStatus.PUBLISHED)
+object PublishedSelfAssessmentApiDefinition
+    extends SelfAssessmentApiDefinition(
+      AppContext.apiGatewayRegistrationContext,
+      APIStatus.PUBLISHED)
 
-object PrototypedSelfAssessmentApiDefinition extends SelfAssessmentApiDefinition(AppContext.apiGatewayRegistrationContext, APIStatus.PROTOTYPED)
+object PrototypedSelfAssessmentApiDefinition
+    extends SelfAssessmentApiDefinition(
+      AppContext.apiGatewayRegistrationContext,
+      APIStatus.PROTOTYPED)

@@ -26,7 +26,10 @@ import uk.gov.hmrc.selfassessmentapi.UnitSpec
 
 import scala.concurrent.Future
 
-class ServiceLocatorConnectorSpec extends UnitSpec with MockitoSugar with ScalaFutures {
+class ServiceLocatorConnectorSpec
+    extends UnitSpec
+    with MockitoSugar
+    with ScalaFutures {
 
   trait Setup {
     implicit val hc = HeaderCarrier()
@@ -38,32 +41,51 @@ class ServiceLocatorConnectorSpec extends UnitSpec with MockitoSugar with ScalaF
       override val appName: String = "api-microservice-template"
       override val serviceUrl: String = "https://SERVICE_LOCATOR"
       override val handlerOK: () => Unit = mock[Function0[Unit]]
-      override val handlerError: Throwable => Unit = mock[Function1[Throwable, Unit]]
-      override val metadata: Option[Map[String, String]] = Some(Map("third-party-api" -> "true"))
+      override val handlerError: Throwable => Unit =
+        mock[Function1[Throwable, Unit]]
+      override val metadata: Option[Map[String, String]] = Some(
+        Map("third-party-api" -> "true"))
     }
   }
 
   "register" should {
     "register the JSON API Definition into the Service Locator" in new Setup {
 
-      val registration = Registration(serviceName = "api-microservice-template", serviceUrl = "http://api-microservice-template.service", metadata = Some(Map("third-party-api" -> "true")))
+      val registration =
+        Registration(serviceName = "api-microservice-template",
+                     serviceUrl = "http://api-microservice-template.service",
+                     metadata = Some(Map("third-party-api" -> "true")))
 
-      when(connector.http.POST(s"${connector.serviceUrl}/registration", registration, Seq("Content-Type"-> "application/json"))).thenReturn(Future.successful(HttpResponse(200)))
+      when(
+        connector.http.POST(s"${connector.serviceUrl}/registration",
+                            registration,
+                            Seq("Content-Type" -> "application/json")))
+        .thenReturn(Future.successful(HttpResponse(200)))
 
       connector.register.futureValue shouldBe true
-      verify(connector.http).POST("https://SERVICE_LOCATOR/registration", registration, Seq("Content-Type"-> "application/json"))
+      verify(connector.http).POST("https://SERVICE_LOCATOR/registration",
+                                  registration,
+                                  Seq("Content-Type" -> "application/json"))
       verify(connector.handlerOK).apply()
       verify(connector.handlerError, never).apply(serviceLocatorException)
     }
 
-
     "fail registering in service locator" in new Setup {
 
-      val registration = Registration(serviceName = "api-microservice-template", serviceUrl = "http://api-microservice-template.service", metadata = Some(Map("third-party-api" -> "true")))
-      when(connector.http.POST(s"${connector.serviceUrl}/registration", registration, Seq("Content-Type"-> "application/json"))).thenReturn(Future.failed(serviceLocatorException))
+      val registration =
+        Registration(serviceName = "api-microservice-template",
+                     serviceUrl = "http://api-microservice-template.service",
+                     metadata = Some(Map("third-party-api" -> "true")))
+      when(
+        connector.http.POST(s"${connector.serviceUrl}/registration",
+                            registration,
+                            Seq("Content-Type" -> "application/json")))
+        .thenReturn(Future.failed(serviceLocatorException))
 
       connector.register.futureValue shouldBe false
-      verify(connector.http).POST("https://SERVICE_LOCATOR/registration", registration, Seq("Content-Type"-> "application/json"))
+      verify(connector.http).POST("https://SERVICE_LOCATOR/registration",
+                                  registration,
+                                  Seq("Content-Type" -> "application/json"))
       verify(connector.handlerOK, never).apply()
       verify(connector.handlerError).apply(serviceLocatorException)
     }

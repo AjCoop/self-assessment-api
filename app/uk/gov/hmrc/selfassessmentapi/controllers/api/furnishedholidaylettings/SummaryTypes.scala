@@ -24,44 +24,69 @@ object SummaryTypes {
 
   case object Incomes extends SummaryType {
     override val name = "incomes"
-    override def example(id: Option[SummaryId] = None): JsValue = toJson(Income.example(id))
+    override def example(id: Option[SummaryId] = None): JsValue =
+      toJson(Income.example(id))
     override val title = "Sample furnished holiday lettings income"
-    override def description(action: String) = s"$action a furnished holiday lettings income summary for the specified source"
+    override def description(action: String) =
+      s"$action a furnished holiday lettings income summary for the specified source"
     override val fieldDescriptions = Seq(
-      PositiveMonetaryFieldDescription("furnished-holiday-lettings", "amount", "The total amount of income from all your Furnished Holiday Lettings " +
-        "(including income from services you provide to tenants) for the given location (UK / EEA).")
+      PositiveMonetaryFieldDescription(
+        "furnished-holiday-lettings",
+        "amount",
+        "The total amount of income from all your Furnished Holiday Lettings " +
+          "(including income from services you provide to tenants) for the given location (UK / EEA).")
     )
   }
 
   case object Expenses extends SummaryType {
     override val name = "expenses"
-    override def example(id: Option[SummaryId] = None): JsValue = toJson(Expense.example(id))
+    override def example(id: Option[SummaryId] = None): JsValue =
+      toJson(Expense.example(id))
     override val title = "Sample expenses"
-    override def description(action: String) = s"$action an expense for the specified source"
+    override def description(action: String) =
+      s"$action an expense for the specified source"
     override val fieldDescriptions = Seq(
-      FullFieldDescription("furnished-holiday-lettings", "type", "Enum", s"Type of expense (one of the following: ${ExpenseType.values.mkString(", ")})"),
-      PositiveMonetaryFieldDescription("furnished-holiday-lettings", "amount", "Business costs related to the Furnished Holiday Letting, split out by expense type")
+      FullFieldDescription(
+        "furnished-holiday-lettings",
+        "type",
+        "Enum",
+        s"Type of expense (one of the following: ${ExpenseType.values.mkString(", ")})"),
+      PositiveMonetaryFieldDescription(
+        "furnished-holiday-lettings",
+        "amount",
+        "Business costs related to the Furnished Holiday Letting, split out by expense type")
     )
   }
 
   case object PrivateUseAdjustments extends SummaryType {
     override val name = "private-use-adjustments"
-    override def example(id: Option[SummaryId] = None): JsValue = toJson(PrivateUseAdjustment.example(id))
-    override val title = "Sample furnished holiday lettings private use adjustment"
-    override def description(action: String) = s"$action a private use adjustment summary for the specified source"
+    override def example(id: Option[SummaryId] = None): JsValue =
+      toJson(PrivateUseAdjustment.example(id))
+    override val title =
+      "Sample furnished holiday lettings private use adjustment"
+    override def description(action: String) =
+      s"$action a private use adjustment summary for the specified source"
     override val fieldDescriptions = Seq(
-      PositiveMonetaryFieldDescription("furnished-holiday-lettings", "amount", "The private use (non-business) amount of any expenses that weren’t solely for the business.")
+      PositiveMonetaryFieldDescription(
+        "furnished-holiday-lettings",
+        "amount",
+        "The private use (non-business) amount of any expenses that weren’t solely for the business.")
     )
   }
 
   case object BalancingCharges extends SummaryType {
     override val name = "balancing-charges"
-    override def example(id: Option[SummaryId] = None): JsValue = toJson(BalancingCharge.example(id))
+    override def example(id: Option[SummaryId] = None): JsValue =
+      toJson(BalancingCharge.example(id))
     override val title = "Sample furnished holiday lettings balancing charge"
-    override def description(action: String) = s"$action a furnished holiday lettings balancing charge summary for the specified source"
+    override def description(action: String) =
+      s"$action a furnished holiday lettings balancing charge summary for the specified source"
     override val fieldDescriptions = Seq(
-      PositiveMonetaryFieldDescription("furnished-holiday-lettings", "amount", "For items where capital allowances were claimed that have been sold, given away or stopped being used," +
-        " a balancing charge may be needed.")
+      PositiveMonetaryFieldDescription(
+        "furnished-holiday-lettings",
+        "amount",
+        "For items where capital allowances were claimed that have been sold, given away or stopped being used," +
+          " a balancing charge may be needed.")
     )
   }
 

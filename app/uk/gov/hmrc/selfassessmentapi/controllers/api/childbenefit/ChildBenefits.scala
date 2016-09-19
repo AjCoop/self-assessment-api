@@ -18,7 +18,11 @@ package uk.gov.hmrc.selfassessmentapi.controllers.api.childbenefit
 
 import play.api.libs.json.Json.toJson
 import play.api.libs.json._
-import uk.gov.hmrc.selfassessmentapi.controllers.api.{ErrorCode, FullFieldDescription, PositiveMonetaryFieldDescription}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.{
+  ErrorCode,
+  FullFieldDescription,
+  PositiveMonetaryFieldDescription
+}
 import ErrorCode.{apply => _}
 import uk.gov.hmrc.selfassessmentapi.controllers.api._
 
@@ -28,9 +32,21 @@ case object ChildBenefits extends TaxYearPropertyType {
   override def description(action: String): String = s"$action a childBenefit"
   override val title: String = "Sample child benefit"
   override val fieldDescriptions = Seq(
-    PositiveMonetaryFieldDescription(name, "amount", "Total amount of Child Benefit taxpayer and their partner got for the tax year"),
-    FullFieldDescription(name, "numberOfChildren", "Int", "Number of children taxpayer and their partner got Child Benefit for"),
-    FullFieldDescription(name, "dateBenefitStopped", "Date", "The date that taxpayer and their partner stopped getting all Child Benefit payments", optional = true)
+    PositiveMonetaryFieldDescription(
+      name,
+      "amount",
+      "Total amount of Child Benefit taxpayer and their partner got for the tax year"),
+    FullFieldDescription(
+      name,
+      "numberOfChildren",
+      "Int",
+      "Number of children taxpayer and their partner got Child Benefit for"),
+    FullFieldDescription(
+      name,
+      "dateBenefitStopped",
+      "Date",
+      "The date that taxpayer and their partner stopped getting all Child Benefit payments",
+      optional = true)
   )
 
 }

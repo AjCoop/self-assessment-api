@@ -25,9 +25,11 @@ case class TaxRefundedOrSetOff(amount: BigDecimal)
 object TaxRefundedOrSetOff extends JsonMarshaller[TaxRefundedOrSetOff] {
   implicit val writes = Json.writes[TaxRefundedOrSetOff]
 
-  implicit val reads: Reads[TaxRefundedOrSetOff] = (__ \ "amount").read[BigDecimal](positiveAmountValidator("amount")).map {
-    TaxRefundedOrSetOff(_)
-  }
+  implicit val reads: Reads[TaxRefundedOrSetOff] =
+    (__ \ "amount").read[BigDecimal](positiveAmountValidator("amount")).map {
+      TaxRefundedOrSetOff(_)
+    }
 
-  override def example(id: Option[String] = None) = TaxRefundedOrSetOff(amount = BigDecimal(2000.00))
+  override def example(id: Option[String] = None) =
+    TaxRefundedOrSetOff(amount = BigDecimal(2000.00))
 }

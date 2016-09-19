@@ -21,5 +21,6 @@ import play.api.libs.json.Json
 case class FurnishedHolidayLettingIncome(sourceId: String, profit: BigDecimal)
 
 object FurnishedHolidayLettingIncome {
-  implicit val furnishedHolidayLettingIncomeFormats = Json.format[FurnishedHolidayLettingIncome]
+  implicit val furnishedHolidayLettingIncomeFormats =
+    Json.format[FurnishedHolidayLettingIncome]
 }

@@ -26,10 +26,14 @@ import uk.gov.hmrc.selfassessmentapi.controllers.api.unearnedincome.SavingsIncom
 object SavingsIncomeType extends Enumeration {
   type SavingsIncomeType = Value
   val InterestFromBanksTaxed, InterestFromBanksUntaxed = Value
-  implicit val format = enumFormat(SavingsIncomeType, Some("Unearned Income Savings Income type is invalid"))
+  implicit val format = enumFormat(
+    SavingsIncomeType,
+    Some("Unearned Income Savings Income type is invalid"))
 }
 
-case class SavingsIncome(id: Option[String] = None, `type`: SavingsIncomeType, amount: BigDecimal)
+case class SavingsIncome(id: Option[String] = None,
+                         `type`: SavingsIncomeType,
+                         amount: BigDecimal)
 
 object SavingsIncome extends JsonMarshaller[SavingsIncome] {
 
@@ -39,7 +43,10 @@ object SavingsIncome extends JsonMarshaller[SavingsIncome] {
     Reads.pure(None) and
       (__ \ "type").read[SavingsIncomeType] and
       (__ \ "amount").read[BigDecimal](positiveAmountValidator("amount"))
-    ) (SavingsIncome.apply _)
+  )(SavingsIncome.apply _)
 
-  override def example(id: Option[SummaryId]) = SavingsIncome(id, SavingsIncomeType.InterestFromBanksTaxed, BigDecimal(1000.00))
+  override def example(id: Option[SummaryId]) =
+    SavingsIncome(id,
+                  SavingsIncomeType.InterestFromBanksTaxed,
+                  BigDecimal(1000.00))
 }

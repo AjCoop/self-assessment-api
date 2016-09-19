@@ -25,9 +25,11 @@ class SelfEmploymentSpec extends JsonSpec {
 
   "format" should {
     "round trip valid SelfEmployment json" in {
-      roundTripJson(SelfEmployment(
-        commencementDate = new LocalDate(2016, 4, 22),
-        allowances = Some(Allowances(annualInvestmentAllowance = Some(BigDecimal(10))))))
+      roundTripJson(
+        SelfEmployment(
+          commencementDate = new LocalDate(2016, 4, 22),
+          allowances = Some(
+            Allowances(annualInvestmentAllowance = Some(BigDecimal(10))))))
     }
   }
 
@@ -36,21 +38,26 @@ class SelfEmploymentSpec extends JsonSpec {
 
       val se = SelfEmployment(
         commencementDate = new LocalDate(2016, 4, 22),
-        allowances = Some(Allowances(annualInvestmentAllowance = Some(BigDecimal(-10)))))
+        allowances =
+          Some(Allowances(annualInvestmentAllowance = Some(BigDecimal(-10)))))
 
       assertValidationError[SelfEmployment](
         se,
-        Map("/allowances/annualInvestmentAllowance" -> INVALID_MONETARY_AMOUNT), "Expected valid self-employment")
+        Map(
+          "/allowances/annualInvestmentAllowance" -> INVALID_MONETARY_AMOUNT),
+        "Expected valid self-employment")
     }
 
     "reject invalid adjustments" in {
       val se = SelfEmployment(
         commencementDate = new LocalDate(2016, 4, 22),
-        adjustments = Some(Adjustments(lossBroughtForward = Some(BigDecimal(-10)))))
+        adjustments =
+          Some(Adjustments(lossBroughtForward = Some(BigDecimal(-10)))))
 
       assertValidationError[SelfEmployment](
         se,
-        Map("/adjustments/lossBroughtForward" -> INVALID_MONETARY_AMOUNT), "Expected valid self-employment")
+        Map("/adjustments/lossBroughtForward" -> INVALID_MONETARY_AMOUNT),
+        "Expected valid self-employment")
     }
 
   }

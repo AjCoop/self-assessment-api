@@ -21,11 +21,23 @@ import play.modules.reactivemongo.MongoDbConnection
 import reactivemongo.api.DB
 import reactivemongo.api.indexes.Index
 import reactivemongo.api.indexes.IndexType.Ascending
-import reactivemongo.bson.{BSONDateTime, BSONDocument, BSONDouble, BSONElement, BSONNull, BSONObjectID, BSONString, Producer}
+import reactivemongo.bson.{
+  BSONDateTime,
+  BSONDocument,
+  BSONDouble,
+  BSONElement,
+  BSONNull,
+  BSONObjectID,
+  BSONString,
+  Producer
+}
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 import uk.gov.hmrc.mongo.{AtomicUpdate, ReactiveRepository}
-import uk.gov.hmrc.selfassessmentapi.controllers.api.{TaxYear, TaxYearProperties}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.{
+  TaxYear,
+  TaxYearProperties
+}
 import uk.gov.hmrc.selfassessmentapi.repositories.domain.SelfAssessment
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -38,23 +50,27 @@ object SelfAssessmentRepository extends MongoDbConnection {
 }
 
 class SelfAssessmentMongoRepository(implicit mongo: () => DB)
-  extends ReactiveRepository[SelfAssessment, BSONObjectID](
-    "selfAssessments",
-    mongo,
-    domainFormat = SelfAssessment.mongoFormats,
-    idFormat = ReactiveMongoFormats.objectIdFormats)
+    extends ReactiveRepository[SelfAssessment, BSONObjectID](
+      "selfAssessments",
+      mongo,
+      domainFormat = SelfAssessment.mongoFormats,
+      idFormat = ReactiveMongoFormats.objectIdFormats)
     with AtomicUpdate[SelfAssessment] {
 
-  override def indexes: Seq[Index] = Seq(
-    Index(Seq(("saUtr", Ascending), ("taxYear", Ascending)), name = Some("sa_utr_taxyear"), unique = true),
-    Index(Seq(("lastModifiedDateTime", Ascending)), name = Some("sa_last_modified"), unique = false))
-
+  override def indexes: Seq[Index] =
+    Seq(Index(Seq(("saUtr", Ascending), ("taxYear", Ascending)),
+              name = Some("sa_utr_taxyear"),
+              unique = true),
+        Index(Seq(("lastModifiedDateTime", Ascending)),
+              name = Some("sa_last_modified"),
+              unique = false))
 
   def touch(saUtr: SaUtr, taxYear: TaxYear) = {
 
     for {
       result <- atomicUpsert(
-        BSONDocument("saUtr" -> BSONString(saUtr.toString), "taxYear" -> BSONString(taxYear.toString)),
+        BSONDocument("saUtr" -> BSONString(saUtr.toString),
+                     "taxYear" -> BSONString(taxYear.toString)),
         touchModifier()
       )
     } yield ()
@@ -69,52 +85,77 @@ class SelfAssessmentMongoRepository(implicit mongo: () => DB)
   }
 
   private def setOnInsert(dateTime: DateTime): Producer[BSONElement] =
-    "$setOnInsert" -> BSONDocument("createdDateTime" -> BSONDateTime(dateTime.getMillis))
+    "$setOnInsert" -> BSONDocument(
+      "createdDateTime" -> BSONDateTime(dateTime.getMillis))
 
-  private def lastModifiedDateTimeModfier(dateTime: DateTime): Producer[BSONElement] =
+  private def lastModifiedDateTimeModfier(
+      dateTime: DateTime): Producer[BSONElement] =
     "lastModifiedDateTime" -> BSONDateTime(dateTime.getMillis)
-
 
   def findBy(saUtr: SaUtr, taxYear: TaxYear): Future[Option[SelfAssessment]] = {
     find(
-      "saUtr" -> BSONString(saUtr.toString), "taxYear" -> BSONString(taxYear.toString)
+      "saUtr" -> BSONString(saUtr.toString),
+      "taxYear" -> BSONString(taxYear.toString)
     ).map(_.headOption)
   }
 
   def findOlderThan(lastModified: DateTime): Future[Seq[SelfAssessment]] = {
     find(
-      "lastModifiedDateTime" -> BSONDocument("$lt" -> BSONDateTime(lastModified.getMillis))
+      "lastModifiedDateTime" -> BSONDocument(
+        "$lt" -> BSONDateTime(lastModified.getMillis))
     )
   }
 
   def delete(saUtr: SaUtr, taxYear: TaxYear): Future[Boolean] = {
-    for (option <- remove("saUtr" -> saUtr.utr, "taxYear" -> taxYear.taxYear)) yield option.n > 0
+    for (option <- remove("saUtr" -> saUtr.utr, "taxYear" -> taxYear.taxYear))
+      yield option.n > 0
   }
 
-  def isInsertion(suppliedId: BSONObjectID, returned: SelfAssessment): Boolean = suppliedId.equals(returned.id)
+  def isInsertion(suppliedId: BSONObjectID,
+                  returned: SelfAssessment): Boolean =
+    suppliedId.equals(returned.id)
 
-  def updateTaxYearProperties(saUtr: SaUtr, taxYear: TaxYear, taxYearProperties: TaxYearProperties): Future[Unit] = {
+  def updateTaxYearProperties(
+      saUtr: SaUtr,
+      taxYear: TaxYear,
+      taxYearProperties: TaxYearProperties): Future[Unit] = {
     val now = DateTime.now(DateTimeZone.UTC)
 
-    val pensionContributionModifiers:BSONDocument =
+    val pensionContributionModifiers: BSONDocument =
       taxYearProperties.pensionContributions
-        .map(pensionContributions =>
+        .map(
+          pensionContributions =>
             BSONDocument(
               lastModifiedDateTimeModfier(now),
               "taxYearProperties" -> BSONDocument(
-                "pensionContributions" -> BSONDocument(
-                  Seq(
-                    "ukRegisteredPension" -> pensionContributions.ukRegisteredPension.map(x => BSONDouble(x.doubleValue())).getOrElse(BSONNull),
-                    "retirementAnnuity" -> pensionContributions.retirementAnnuity.map(x => BSONDouble(x.doubleValue())).getOrElse(BSONNull),
-                    "employerScheme" -> pensionContributions.employerScheme.map(x => BSONDouble(x.doubleValue())).getOrElse(BSONNull),
-                    "overseasPension" -> pensionContributions.overseasPension.map(x => BSONDouble(x.doubleValue())).getOrElse(BSONNull),
-                    "pensionSavings" -> BSONDocument(Seq(
-                      "excessOfAnnualAllowance" -> pensionContributions.pensionSavings.map(_.excessOfAnnualAllowance.map(x => BSONDouble(x.doubleValue())).getOrElse(BSONNull)).getOrElse(BSONNull),
-                      "taxPaidByPensionScheme" -> pensionContributions.pensionSavings.map(_.taxPaidByPensionScheme.map(x => BSONDouble(x.doubleValue())).getOrElse(BSONNull)).getOrElse(BSONNull)
+                "pensionContributions" -> BSONDocument(Seq(
+                  "ukRegisteredPension" -> pensionContributions.ukRegisteredPension
+                    .map(x => BSONDouble(x.doubleValue()))
+                    .getOrElse(BSONNull),
+                  "retirementAnnuity" -> pensionContributions.retirementAnnuity
+                    .map(x => BSONDouble(x.doubleValue()))
+                    .getOrElse(BSONNull),
+                  "employerScheme" -> pensionContributions.employerScheme
+                    .map(x => BSONDouble(x.doubleValue()))
+                    .getOrElse(BSONNull),
+                  "overseasPension" -> pensionContributions.overseasPension
+                    .map(x => BSONDouble(x.doubleValue()))
+                    .getOrElse(BSONNull),
+                  "pensionSavings" -> BSONDocument(
+                    Seq(
+                      "excessOfAnnualAllowance" -> pensionContributions.pensionSavings
+                        .map(_.excessOfAnnualAllowance
+                          .map(x => BSONDouble(x.doubleValue()))
+                          .getOrElse(BSONNull))
+                        .getOrElse(BSONNull),
+                      "taxPaidByPensionScheme" -> pensionContributions.pensionSavings
+                        .map(_.taxPaidByPensionScheme
+                          .map(x => BSONDouble(x.doubleValue()))
+                          .getOrElse(BSONNull))
+                        .getOrElse(BSONNull)
                     )))))))
-        .getOrElse(BSONDocument(
-          lastModifiedDateTimeModfier(now),
-          "pensionContributions" -> BSONNull))
+        .getOrElse(BSONDocument(lastModifiedDateTimeModfier(now),
+                                "pensionContributions" -> BSONNull))
     for {
       result <- atomicUpsert(
         BSONDocument("saUtr" -> saUtr.utr, "taxYear" -> taxYear.taxYear),
@@ -125,12 +166,16 @@ class SelfAssessmentMongoRepository(implicit mongo: () => DB)
     } yield ()
   }
 
-  def findTaxYearProperties(saUtr: SaUtr, taxYear: TaxYear): Future[Option[TaxYearProperties]] = {
+  def findTaxYearProperties(
+      saUtr: SaUtr,
+      taxYear: TaxYear): Future[Option[TaxYearProperties]] = {
     for {
-      optionSa <- find("saUtr" -> saUtr.utr, "taxYear" -> taxYear.taxYear).map(_.headOption)
-    } yield for {
-      sa <- optionSa
-      taxYearProperties <- sa.taxYearProperties
-    } yield taxYearProperties
+      optionSa <- find("saUtr" -> saUtr.utr, "taxYear" -> taxYear.taxYear)
+        .map(_.headOption)
+    } yield
+      for {
+        sa <- optionSa
+        taxYearProperties <- sa.taxYearProperties
+      } yield taxYearProperties
   }
 }

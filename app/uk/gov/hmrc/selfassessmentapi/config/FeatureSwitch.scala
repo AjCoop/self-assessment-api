@@ -18,7 +18,10 @@ package uk.gov.hmrc.selfassessmentapi.config
 
 import play.api.Configuration
 import uk.gov.hmrc.selfassessmentapi.config.AppContext._
-import uk.gov.hmrc.selfassessmentapi.controllers.api.{SourceType, TaxYearPropertyType}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.{
+  SourceType,
+  TaxYearPropertyType
+}
 
 case class FeatureSwitch(value: Option[Configuration]) {
   val DEFAULT_VALUE = false
@@ -28,12 +31,14 @@ case class FeatureSwitch(value: Option[Configuration]) {
     case None => DEFAULT_VALUE
   }
 
-  def isEnabled(sourceType: SourceType, summary: String): Boolean = value match {
-    case Some(config) =>
-      if(summary.isEmpty) FeatureConfig(config).isSourceEnabled(sourceType.name)
-      else FeatureConfig(config).isSummaryEnabled(sourceType.name, summary)
-    case None => DEFAULT_VALUE
-  }
+  def isEnabled(sourceType: SourceType, summary: String): Boolean =
+    value match {
+      case Some(config) =>
+        if (summary.isEmpty)
+          FeatureConfig(config).isSourceEnabled(sourceType.name)
+        else FeatureConfig(config).isSummaryEnabled(sourceType.name, summary)
+      case None => DEFAULT_VALUE
+    }
 
   def isEnabled(source: TaxYearPropertyType): Boolean = value match {
     case Some(config) => FeatureConfig(config).isSourceEnabled(source.name)
@@ -42,14 +47,19 @@ case class FeatureSwitch(value: Option[Configuration]) {
 
   def isWhiteListingEnabled = {
     value match {
-      case Some(config) => config.getBoolean("white-list.enabled").getOrElse(false)
+      case Some(config) =>
+        config.getBoolean("white-list.enabled").getOrElse(false)
       case None => false
     }
   }
 
   def whiteListedApplicationIds = {
     value match {
-      case Some(config) => config.getStringSeq("white-list.applicationIds").getOrElse(throw new RuntimeException(s"$env.feature-switch.white-list.applicationIds is not configured"))
+      case Some(config) =>
+        config
+          .getStringSeq("white-list.applicationIds")
+          .getOrElse(throw new RuntimeException(
+            s"$env.feature-switch.white-list.applicationIds is not configured"))
       case None => Seq()
     }
   }

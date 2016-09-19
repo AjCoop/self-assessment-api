@@ -27,30 +27,33 @@ import uk.gov.hmrc.selfassessmentapi.services.live.calculation.LiabilityService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object LiabilityController extends uk.gov.hmrc.selfassessmentapi.controllers.LiabilityController {
+object LiabilityController
+    extends uk.gov.hmrc.selfassessmentapi.controllers.LiabilityController {
 
   override val context: String = AppContext.apiGatewayLinkContext
 
   private val liabilityService = LiabilityService()
 
-  override def requestLiability(utr: SaUtr, taxYear: TaxYear) = Action.async { request =>
-    liabilityService.calculate(utr, taxYear) map { _ =>
-      val links = Set(
+  override def requestLiability(utr: SaUtr, taxYear: TaxYear) = Action.async {
+    request =>
+      liabilityService.calculate(utr, taxYear) map { _ =>
+        val links = Set(
           HalLink("self", liabilityHref(utr, taxYear))
-      )
-      Accepted(halResource(JsObject(Nil), links))
-    }
+        )
+        Accepted(halResource(JsObject(Nil), links))
+      }
   }
 
-  override def retrieveLiability(utr: SaUtr, taxYear: TaxYear) = Action.async { request =>
-    liabilityService.find(utr, taxYear) map {
-      case Some(Left(error)) =>
-        Forbidden(Json.toJson(error))
-      case Some(Right(liability)) =>
-        val links = Set(HalLink("self", liabilityHref(utr, taxYear)))
-        Ok(halResource(Json.toJson(liability), links))
-      case _ => notFound
-    }
+  override def retrieveLiability(utr: SaUtr, taxYear: TaxYear) = Action.async {
+    request =>
+      liabilityService.find(utr, taxYear) map {
+        case Some(Left(error)) =>
+          Forbidden(Json.toJson(error))
+        case Some(Right(liability)) =>
+          val links = Set(HalLink("self", liabilityHref(utr, taxYear)))
+          Ok(halResource(Json.toJson(liability), links))
+        case _ => notFound
+      }
   }
 
 }

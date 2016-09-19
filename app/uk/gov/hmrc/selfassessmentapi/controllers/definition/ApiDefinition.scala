@@ -21,15 +21,13 @@ import uk.gov.hmrc.selfassessmentapi.controllers.definition.AuthType.AuthType
 import uk.gov.hmrc.selfassessmentapi.controllers.definition.HttpMethod.HttpMethod
 import uk.gov.hmrc.selfassessmentapi.controllers.definition.ResourceThrottlingTier.ResourceThrottlingTier
 
-case class Definition(scopes: Seq[Scope],
-                      api: APIDefinition)
+case class Definition(scopes: Seq[Scope], api: APIDefinition)
 
-case class APIDefinition(
-                          name: String,
-                          description: String,
-                          context: String,
-                          versions: Seq[APIVersion],
-                          requiresTrust: Option[Boolean]) {
+case class APIDefinition(name: String,
+                         description: String,
+                         context: String,
+                         versions: Seq[APIVersion],
+                         requiresTrust: Option[Boolean]) {
 
   require(name.nonEmpty, s"name is required")
   require(context.nonEmpty, s"context is required")
@@ -41,43 +39,46 @@ case class APIDefinition(
     require(version.endpoints.nonEmpty, s"at least one endpoint is required")
     version.endpoints.foreach(endpoint => {
       require(endpoint.endpointName.nonEmpty, s"endpointName is required")
-      endpoint.queryParameters.getOrElse(Nil).foreach(parameter => {
-        require(parameter.name.nonEmpty, "parameter name is required")
-      })
+      endpoint.queryParameters
+        .getOrElse(Nil)
+        .foreach(parameter => {
+          require(parameter.name.nonEmpty, "parameter name is required")
+        })
       endpoint.authType match {
-        case AuthType.USER => require(endpoint.scope.nonEmpty, s"scope is required if authType is USER")
+        case AuthType.USER =>
+          require(endpoint.scope.nonEmpty,
+                  s"scope is required if authType is USER")
         case _ => ()
       }
     })
   })
 
   private def uniqueVersions = {
-    !versions.map(_.version).groupBy(identity).mapValues(_.size).exists(_._2 > 1)
+    !versions
+      .map(_.version)
+      .groupBy(identity)
+      .mapValues(_.size)
+      .exists(_._2 > 1)
   }
 
 }
 
-case class Scope(key: String,
-                 name: String,
-                 description: String)
+case class Scope(key: String, name: String, description: String)
 
-case class APIVersion(
-                       version: String,
-                       access: Option[Access] = None,
-                       status: APIStatus,
-                       endpoints: Seq[Endpoint])
-
+case class APIVersion(version: String,
+                      access: Option[Access] = None,
+                      status: APIStatus,
+                      endpoints: Seq[Endpoint])
 
 case class Access(`type`: String, whitelistedApplicationIds: Seq[String])
 
-case class Endpoint(
-                     uriPattern: String,
-                     endpointName: String,
-                     method: HttpMethod,
-                     authType: AuthType,
-                     throttlingTier: ResourceThrottlingTier,
-                     scope: Option[String] = None,
-                     queryParameters: Option[Seq[Parameter]] = None)
+case class Endpoint(uriPattern: String,
+                    endpointName: String,
+                    method: HttpMethod,
+                    authType: AuthType,
+                    throttlingTier: ResourceThrottlingTier,
+                    scope: Option[String] = None,
+                    queryParameters: Option[Seq[Parameter]] = None)
 
 case class Parameter(name: String, required: Boolean = false)
 

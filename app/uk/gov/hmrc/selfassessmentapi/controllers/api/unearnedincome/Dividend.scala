@@ -26,10 +26,13 @@ import uk.gov.hmrc.selfassessmentapi.controllers.api.unearnedincome.DividendType
 object DividendType extends Enumeration {
   type DividendType = Value
   val FromUKCompanies, FromOtherUKSources = Value
-  implicit val format = enumFormat(DividendType, Some("Dividend type is invalid"))
+  implicit val format =
+    enumFormat(DividendType, Some("Dividend type is invalid"))
 }
 
-case class Dividend(id: Option[String] = None, `type`: DividendType, amount: BigDecimal)
+case class Dividend(id: Option[String] = None,
+                    `type`: DividendType,
+                    amount: BigDecimal)
 
 object Dividend extends JsonMarshaller[Dividend] {
 
@@ -39,7 +42,8 @@ object Dividend extends JsonMarshaller[Dividend] {
     Reads.pure(None) and
       (__ \ "type").read[DividendType] and
       (__ \ "amount").read[BigDecimal](positiveAmountValidator("amount"))
-    ) (Dividend.apply _)
+  )(Dividend.apply _)
 
-  override def example(id: Option[SummaryId]) = Dividend(id, DividendType.FromUKCompanies, BigDecimal(1000.00))
+  override def example(id: Option[SummaryId]) =
+    Dividend(id, DividendType.FromUKCompanies, BigDecimal(1000.00))
 }

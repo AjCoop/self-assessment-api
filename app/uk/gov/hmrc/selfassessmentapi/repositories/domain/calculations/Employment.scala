@@ -16,39 +16,58 @@
 
 package uk.gov.hmrc.selfassessmentapi.repositories.domain.calculations
 
-import uk.gov.hmrc.selfassessmentapi.controllers.api.{UkTaxPaidForEmployment, SelfAssessment, EmploymentIncome}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.{
+  UkTaxPaidForEmployment,
+  SelfAssessment,
+  EmploymentIncome
+}
 import uk.gov.hmrc.selfassessmentapi.controllers.api._
 import uk.gov.hmrc.selfassessmentapi.repositories._
 
 object Employment {
 
   object TotalProfit {
-    def apply(selfAssessment: SelfAssessment) = selfAssessment.employments.map(Profit(_)).sum
+    def apply(selfAssessment: SelfAssessment) =
+      selfAssessment.employments.map(Profit(_)).sum
   }
 
   object Profit {
-    def apply(employment: domain.Employment) = RoundDown(PositiveOrZero(Total(employment.incomes) + Total(employment.benefits) - Total(employment.expenses)))
+    def apply(employment: domain.Employment) =
+      RoundDown(
+        PositiveOrZero(
+          Total(employment.incomes) + Total(employment.benefits) - Total(
+            employment.expenses)))
   }
 
   object Incomes {
-    def apply(selfAssessment: SelfAssessment) = selfAssessment.employments.map { employment =>
-      EmploymentIncome(sourceId = employment.sourceId, pay = Total(employment.incomes), benefitsAndExpenses = Total(employment.benefits),
-        allowableExpenses = CapAt(Total(employment.expenses), Total(employment.incomes) + Total(employment.benefits)), total = Profit(employment))
-    }
+    def apply(selfAssessment: SelfAssessment) =
+      selfAssessment.employments.map { employment =>
+        EmploymentIncome(
+          sourceId = employment.sourceId,
+          pay = Total(employment.incomes),
+          benefitsAndExpenses = Total(employment.benefits),
+          allowableExpenses =
+            CapAt(Total(employment.expenses),
+                  Total(employment.incomes) + Total(employment.benefits)),
+          total = Profit(employment))
+      }
   }
 
   object TotalTaxPaid {
-    def apply(selfAssessment: SelfAssessment) = PositiveOrZero(selfAssessment.employments.map(TaxPaid(_)).sum)
+    def apply(selfAssessment: SelfAssessment) =
+      PositiveOrZero(selfAssessment.employments.map(TaxPaid(_)).sum)
   }
 
   object TaxPaid {
-    def apply(employment: domain.Employment) = RoundUpToPennies(employment.ukTaxPaid.map(_.amount).sum)
+    def apply(employment: domain.Employment) =
+      RoundUpToPennies(employment.ukTaxPaid.map(_.amount).sum)
   }
 
   object TaxesPaid {
     def apply(selfAssessment: SelfAssessment) = {
       selfAssessment.employments.map { employment =>
-        UkTaxPaidForEmployment(employment.sourceId, Employment.TaxPaid(employment))
+        UkTaxPaidForEmployment(employment.sourceId,
+                               Employment.TaxPaid(employment))
       }
     }
   }

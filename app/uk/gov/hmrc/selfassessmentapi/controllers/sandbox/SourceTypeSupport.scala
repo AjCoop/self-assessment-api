@@ -25,14 +25,16 @@ import uk.gov.hmrc.selfassessmentapi.controllers.sandbox.ukproperty.UKPropertySo
 import uk.gov.hmrc.selfassessmentapi.controllers.sandbox.unearnedincome.UnearnedIncomeSourceHandler
 import SourceTypes._
 
-trait SourceTypeSupport extends uk.gov.hmrc.selfassessmentapi.controllers.SourceTypeSupport {
+trait SourceTypeSupport
+    extends uk.gov.hmrc.selfassessmentapi.controllers.SourceTypeSupport {
 
-  def sourceHandler(sourceType: SourceType): SourceHandler[_] = sourceType match {
-    case SelfEmployments => SelfEmploymentSourceHandler
-    case FurnishedHolidayLettings => FurnishedHolidayLettingsSourceHandler
-    case UKProperties => UKPropertySourceHandler
-    case Employments => EmploymentSourceHandler
-    case UnearnedIncomes => UnearnedIncomeSourceHandler
-  }
+  def sourceHandler(sourceType: SourceType): SourceHandler[_] =
+    sourceType match {
+      case SelfEmployments => SelfEmploymentSourceHandler
+      case FurnishedHolidayLettings => FurnishedHolidayLettingsSourceHandler
+      case UKProperties => UKPropertySourceHandler
+      case Employments => EmploymentSourceHandler
+      case UnearnedIncomes => UnearnedIncomeSourceHandler
+    }
 
 }

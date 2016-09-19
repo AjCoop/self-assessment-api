@@ -19,7 +19,7 @@ package uk.gov.hmrc.selfassessmentapi.controllers.api
 import play.api.libs.json.{Reads, Writes}
 
 trait JsonMarshaller[T] {
-  val writes : Writes[T]
-  val reads : Reads[T]
-  def example(id: Option[String] = None) : T
+  val writes: Writes[T]
+  val reads: Reads[T]
+  def example(id: Option[String] = None): T
 }

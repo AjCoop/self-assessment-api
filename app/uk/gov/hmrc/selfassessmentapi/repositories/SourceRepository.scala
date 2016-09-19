@@ -26,7 +26,10 @@ trait SourceRepository[T] {
 
   def findById(saUtr: SaUtr, taxYear: TaxYear, id: SourceId): Future[Option[T]]
 
-  def update(saUtr: SaUtr, taxYear: TaxYear, id: SourceId, source: T): Future[Boolean]
+  def update(saUtr: SaUtr,
+             taxYear: TaxYear,
+             id: SourceId,
+             source: T): Future[Boolean]
 
   def delete(saUtr: SaUtr, taxYear: TaxYear, id: SourceId): Future[Boolean]
 
@@ -38,23 +41,34 @@ trait SourceRepository[T] {
 }
 
 //todo feel free to implement this functionality in more scalaish way
-case class SourceRepositoryWrapper[T](private val target: SourceRepository[T]) extends SourceRepository[T] {
+case class SourceRepositoryWrapper[T](private val target: SourceRepository[T])
+    extends SourceRepository[T] {
 
   lazy val selfAssessmentRepository = SelfAssessmentRepository()
 
-  override def create(saUtr: SaUtr, taxYear: TaxYear, source: T) : Future[SourceId] = {
+  override def create(saUtr: SaUtr,
+                      taxYear: TaxYear,
+                      source: T): Future[SourceId] = {
     selfAssessmentRepository.touch(saUtr, taxYear)
     target.create(saUtr, taxYear, source)
   }
 
-  override def update(saUtr: SaUtr, taxYear: TaxYear, id: SourceId, source: T): Future[Boolean] = {
+  override def update(saUtr: SaUtr,
+                      taxYear: TaxYear,
+                      id: SourceId,
+                      source: T): Future[Boolean] = {
     selfAssessmentRepository.touch(saUtr, taxYear)
     target.update(saUtr, taxYear, id, source)
   }
 
-  override def findById(saUtr: SaUtr, taxYear: TaxYear, id: SourceId): Future[Option[T]] = target.findById(saUtr, taxYear, id)
+  override def findById(saUtr: SaUtr,
+                        taxYear: TaxYear,
+                        id: SourceId): Future[Option[T]] =
+    target.findById(saUtr, taxYear, id)
 
-  override def delete(saUtr: SaUtr, taxYear: TaxYear, id: SourceId): Future[Boolean] = {
+  override def delete(saUtr: SaUtr,
+                      taxYear: TaxYear,
+                      id: SourceId): Future[Boolean] = {
     selfAssessmentRepository.touch(saUtr, taxYear)
     target.delete(saUtr, taxYear, id)
   }
@@ -64,7 +78,10 @@ case class SourceRepositoryWrapper[T](private val target: SourceRepository[T]) e
     target.delete(saUtr, taxYear)
   }
 
-  override def list(saUtr: SaUtr, taxYear: TaxYear): Future[Seq[T]] = target.list(saUtr, taxYear)
+  override def list(saUtr: SaUtr, taxYear: TaxYear): Future[Seq[T]] =
+    target.list(saUtr, taxYear)
 
-  override def listAsJsonItem(saUtr: SaUtr, taxYear: TaxYear): Future[Seq[JsonItem]] = target.listAsJsonItem(saUtr, taxYear)
+  override def listAsJsonItem(saUtr: SaUtr,
+                              taxYear: TaxYear): Future[Seq[JsonItem]] =
+    target.listAsJsonItem(saUtr, taxYear)
 }

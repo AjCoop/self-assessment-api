@@ -27,26 +27,28 @@ import uk.gov.hmrc.selfassessmentapi.controllers.api._
 
 import scala.concurrent.Future
 
-object LiabilityController extends uk.gov.hmrc.selfassessmentapi.controllers.LiabilityController {
+object LiabilityController
+    extends uk.gov.hmrc.selfassessmentapi.controllers.LiabilityController {
 
   override val context: String = AppContext.apiGatewayLinkContext
 
-  override def requestLiability(utr: SaUtr, taxYear: TaxYear) = Action.async { request =>
+  override def requestLiability(utr: SaUtr, taxYear: TaxYear) = Action.async {
+    request =>
       val links = Set(
         HalLink("self", liabilityHref(utr, taxYear))
       )
-    Future.successful(Accepted(halResource(JsObject(Nil), links)))
+      Future.successful(Accepted(halResource(JsObject(Nil), links)))
   }
 
-  override def retrieveLiability(utr: SaUtr, taxYear: TaxYear) = Action.async { request =>
-    val liability = createLiability
-    val links = Set(
-      HalLink("self", liabilityHref(utr, taxYear))
-    )
-    Future.successful(Ok(halResource(Json.toJson(liability), links)))
+  override def retrieveLiability(utr: SaUtr, taxYear: TaxYear) = Action.async {
+    request =>
+      val liability = createLiability
+      val links = Set(
+        HalLink("self", liabilityHref(utr, taxYear))
+      )
+      Future.successful(Ok(halResource(Json.toJson(liability), links)))
   }
 
   def createLiability: Liability = Liability.example
-
 
 }

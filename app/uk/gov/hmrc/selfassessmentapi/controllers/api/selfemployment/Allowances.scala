@@ -21,18 +21,23 @@ import play.api.libs.json.Reads._
 import play.api.libs.json._
 import uk.gov.hmrc.selfassessmentapi.controllers.api._
 
-case class Allowances(annualInvestmentAllowance: Option[BigDecimal] = None,
-                      capitalAllowanceMainPool: Option[BigDecimal] = None,
-                      capitalAllowanceSpecialRatePool: Option[BigDecimal] = None,
-                      businessPremisesRenovationAllowance: Option[BigDecimal] = None,
-                      enhancedCapitalAllowance: Option[BigDecimal] = None,
-                      allowancesOnSales: Option[BigDecimal] = None) {
+case class Allowances(
+    annualInvestmentAllowance: Option[BigDecimal] = None,
+    capitalAllowanceMainPool: Option[BigDecimal] = None,
+    capitalAllowanceSpecialRatePool: Option[BigDecimal] = None,
+    businessPremisesRenovationAllowance: Option[BigDecimal] = None,
+    enhancedCapitalAllowance: Option[BigDecimal] = None,
+    allowancesOnSales: Option[BigDecimal] = None) {
 
   private val maxAnnualInvestmentAllowance = 200000
 
   def total = {
-    Sum(CapAt(annualInvestmentAllowance, maxAnnualInvestmentAllowance), capitalAllowanceMainPool, capitalAllowanceSpecialRatePool,
-      businessPremisesRenovationAllowance, enhancedCapitalAllowance, allowancesOnSales)
+    Sum(CapAt(annualInvestmentAllowance, maxAnnualInvestmentAllowance),
+        capitalAllowanceMainPool,
+        capitalAllowanceSpecialRatePool,
+        businessPremisesRenovationAllowance,
+        enhancedCapitalAllowance,
+        allowancesOnSales)
   }
 }
 
@@ -49,11 +54,17 @@ object Allowances {
   implicit val writes = Json.writes[Allowances]
 
   implicit val reads: Reads[Allowances] = (
-      (__ \ "annualInvestmentAllowance").readNullable[BigDecimal](positiveAmountValidator("annualInvestmentAllowance")) and
-      (__ \ "capitalAllowanceMainPool").readNullable[BigDecimal](positiveAmountValidator("capitalAllowanceMainPool")) and
-      (__ \ "capitalAllowanceSpecialRatePool").readNullable[BigDecimal](positiveAmountValidator("capitalAllowanceSpecialRatePool")) and
-      (__ \ "businessPremisesRenovationAllowance").readNullable[BigDecimal](positiveAmountValidator("businessPremisesRenovationAllowance")) and
-      (__ \ "enhancedCapitalAllowance").readNullable[BigDecimal](positiveAmountValidator("enhancedCapitalAllowance")) and
-      (__ \ "allowancesOnSales").readNullable[BigDecimal](positiveAmountValidator("allowancesOnSales"))
-    ) (Allowances.apply _)
+    (__ \ "annualInvestmentAllowance").readNullable[BigDecimal](
+      positiveAmountValidator("annualInvestmentAllowance")) and
+      (__ \ "capitalAllowanceMainPool").readNullable[BigDecimal](
+        positiveAmountValidator("capitalAllowanceMainPool")) and
+      (__ \ "capitalAllowanceSpecialRatePool").readNullable[BigDecimal](
+        positiveAmountValidator("capitalAllowanceSpecialRatePool")) and
+      (__ \ "businessPremisesRenovationAllowance").readNullable[BigDecimal](
+        positiveAmountValidator("businessPremisesRenovationAllowance")) and
+      (__ \ "enhancedCapitalAllowance").readNullable[BigDecimal](
+        positiveAmountValidator("enhancedCapitalAllowance")) and
+      (__ \ "allowancesOnSales")
+        .readNullable[BigDecimal](positiveAmountValidator("allowancesOnSales"))
+  )(Allowances.apply _)
 }

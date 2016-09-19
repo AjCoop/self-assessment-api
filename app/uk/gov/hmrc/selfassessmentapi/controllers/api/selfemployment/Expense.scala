@@ -23,15 +23,19 @@ import uk.gov.hmrc.selfassessmentapi.controllers.definition.EnumJson
 import uk.gov.hmrc.selfassessmentapi.controllers.api._
 import uk.gov.hmrc.selfassessmentapi.controllers.api.selfemployment.ExpenseType.ExpenseType
 
-
 object ExpenseType extends Enumeration {
   type ExpenseType = Value
-  val CoGBought, CISPaymentsToSubcontractors, StaffCosts, TravelCosts, PremisesRunningCosts, MaintenanceCosts, AdminCosts,
-  AdvertisingCosts, Interest, FinancialCharges, BadDebt, ProfessionalFees, Depreciation, Other = Value
-  implicit val seExpenseTypes = EnumJson.enumFormat(ExpenseType, Some("Self Employment Expense type is invalid"))
+  val CoGBought, CISPaymentsToSubcontractors, StaffCosts, TravelCosts,
+  PremisesRunningCosts, MaintenanceCosts, AdminCosts, AdvertisingCosts,
+  Interest, FinancialCharges, BadDebt, ProfessionalFees, Depreciation, Other =
+    Value
+  implicit val seExpenseTypes = EnumJson
+    .enumFormat(ExpenseType, Some("Self Employment Expense type is invalid"))
 }
 
-case class Expense(id: Option[SummaryId] = None, `type`: ExpenseType, amount: BigDecimal)
+case class Expense(id: Option[SummaryId] = None,
+                   `type`: ExpenseType,
+                   amount: BigDecimal)
 
 object Expense extends JsonMarshaller[Expense] {
 
@@ -40,7 +44,8 @@ object Expense extends JsonMarshaller[Expense] {
     Reads.pure(None) and
       (__ \ "type").read[ExpenseType] and
       (__ \ "amount").read[BigDecimal](positiveAmountValidator("amount"))
-    ) (Expense.apply _)
+  )(Expense.apply _)
 
-  override def example(id: Option[SummaryId]) = Expense(id, ExpenseType.CISPaymentsToSubcontractors, BigDecimal(1000))
+  override def example(id: Option[SummaryId]) =
+    Expense(id, ExpenseType.CISPaymentsToSubcontractors, BigDecimal(1000))
 }

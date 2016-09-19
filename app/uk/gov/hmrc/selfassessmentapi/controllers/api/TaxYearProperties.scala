@@ -25,14 +25,17 @@ import uk.gov.hmrc.selfassessmentapi.controllers.api.pensioncontribution.Pension
 import uk.gov.hmrc.selfassessmentapi.controllers.api.studentsloan.StudentLoan
 import uk.gov.hmrc.selfassessmentapi.controllers.api.taxrefundedorsetoff.TaxRefundedOrSetOff
 
-case class TaxYearProperties(id: Option[String] = None, pensionContributions: Option[PensionContribution] = None,
-                             charitableGivings: Option[CharitableGiving] = None,
-                             blindPerson: Option[BlindPerson] = None,
-                             studentLoan: Option[StudentLoan] = None,
-                             taxRefundedOrSetOff: Option[TaxRefundedOrSetOff] = None,
-                             childBenefit: Option[ChildBenefit] = None) {
+case class TaxYearProperties(
+    id: Option[String] = None,
+    pensionContributions: Option[PensionContribution] = None,
+    charitableGivings: Option[CharitableGiving] = None,
+    blindPerson: Option[BlindPerson] = None,
+    studentLoan: Option[StudentLoan] = None,
+    taxRefundedOrSetOff: Option[TaxRefundedOrSetOff] = None,
+    childBenefit: Option[ChildBenefit] = None) {
 
-  def retirementAnnuityContract = pensionContributions.map(_.retirementAnnuityContract)
+  def retirementAnnuityContract =
+    pensionContributions.map(_.retirementAnnuityContract)
 }
 
 object TaxYearProperties extends JsonMarshaller[TaxYearProperties] {
@@ -47,7 +50,7 @@ object TaxYearProperties extends JsonMarshaller[TaxYearProperties] {
       (__ \ "studentLoan").readNullable[StudentLoan] and
       (__ \ "taxRefundedOrSetOff").readNullable[TaxRefundedOrSetOff] and
       (__ \ "childBenefit").readNullable[ChildBenefit]
-    ) (TaxYearProperties.apply _)
+  )(TaxYearProperties.apply _)
 
   override def example(id: Option[String]) =
     TaxYearProperties(

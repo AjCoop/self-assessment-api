@@ -22,17 +22,21 @@ class TotalsSpec extends UnitSpec {
 
   "TotalIncomeReceived" should {
     "be nonSavingsIncome + savingsIncome + dividendsIncome" in {
-      Totals.IncomeReceived(totalNonSavings = 1000, totalSavings = 1000, totalDividends = 2000) shouldBe 4000
+      Totals.IncomeReceived(totalNonSavings = 1000,
+                            totalSavings = 1000,
+                            totalDividends = 2000) shouldBe 4000
     }
   }
 
   "TotalTaxableIncome" should {
     "be (TotalIncomeReceived - TotalDeductions)" in {
-      Totals.TaxableIncome(totalIncomeReceived = 10000, totalDeduction = 5000) shouldBe 5000
+      Totals
+        .TaxableIncome(totalIncomeReceived = 10000, totalDeduction = 5000) shouldBe 5000
     }
 
     "be 0 if TotalDeductions > TotalIncomeReceived" in {
-      Totals.TaxableIncome(totalIncomeReceived = 10000, totalDeduction = 10001) shouldBe 0
+      Totals
+        .TaxableIncome(totalIncomeReceived = 10000, totalDeduction = 10001) shouldBe 0
     }
   }
 }

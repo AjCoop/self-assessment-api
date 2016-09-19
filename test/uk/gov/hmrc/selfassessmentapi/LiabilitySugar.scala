@@ -20,28 +20,31 @@ import reactivemongo.bson.BSONObjectID
 import uk.gov.hmrc.selfassessmentapi.controllers.api.{TaxDeducted => _, _}
 import uk.gov.hmrc.selfassessmentapi.repositories.domain.{Liability, _}
 
-@deprecated("This class is used by an old version of the Liability Calculator. DO NOT USE.", "")
+@deprecated(
+  "This class is used by an old version of the Liability Calculator. DO NOT USE.",
+  "")
 object LiabilitySugar extends UnitSpec {
-  def aLiability(id: BSONObjectID = BSONObjectID.generate,
-                 employmentIncome: Seq[EmploymentIncome] = Seq(),
-                 selfEmploymentIncome: Seq[SelfEmploymentIncome] = Seq(),
-                 ukPropertyIncome: Seq[UkPropertyIncome] = Seq(),
-                 furnishedHolidayLettingsIncome: Seq[FurnishedHolidayLettingIncome] = Seq(),
-                 savingsIncome: Seq[InterestFromUKBanksAndBuildingSocieties] = Seq(),
-                 ukDividendsIncome: Seq[DividendsFromUKSources] = Seq(),
-                 totalIncomeReceived: BigDecimal = 0,
-                 totalTaxableIncome: BigDecimal = 0,
-                 allowancesAndReliefs: AllowancesAndReliefs = AllowancesAndReliefs(),
-                 taxDeducted: TaxDeducted = TaxDeducted(),
-                 dividendTaxBandSummary: Seq[TaxBandSummary] = Seq(),
-                 savingsTaxBandSummary: Seq[TaxBandSummary] = Seq(),
-                 nonSavingsTaxBandSummary: Seq[TaxBandSummary] = Seq(),
-                 pensionSavingsChargesSummary: Seq[TaxBandSummary] = Seq(),
-                 totalIncomeTax: BigDecimal = 0,
-                 totalTaxDeducted: BigDecimal = 0,
-                 totalTaxDue: BigDecimal = 0,
-                 totalTaxOverPaid: BigDecimal = 0
-                 ): Liability = {
+  def aLiability(
+      id: BSONObjectID = BSONObjectID.generate,
+      employmentIncome: Seq[EmploymentIncome] = Seq(),
+      selfEmploymentIncome: Seq[SelfEmploymentIncome] = Seq(),
+      ukPropertyIncome: Seq[UkPropertyIncome] = Seq(),
+      furnishedHolidayLettingsIncome: Seq[FurnishedHolidayLettingIncome] =
+        Seq(),
+      savingsIncome: Seq[InterestFromUKBanksAndBuildingSocieties] = Seq(),
+      ukDividendsIncome: Seq[DividendsFromUKSources] = Seq(),
+      totalIncomeReceived: BigDecimal = 0,
+      totalTaxableIncome: BigDecimal = 0,
+      allowancesAndReliefs: AllowancesAndReliefs = AllowancesAndReliefs(),
+      taxDeducted: TaxDeducted = TaxDeducted(),
+      dividendTaxBandSummary: Seq[TaxBandSummary] = Seq(),
+      savingsTaxBandSummary: Seq[TaxBandSummary] = Seq(),
+      nonSavingsTaxBandSummary: Seq[TaxBandSummary] = Seq(),
+      pensionSavingsChargesSummary: Seq[TaxBandSummary] = Seq(),
+      totalIncomeTax: BigDecimal = 0,
+      totalTaxDeducted: BigDecimal = 0,
+      totalTaxDue: BigDecimal = 0,
+      totalTaxOverPaid: BigDecimal = 0): Liability = {
     Liability(id,
               id.stringify,
               generateSaUtr(),
@@ -61,13 +64,12 @@ object LiabilitySugar extends UnitSpec {
               nonSavingsTaxBandSummary,
               pensionSavingsChargesSummary,
               taxes = TaxesCalculated(
-                        totalIncomeTax = totalIncomeTax,
-                        totalTaxDeducted = totalTaxDeducted,
-                        totalTaxDue = totalTaxDue,
-                        totalTaxOverPaid = totalTaxOverPaid,
-                        pensionSavingsCharges = 0,
-                        taxPaidByPensionScheme = 0
-                      )
-              )
+                totalIncomeTax = totalIncomeTax,
+                totalTaxDeducted = totalTaxDeducted,
+                totalTaxDue = totalTaxDue,
+                totalTaxOverPaid = totalTaxOverPaid,
+                pensionSavingsCharges = 0,
+                taxPaidByPensionScheme = 0
+              ))
   }
 }

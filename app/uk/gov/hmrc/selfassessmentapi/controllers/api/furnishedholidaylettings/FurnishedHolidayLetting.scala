@@ -26,7 +26,9 @@ import uk.gov.hmrc.selfassessmentapi.controllers.api.furnishedholidaylettings.Pr
 object PropertyLocationType extends Enumeration {
   type PropertyLocationType = Value
   val UK, EEA = Value
-  implicit val format = enumFormat(PropertyLocationType, Some("Furnished holiday lettings property location type is invalid"))
+  implicit val format = enumFormat(
+    PropertyLocationType,
+    Some("Furnished holiday lettings property location type is invalid"))
 }
 
 case class FurnishedHolidayLetting(id: Option[SourceId] = None,
@@ -34,8 +36,8 @@ case class FurnishedHolidayLetting(id: Option[SourceId] = None,
                                    allowances: Option[Allowances] = None,
                                    adjustments: Option[Adjustments] = None)
 
-
-object FurnishedHolidayLetting extends JsonMarshaller[FurnishedHolidayLetting]{
+object FurnishedHolidayLetting
+    extends JsonMarshaller[FurnishedHolidayLetting] {
 
   implicit val writes = Json.writes[FurnishedHolidayLetting]
 
@@ -44,11 +46,11 @@ object FurnishedHolidayLetting extends JsonMarshaller[FurnishedHolidayLetting]{
       (__ \ "propertyLocation").read[PropertyLocationType] and
       (__ \ "allowances").readNullable[Allowances] and
       (__ \ "adjustments").readNullable[Adjustments]
-    ) (FurnishedHolidayLetting.apply _)
+  )(FurnishedHolidayLetting.apply _)
 
-
-  override def example(id: Option[SourceId]): FurnishedHolidayLetting = FurnishedHolidayLetting(
-    id, PropertyLocationType.UK,
-    Some(Allowances(Some(BigDecimal(1000.00)))),
-    Some(Adjustments(Some(BigDecimal(500.00)))))
+  override def example(id: Option[SourceId]): FurnishedHolidayLetting =
+    FurnishedHolidayLetting(id,
+                            PropertyLocationType.UK,
+                            Some(Allowances(Some(BigDecimal(1000.00)))),
+                            Some(Adjustments(Some(BigDecimal(500.00)))))
 }

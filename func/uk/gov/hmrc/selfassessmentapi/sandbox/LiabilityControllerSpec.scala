@@ -12,7 +12,8 @@ class LiabilityControllerSpec extends BaseFunctionalSpec {
         .thenAssertThat()
         .statusIs(202)
         .contentTypeIsHalJson()
-        .bodyHasLink("self", s"""^/self-assessment/$saUtr/$taxYear/liability""".r)
+        .bodyHasLink("self",
+                     s"""^/self-assessment/$saUtr/$taxYear/liability""".r)
     }
   }
 
@@ -23,7 +24,8 @@ class LiabilityControllerSpec extends BaseFunctionalSpec {
         .thenAssertThat()
         .statusIs(200)
         .contentTypeIsHalJson()
-        .bodyHasLink("self", s"""^/self-assessment/$saUtr/$taxYear/liability""".r)
+        .bodyHasLink("self",
+                     s"""^/self-assessment/$saUtr/$taxYear/liability""".r)
     }
 
   }

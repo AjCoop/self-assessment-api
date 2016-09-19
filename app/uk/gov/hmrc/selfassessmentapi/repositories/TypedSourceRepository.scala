@@ -21,29 +21,40 @@ import reactivemongo.bson.{BSONDateTime, BSONDocument, BSONObjectID}
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.mongo.Repository
 import uk.gov.hmrc.selfassessmentapi.controllers.api._
-import uk.gov.hmrc.selfassessmentapi.repositories.domain.{SelfEmployment, SourceMetadata}
+import uk.gov.hmrc.selfassessmentapi.repositories.domain.{
+  SelfEmployment,
+  SourceMetadata
+}
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-
-trait TypedSourceRepository[A <: SourceMetadata, ID <: Any] extends Repository[A, ID] {
+trait TypedSourceRepository[A <: SourceMetadata, ID <: Any]
+    extends Repository[A, ID] {
 
   protected def modifierStatementLastModified: (String, BSONDocument) =
-    "$set" -> BSONDocument("lastModifiedDateTime" -> BSONDateTime(DateTime.now(DateTimeZone.UTC).getMillis))
+    "$set" -> BSONDocument(
+      "lastModifiedDateTime" -> BSONDateTime(
+        DateTime.now(DateTimeZone.UTC).getMillis))
 
   def isInsertion(suppliedId: BSONObjectID, returned: A): Boolean =
     suppliedId.equals(BSONObjectID(returned.sourceId))
 
-  def findMongoObjectById(saUtr: SaUtr, taxYear: TaxYear, id: SourceId): Future[Option[A]] = {
-    find("saUtr" -> saUtr.utr, "taxYear" -> taxYear.taxYear, "sourceId" -> id).map(_.headOption)
+  def findMongoObjectById(saUtr: SaUtr,
+                          taxYear: TaxYear,
+                          id: SourceId): Future[Option[A]] = {
+    find("saUtr" -> saUtr.utr, "taxYear" -> taxYear.taxYear, "sourceId" -> id)
+      .map(_.headOption)
   }
 
   def delete(saUtr: SaUtr, taxYear: TaxYear, id: SourceId): Future[Boolean] = {
-    for (option <- remove("saUtr" -> saUtr.utr, "taxYear" -> taxYear.taxYear, "sourceId" -> id)) yield option.n == 1
+    for (option <- remove("saUtr" -> saUtr.utr,
+                          "taxYear" -> taxYear.taxYear,
+                          "sourceId" -> id)) yield option.n == 1
   }
 
   def delete(saUtr: SaUtr, taxYear: TaxYear): Future[Boolean] = {
-    for (option <- remove("saUtr" -> saUtr.utr, "taxYear" -> taxYear.taxYear)) yield option.n > 0
+    for (option <- remove("saUtr" -> saUtr.utr, "taxYear" -> taxYear.taxYear))
+      yield option.n > 0
   }
 }

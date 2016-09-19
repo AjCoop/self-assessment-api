@@ -22,7 +22,6 @@ import reactivemongo.bson.{BSON, BSONHandler, BSONString}
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 import uk.gov.hmrc.selfassessmentapi.controllers.definition.EnumJson
 
-
 object JobStatus extends Enumeration {
   type JobStatus = Value
 
@@ -30,7 +29,8 @@ object JobStatus extends Enumeration {
   val Success = Value("Success")
   val Failed = Value("Failed")
 
-  implicit val jobStatus = EnumJson.enumFormat(JobStatus, Some("Job Status is invalid"))
+  implicit val jobStatus =
+    EnumJson.enumFormat(JobStatus, Some("Job Status is invalid"))
 
   implicit object BSONEnumHandler extends BSONHandler[BSONString, JobStatus] {
     def read(doc: BSONString) = JobStatus.Value(doc.value)
@@ -42,8 +42,11 @@ object JobStatus extends Enumeration {
 
 import uk.gov.hmrc.selfassessmentapi.repositories.domain.JobStatus._
 
-case class JobHistory(jobNumber: Int, status: JobStatus, startedAt: DateTime = DateTime.now,
-                      finishedAt: Option[DateTime] = None, recordsDeleted: Int = 0) {
+case class JobHistory(jobNumber: Int,
+                      status: JobStatus,
+                      startedAt: DateTime = DateTime.now,
+                      finishedAt: Option[DateTime] = None,
+                      recordsDeleted: Int = 0) {
   val isInProgress = status == InProgress
   val hasFailed = status == Failed
   val hasFinished = status == Success

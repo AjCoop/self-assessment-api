@@ -19,7 +19,10 @@ package uk.gov.hmrc.selfassessmentapi
 import org.scalatest.Matchers
 import uk.gov.hmrc.play.auth.controllers.AuthConfig
 import uk.gov.hmrc.play.auth.microservice.connectors.ConfidenceLevel.L50
-import uk.gov.hmrc.play.auth.microservice.connectors.{AuthRequestParameters, HttpVerb}
+import uk.gov.hmrc.play.auth.microservice.connectors.{
+  AuthRequestParameters,
+  HttpVerb
+}
 import uk.gov.hmrc.selfassessmentapi.config.MicroserviceAuthFilter
 
 class MicroserviceAuthFilterSpec extends UnitSpec with Matchers {
@@ -29,8 +32,13 @@ class MicroserviceAuthFilterSpec extends UnitSpec with Matchers {
   "MicroserviceAuthFilter" should {
     val utr = generateSaUtr().utr
     "extract resource that builds valid auth url" in {
-      val resource = underTest.extractResource(s"/$utr/employments", HttpVerb("GET"), AuthConfig(pattern = "/(\\w+)/.*".r, confidenceLevel = L50))
-      resource.get.buildUrl("http://authhost.com/auth", AuthRequestParameters(L50)) shouldBe s"http://authhost.com/auth/authorise/read/sa/$utr?confidenceLevel=50"
+      val resource = underTest.extractResource(
+        s"/$utr/employments",
+        HttpVerb("GET"),
+        AuthConfig(pattern = "/(\\w+)/.*".r, confidenceLevel = L50))
+      resource.get.buildUrl(
+        "http://authhost.com/auth",
+        AuthRequestParameters(L50)) shouldBe s"http://authhost.com/auth/authorise/read/sa/$utr?confidenceLevel=50"
     }
   }
 }

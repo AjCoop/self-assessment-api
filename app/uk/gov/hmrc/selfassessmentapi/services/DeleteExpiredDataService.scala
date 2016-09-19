@@ -20,17 +20,25 @@ import org.joda.time.DateTime
 import play.api.Logger
 import uk.gov.hmrc.selfassessmentapi.repositories.domain.SelfAssessment
 import uk.gov.hmrc.selfassessmentapi.repositories._
-import uk.gov.hmrc.selfassessmentapi.repositories.live.{UnearnedIncomeRepository, UnearnedIncomeMongoRepository, SelfEmploymentRepository, SelfEmploymentMongoRepository}
+import uk.gov.hmrc.selfassessmentapi.repositories.live.{
+  UnearnedIncomeRepository,
+  UnearnedIncomeMongoRepository,
+  SelfEmploymentRepository,
+  SelfEmploymentMongoRepository
+}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
-class DeleteExpiredDataService(saRepo: SelfAssessmentMongoRepository, seRepo: SelfEmploymentMongoRepository,
-                               uiRepo : UnearnedIncomeMongoRepository, jobRepo: JobHistoryMongoRepository) {
+class DeleteExpiredDataService(saRepo: SelfAssessmentMongoRepository,
+                               seRepo: SelfEmploymentMongoRepository,
+                               uiRepo: UnearnedIncomeMongoRepository,
+                               jobRepo: JobHistoryMongoRepository) {
 
   def deleteExpiredData(lastModifiedDate: DateTime): Future[Int] = {
-    Logger.info(s"Deleting records older than lastModifiedDate : $lastModifiedDate ")
+    Logger.info(
+      s"Deleting records older than lastModifiedDate : $lastModifiedDate ")
 
     jobRepo.startJob().flatMap { job =>
       val result = for {
@@ -64,6 +72,9 @@ class DeleteExpiredDataService(saRepo: SelfAssessmentMongoRepository, seRepo: Se
 }
 
 object DeleteExpiredDataService {
-  def apply() = new DeleteExpiredDataService(SelfAssessmentRepository(), SelfEmploymentRepository(),
-    UnearnedIncomeRepository(), JobHistoryRepository())
+  def apply() =
+    new DeleteExpiredDataService(SelfAssessmentRepository(),
+                                 SelfEmploymentRepository(),
+                                 UnearnedIncomeRepository(),
+                                 JobHistoryRepository())
 }

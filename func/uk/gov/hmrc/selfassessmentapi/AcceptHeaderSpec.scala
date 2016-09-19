@@ -10,8 +10,10 @@ class AcceptHeaderSpec extends BaseFunctionalSpec {
     "receive 200" in {
       given()
         .when()
-        .get(s"/sandbox/$saUtr/$taxYear/self-employments/$selfEmploymentId").withAcceptHeader()
-        .thenAssertThat().statusIs(200)
+        .get(s"/sandbox/$saUtr/$taxYear/self-employments/$selfEmploymentId")
+        .withAcceptHeader()
+        .thenAssertThat()
+        .statusIs(200)
     }
   }
 
@@ -19,7 +21,8 @@ class AcceptHeaderSpec extends BaseFunctionalSpec {
     "receive 406" in {
       given()
         .when()
-        .get(s"/sandbox/$saUtr/$taxYear/self-employments/$selfEmploymentId").withoutAcceptHeader()
+        .get(s"/sandbox/$saUtr/$taxYear/self-employments/$selfEmploymentId")
+        .withoutAcceptHeader()
         .thenAssertThat()
         .statusIs(406)
         .bodyIsError("ACCEPT_HEADER_INVALID")

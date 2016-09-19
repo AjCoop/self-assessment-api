@@ -11,20 +11,20 @@ class SourceControllerSpec extends BaseFunctionalSpec {
   "Sandbox Self source" should {
 
     "return a 404 error when source type is invalid" in {
-      when()
-        .get(s"/sandbox/$saUtr/$taxYear/blah")
-        .thenAssertThat()
-        .isNotFound
-  }
+      when().get(s"/sandbox/$saUtr/$taxYear/blah").thenAssertThat().isNotFound
+    }
 
     "return a 201 response with links to newly created source" in {
       SourceTypes.types.foreach { sourceType =>
         when()
-          .post(s"/sandbox/$saUtr/$taxYear/${sourceType.name}", Some(sourceType.example()))
+          .post(s"/sandbox/$saUtr/$taxYear/${sourceType.name}",
+                Some(sourceType.example()))
           .thenAssertThat()
           .statusIs(201)
           .contentTypeIsHalJson()
-          .bodyHasLink("self", s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/.+".r)
+          .bodyHasLink(
+            "self",
+            s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/.+".r)
           .bodyHasSummaryLinks(sourceType, saUtr, taxYear)
       }
     }
@@ -36,7 +36,9 @@ class SourceControllerSpec extends BaseFunctionalSpec {
           .thenAssertThat()
           .statusIs(200)
           .contentTypeIsHalJson()
-          .bodyHasLink("self", s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/$sourceId")
+          .bodyHasLink(
+            "self",
+            s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/$sourceId")
           .bodyHasSummaryLinks(sourceType, sourceId, saUtr, taxYear)
       }
     }
@@ -48,21 +50,31 @@ class SourceControllerSpec extends BaseFunctionalSpec {
           .thenAssertThat()
           .statusIs(200)
           .contentTypeIsHalJson()
-          .bodyHasLink("self", s"/self-assessment/$saUtr/$taxYear/${sourceType.name}")
-          .bodyHasPath(s"""_embedded \\ ${sourceType.name}(0) \\ _links \\ self \\ href""", s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/.+".r)
-          .bodyHasPath(s"""_embedded \\ ${sourceType.name}(1) \\ _links \\ self \\ href""", s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/.+".r)
-          .bodyHasPath(s"""_embedded \\ ${sourceType.name}(2) \\ _links \\ self \\ href""", s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/.+".r)
+          .bodyHasLink("self",
+                       s"/self-assessment/$saUtr/$taxYear/${sourceType.name}")
+          .bodyHasPath(
+            s"""_embedded \\ ${sourceType.name}(0) \\ _links \\ self \\ href""",
+            s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/.+".r)
+          .bodyHasPath(
+            s"""_embedded \\ ${sourceType.name}(1) \\ _links \\ self \\ href""",
+            s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/.+".r)
+          .bodyHasPath(
+            s"""_embedded \\ ${sourceType.name}(2) \\ _links \\ self \\ href""",
+            s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/.+".r)
       }
     }
 
     "return 200 and a valid response when an existing source is modified" in {
       SourceTypes.types.foreach { sourceType =>
         when()
-          .put(s"/sandbox/$saUtr/$taxYear/${sourceType.name}/$sourceId", Some(sourceType.example()))
+          .put(s"/sandbox/$saUtr/$taxYear/${sourceType.name}/$sourceId",
+               Some(sourceType.example()))
           .thenAssertThat()
           .statusIs(200)
           .contentTypeIsHalJson()
-          .bodyHasLink("self", s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/$sourceId".r)
+          .bodyHasLink(
+            "self",
+            s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/$sourceId".r)
           .bodyHasSummaryLinks(sourceType, sourceId, saUtr, taxYear)
       }
     }

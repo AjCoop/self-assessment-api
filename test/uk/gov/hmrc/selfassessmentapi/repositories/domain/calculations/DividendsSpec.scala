@@ -19,7 +19,10 @@ package uk.gov.hmrc.selfassessmentapi.repositories.domain.calculations
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.prop.Tables.Table
 import uk.gov.hmrc.selfassessmentapi.UnitSpec
-import uk.gov.hmrc.selfassessmentapi.controllers.api.{DividendsFromUKSources, TaxBandSummary}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.{
+  DividendsFromUKSources,
+  TaxBandSummary
+}
 import uk.gov.hmrc.selfassessmentapi.controllers.api.unearnedincome.DividendType._
 import uk.gov.hmrc.selfassessmentapi.controllers.api.SelfAssessment
 import uk.gov.hmrc.selfassessmentapi.repositories.domain.builders.UnearnedIncomeBuilder
@@ -34,40 +37,42 @@ class DividendsSpec extends UnitSpec {
 
     "be calculated for multiple UK dividends from multiple income sources" in {
       val unearnedIncomeOne = UnearnedIncomeBuilder()
-        .withDividends(
-          (FromUKCompanies, 1000.50),
-          (FromOtherUKSources, 2000.99))
+        .withDividends((FromUKCompanies, 1000.50),
+                       (FromOtherUKSources, 2000.99))
         .create()
 
       val unearnedIncomeTwo = UnearnedIncomeBuilder()
-        .withDividends(
-          (FromUKCompanies, 3000.50),
-          (FromOtherUKSources, 4000.999))
+        .withDividends((FromUKCompanies, 3000.50),
+                       (FromOtherUKSources, 4000.999))
         .create()
 
-      Dividends.FromUK(SelfAssessment(unearnedIncomes = Seq(unearnedIncomeOne, unearnedIncomeTwo))) shouldBe
-        Seq(DividendsFromUKSources(sourceId = unearnedIncomeOne.sourceId, BigDecimal(3001)),
-          DividendsFromUKSources(sourceId = unearnedIncomeTwo.sourceId, BigDecimal(7001)))
+      Dividends.FromUK(SelfAssessment(
+        unearnedIncomes = Seq(unearnedIncomeOne, unearnedIncomeTwo))) shouldBe
+        Seq(DividendsFromUKSources(sourceId = unearnedIncomeOne.sourceId,
+                                   BigDecimal(3001)),
+            DividendsFromUKSources(sourceId = unearnedIncomeTwo.sourceId,
+                                   BigDecimal(7001)))
     }
 
     "be calculated for a single one uk dividend for a single income source" in {
-      val unearnedIncome = UnearnedIncomeBuilder()
-        .withDividends((FromUKCompanies, 1000))
-        .create()
+      val unearnedIncome =
+        UnearnedIncomeBuilder().withDividends((FromUKCompanies, 1000)).create()
 
       Dividends.FromUK(SelfAssessment(unearnedIncomes = Seq(unearnedIncome))) shouldBe
-        Seq(DividendsFromUKSources(sourceId = unearnedIncome.sourceId, BigDecimal(1000)))
+        Seq(
+          DividendsFromUKSources(sourceId = unearnedIncome.sourceId,
+                                 BigDecimal(1000)))
     }
 
     "be calculated for multiple uk dividends from a single income source" in {
       val unearnedIncome = UnearnedIncomeBuilder()
-        .withDividends(
-          (FromUKCompanies, 1000),
-          (FromUKCompanies, 2000))
+        .withDividends((FromUKCompanies, 1000), (FromUKCompanies, 2000))
         .create()
 
       Dividends.FromUK(SelfAssessment(unearnedIncomes = Seq(unearnedIncome))) shouldBe
-        Seq(DividendsFromUKSources(sourceId = unearnedIncome.sourceId, BigDecimal(3000)))
+        Seq(
+          DividendsFromUKSources(sourceId = unearnedIncome.sourceId,
+                                 BigDecimal(3000)))
     }
 
     "be round down to nearest pound for a single dividend" in {
@@ -76,18 +81,20 @@ class DividendsSpec extends UnitSpec {
         .create()
 
       Dividends.FromUK(SelfAssessment(unearnedIncomes = Seq(unearnedIncome))) shouldBe
-        Seq(DividendsFromUKSources(sourceId = unearnedIncome.sourceId, BigDecimal(1000)))
+        Seq(
+          DividendsFromUKSources(sourceId = unearnedIncome.sourceId,
+                                 BigDecimal(1000)))
     }
 
     "be round down to nearest pound for multiple dividends" in {
       val unearnedIncome = UnearnedIncomeBuilder()
-        .withDividends(
-          (FromUKCompanies, 1000.90),
-          (FromUKCompanies, 2000.99))
+        .withDividends((FromUKCompanies, 1000.90), (FromUKCompanies, 2000.99))
         .create()
 
       Dividends.FromUK(SelfAssessment(unearnedIncomes = Seq(unearnedIncome))) shouldBe
-        Seq(DividendsFromUKSources(sourceId = unearnedIncome.sourceId, BigDecimal(3001)))
+        Seq(
+          DividendsFromUKSources(sourceId = unearnedIncome.sourceId,
+                                 BigDecimal(3001)))
     }
 
   }
@@ -95,43 +102,59 @@ class DividendsSpec extends UnitSpec {
   "TotalDividends" should {
     "be sum of all dividends across multiple sources which have been rounded at source level" in {
       val unearnedIncomeOne = UnearnedIncomeBuilder()
-        .withDividends(
-          (FromUKCompanies, 1000.50),
-          (FromOtherUKSources, 2000.99))
+        .withDividends((FromUKCompanies, 1000.50),
+                       (FromOtherUKSources, 2000.99))
         .create()
 
       val unearnedIncomeTwo = UnearnedIncomeBuilder()
-        .withDividends(
-          (FromUKCompanies, 3000.50),
-          (FromOtherUKSources, 4000.999))
+        .withDividends((FromUKCompanies, 3000.50),
+                       (FromOtherUKSources, 4000.999))
         .create()
 
-      Dividends.TotalIncome(SelfAssessment(unearnedIncomes = Seq(unearnedIncomeOne, unearnedIncomeTwo))) shouldBe 10002
+      Dividends.TotalIncome(
+        SelfAssessment(unearnedIncomes =
+          Seq(unearnedIncomeOne, unearnedIncomeTwo))) shouldBe 10002
     }
   }
 
   "TaxableDividendIncome" should {
     "equal to total dividend income if there is no remaining deductions" in {
-      Dividends.TotalTaxableIncome(totalDividendIncome = 1000, totalProfits = 11000, totalSavingsIncome = 0, totalDeduction = 11000) shouldBe 1000
+      Dividends.TotalTaxableIncome(totalDividendIncome = 1000,
+                                   totalProfits = 11000,
+                                   totalSavingsIncome = 0,
+                                   totalDeduction = 11000) shouldBe 1000
     }
 
     "equal to total dividend income - deduction remain after allocation to profits and savings income" in {
-      Dividends.TotalTaxableIncome(totalDividendIncome = 9001, totalProfits = 1000, totalSavingsIncome = 1000, totalDeduction = 11000) shouldBe 1
+      Dividends.TotalTaxableIncome(totalDividendIncome = 9001,
+                                   totalProfits = 1000,
+                                   totalSavingsIncome = 1000,
+                                   totalDeduction = 11000) shouldBe 1
     }
 
     "equal to zero if total dividend income is equal to deduction remain after allocation to profits and savings income" in {
-      Dividends.TotalTaxableIncome(totalDividendIncome = 9000, totalProfits = 1000, totalSavingsIncome = 1000, totalDeduction = 11000) shouldBe 0
+      Dividends.TotalTaxableIncome(totalDividendIncome = 9000,
+                                   totalProfits = 1000,
+                                   totalSavingsIncome = 1000,
+                                   totalDeduction = 11000) shouldBe 0
     }
 
     "equal to zero if total dividend income is less than the deduction remain after allocation to profits and savings income" in {
-      Dividends.TotalTaxableIncome(totalDividendIncome = 8999, totalProfits = 1000, totalSavingsIncome = 1000, totalDeduction = 11000) shouldBe 0
+      Dividends.TotalTaxableIncome(totalDividendIncome = 8999,
+                                   totalProfits = 1000,
+                                   totalSavingsIncome = 1000,
+                                   totalDeduction = 11000) shouldBe 0
     }
   }
 
   "Dividends.IncomeTaxBandSummary" should {
     "be calculated when TaxableNonSavingsIncome = 0, TaxableSavingIncome = 0 and TaxableDividendsIncome falls within BasicRate band" in {
-      Dividends.IncomeTaxBandSummary(taxableSavingsIncome = 0, taxableNonSavingsIncome =0, taxableDividendIncome = 31999,
-        personalDividendAllowance = 5000, ukPensionContribution = 0) should contain theSameElementsInOrderAs
+      Dividends.IncomeTaxBandSummary(
+        taxableSavingsIncome = 0,
+        taxableNonSavingsIncome = 0,
+        taxableDividendIncome = 31999,
+        personalDividendAllowance = 5000,
+        ukPensionContribution = 0) should contain theSameElementsInOrderAs
         Seq(
           TaxBandSummary("nilRate", 5000.0, "0%", 0.0),
           TaxBandSummary("basicRate", 26999.0, "7.5%", 2024.92),
@@ -141,8 +164,12 @@ class DividendsSpec extends UnitSpec {
     }
 
     "be calculated when NonSavingsIncome = 0 and TaxableSavingIncome is spread over Basic and Higher Rate band" in {
-      Dividends.IncomeTaxBandSummary(taxableSavingsIncome = 0, taxableNonSavingsIncome =0, taxableDividendIncome = 32001,
-        personalDividendAllowance = 5000, ukPensionContribution = 0) should contain theSameElementsInOrderAs
+      Dividends.IncomeTaxBandSummary(
+        taxableSavingsIncome = 0,
+        taxableNonSavingsIncome = 0,
+        taxableDividendIncome = 32001,
+        personalDividendAllowance = 5000,
+        ukPensionContribution = 0) should contain theSameElementsInOrderAs
         Seq(
           TaxBandSummary("nilRate", 5000.0, "0%", 0.0),
           TaxBandSummary("basicRate", 27000.0, "7.5%", 2025.0),
@@ -152,8 +179,12 @@ class DividendsSpec extends UnitSpec {
     }
 
     "be calculated when NonSavingsIncome = 0, ukPensionContributions is present and TaxableSavingIncome is all in Basic Rate band" in {
-      Dividends.IncomeTaxBandSummary(taxableSavingsIncome = 0, taxableNonSavingsIncome =0, taxableDividendIncome = 32001,
-        personalDividendAllowance = 5000, ukPensionContribution = 500) should contain theSameElementsInOrderAs
+      Dividends.IncomeTaxBandSummary(
+        taxableSavingsIncome = 0,
+        taxableNonSavingsIncome = 0,
+        taxableDividendIncome = 32001,
+        personalDividendAllowance = 5000,
+        ukPensionContribution = 500) should contain theSameElementsInOrderAs
         Seq(
           TaxBandSummary("nilRate", 5000.0, "0%", 0.0),
           TaxBandSummary("basicRate", 27001.0, "7.5%", 2025.07),
@@ -163,8 +194,12 @@ class DividendsSpec extends UnitSpec {
     }
 
     "be calculated when NonSavingsIncome = 0 and TaxableSavingIncome is spread over Basic, Higher and Additional Higher Rate band" in {
-      Dividends.IncomeTaxBandSummary(taxableSavingsIncome = 0, taxableNonSavingsIncome =0, taxableDividendIncome = 150001,
-        personalDividendAllowance = 5000, ukPensionContribution = 0) should contain theSameElementsInOrderAs
+      Dividends.IncomeTaxBandSummary(
+        taxableSavingsIncome = 0,
+        taxableNonSavingsIncome = 0,
+        taxableDividendIncome = 150001,
+        personalDividendAllowance = 5000,
+        ukPensionContribution = 0) should contain theSameElementsInOrderAs
         Seq(
           TaxBandSummary("nilRate", 5000.0, "0%", 0.0),
           TaxBandSummary("basicRate", 27000.0, "7.5%", 2025.0),
@@ -174,8 +209,12 @@ class DividendsSpec extends UnitSpec {
     }
 
     "be calculated when NonSavingsIncome > 0 and TaxableSavingIncome falls within BasicRate band" in {
-      Dividends.IncomeTaxBandSummary(taxableSavingsIncome = 500, taxableNonSavingsIncome = 500, taxableDividendIncome = 30999,
-        personalDividendAllowance = 5000, ukPensionContribution = 0) should contain theSameElementsInOrderAs
+      Dividends.IncomeTaxBandSummary(
+        taxableSavingsIncome = 500,
+        taxableNonSavingsIncome = 500,
+        taxableDividendIncome = 30999,
+        personalDividendAllowance = 5000,
+        ukPensionContribution = 0) should contain theSameElementsInOrderAs
         Seq(
           TaxBandSummary("nilRate", 5000.0, "0%", 0.0),
           TaxBandSummary("basicRate", 25999.0, "7.5%", 1949.92),
@@ -185,8 +224,12 @@ class DividendsSpec extends UnitSpec {
     }
 
     "be calculated when NonSavingsIncome > 0 and TaxableSavingIncome is spread over Basic and Higher Rate band" in {
-      Dividends.IncomeTaxBandSummary(taxableSavingsIncome = 500, taxableNonSavingsIncome = 500, taxableDividendIncome = 31001,
-        personalDividendAllowance = 5000, ukPensionContribution = 0) should contain theSameElementsInOrderAs
+      Dividends.IncomeTaxBandSummary(
+        taxableSavingsIncome = 500,
+        taxableNonSavingsIncome = 500,
+        taxableDividendIncome = 31001,
+        personalDividendAllowance = 5000,
+        ukPensionContribution = 0) should contain theSameElementsInOrderAs
         Seq(
           TaxBandSummary("nilRate", 5000.0, "0%", 0.0),
           TaxBandSummary("basicRate", 26000.0, "7.5%", 1950.0),
@@ -196,8 +239,12 @@ class DividendsSpec extends UnitSpec {
     }
 
     "be calculated when NonSavingsIncome > 0 and TaxableSavingIncome is spread over Basic, Higher and Additional Higher Rate band" in {
-      Dividends.IncomeTaxBandSummary(taxableSavingsIncome = 500, taxableNonSavingsIncome = 500, taxableDividendIncome = 149001,
-        personalDividendAllowance = 5000, ukPensionContribution = 0) should contain theSameElementsInOrderAs
+      Dividends.IncomeTaxBandSummary(
+        taxableSavingsIncome = 500,
+        taxableNonSavingsIncome = 500,
+        taxableDividendIncome = 149001,
+        personalDividendAllowance = 5000,
+        ukPensionContribution = 0) should contain theSameElementsInOrderAs
         Seq(
           TaxBandSummary("nilRate", 5000.0, "0%", 0.0),
           TaxBandSummary("basicRate", 26000.0, "7.5%", 1950.0),
@@ -206,9 +253,13 @@ class DividendsSpec extends UnitSpec {
         )
     }
 
-   "be calculated when NonSavingsIncome > 0, ukPensionContributions is present and TaxableSavingIncome is spread over Basic and Higher Rate band" in {
-      Dividends.IncomeTaxBandSummary(taxableSavingsIncome = 500, taxableNonSavingsIncome = 500, taxableDividendIncome = 149001,
-        personalDividendAllowance = 5000, ukPensionContribution = 500) should contain theSameElementsInOrderAs
+    "be calculated when NonSavingsIncome > 0, ukPensionContributions is present and TaxableSavingIncome is spread over Basic and Higher Rate band" in {
+      Dividends.IncomeTaxBandSummary(
+        taxableSavingsIncome = 500,
+        taxableNonSavingsIncome = 500,
+        taxableDividendIncome = 149001,
+        personalDividendAllowance = 5000,
+        ukPensionContribution = 500) should contain theSameElementsInOrderAs
         Seq(
           TaxBandSummary("nilRate", 5000.0, "0%", 0.0),
           TaxBandSummary("basicRate", 26500.0, "7.5%", 1987.5),
@@ -222,8 +273,14 @@ class DividendsSpec extends UnitSpec {
   "Dividends.IncomeTaxBandSummary" should {
     "acceptance test" in {
       val inputs = Table(
-        ("TotalProfitFromSelfEmployments", "TotalSavingsIncome", "UkPensionContribution", "TotalDividends", "NilRateAmount", "BasicRateTaxAmount",
-          "HigherRateTaxAmount", "AdditionalHigherRateAmount"),
+        ("TotalProfitFromSelfEmployments",
+         "TotalSavingsIncome",
+         "UkPensionContribution",
+         "TotalDividends",
+         "NilRateAmount",
+         "BasicRateTaxAmount",
+         "HigherRateTaxAmount",
+         "AdditionalHigherRateAmount"),
         ("0", "0", "0", "10999", "0", "0", "0", "0"),
         ("0", "0", "0", "11001", "1", "0", "0", "0"),
         ("0", "0", "0", "15000", "4000", "0", "0", "0"),
@@ -247,32 +304,56 @@ class DividendsSpec extends UnitSpec {
         ("12000", "0", "500", "139000", "5000", "15500", "118000", "500")
       )
 
-      TableDrivenPropertyChecks.forAll(inputs) { (totalProfits: String, totalSavingsIncome: String, ukPensionContributions: String,
-                                                  totalDividends:String, nilRateAmount: String, basicRateTaxAmount: String,
-                                                  higherRateTaxAmount: String, additionalHigherRateAmount: String) =>
+      TableDrivenPropertyChecks.forAll(inputs) {
+        (totalProfits: String, totalSavingsIncome: String,
+         ukPensionContributions: String, totalDividends: String,
+         nilRateAmount: String, basicRateTaxAmount: String,
+         higherRateTaxAmount: String, additionalHigherRateAmount: String) =>
+          val incomeTaxRelief = 0
+          val profits = BigDecimal(totalProfits.toInt)
+          val savings = BigDecimal(totalSavingsIncome.toInt)
+          val dividends = BigDecimal(totalDividends.toInt)
+          val ukPensionsContributions =
+            BigDecimal(ukPensionContributions.toInt)
 
-        val incomeTaxRelief = 0
-        val profits = BigDecimal(totalProfits.toInt)
-        val savings = BigDecimal(totalSavingsIncome.toInt)
-        val dividends = BigDecimal(totalDividends.toInt)
-        val ukPensionsContributions = BigDecimal(ukPensionContributions.toInt)
+          val personalAllowance = Print(
+            Deductions.PersonalAllowance(
+              totalIncomeReceived = profits + savings + dividends,
+              incomeTaxRelief,
+              pensionContribution = 0)).as("personalAllowance")
+          val totalDeduction =
+            Print(Deductions.Total(incomeTaxRelief, personalAllowance, 0))
+              .as("totalDeduction")
+          val taxableProfitFromSelfEmployments =
+            Print(SelfEmployment.TotalTaxableProfit(profits, totalDeduction))
+              .as("taxableProfits")
+          val taxableSavingsIncome =
+            Print(Savings.TotalTaxableIncome(savings, totalDeduction, profits))
+              .as("taxableSavingsIncome")
+          val taxableDividendIncome = Print(
+            Dividends
+              .TotalTaxableIncome(dividends, profits, savings, totalDeduction))
+            .as("taxableDividendIncome")
+          val personalDividendAllowance =
+            Print(Dividends.PersonalAllowance(taxableDividendIncome))
+              .as("personalDividendAllowance")
 
-        val personalAllowance = Print(Deductions.PersonalAllowance(totalIncomeReceived = profits + savings + dividends, incomeTaxRelief,
-          pensionContribution = 0)).as("personalAllowance")
-        val totalDeduction = Print(Deductions.Total(incomeTaxRelief, personalAllowance, 0)).as("totalDeduction")
-        val taxableProfitFromSelfEmployments = Print(SelfEmployment.TotalTaxableProfit(profits, totalDeduction)).as("taxableProfits")
-        val taxableSavingsIncome = Print(Savings.TotalTaxableIncome(savings, totalDeduction, profits)).as("taxableSavingsIncome")
-        val taxableDividendIncome = Print(Dividends.TotalTaxableIncome(dividends, profits, savings, totalDeduction)).as("taxableDividendIncome")
-        val personalDividendAllowance = Print(Dividends.PersonalAllowance(taxableDividendIncome)).as("personalDividendAllowance")
+          val dividendIncomeTax =
+            Dividends.IncomeTaxBandSummary(taxableProfitFromSelfEmployments,
+                                           taxableSavingsIncome,
+                                           taxableDividendIncome,
+                                           personalDividendAllowance,
+                                           ukPensionContribution =
+                                             ukPensionsContributions)
 
-        val dividendIncomeTax = Dividends.IncomeTaxBandSummary(taxableProfitFromSelfEmployments, taxableSavingsIncome, taxableDividendIncome,
-          personalDividendAllowance, ukPensionContribution = ukPensionsContributions)
+          println(dividendIncomeTax.map(_.taxableAmount))
+          println("==========================================")
 
-        println(dividendIncomeTax.map(_.taxableAmount))
-        println("==========================================")
-
-        dividendIncomeTax.map(_.taxableAmount) should contain theSameElementsInOrderAs
-          Seq(BigDecimal(nilRateAmount.toInt), BigDecimal(basicRateTaxAmount.toInt), BigDecimal(higherRateTaxAmount.toInt), BigDecimal(additionalHigherRateAmount.toInt))
+          dividendIncomeTax.map(_.taxableAmount) should contain theSameElementsInOrderAs
+            Seq(BigDecimal(nilRateAmount.toInt),
+                BigDecimal(basicRateTaxAmount.toInt),
+                BigDecimal(higherRateTaxAmount.toInt),
+                BigDecimal(additionalHigherRateAmount.toInt))
       }
     }
   }
@@ -282,7 +363,10 @@ class DividendsSpec extends UnitSpec {
     "acceptance test" in {
 
       val inputs = Table(
-        ("ProfitFromSelfEmployment", "SavingsIncome", "DividendIncome", "PersonalDividendAllowance"),
+        ("ProfitFromSelfEmployment",
+         "SavingsIncome",
+         "DividendIncome",
+         "PersonalDividendAllowance"),
         ("8000", "0", "2000", "0"),
         ("8000", "0", "6000", "1000"),
         ("8000", "2000", "6000", "3000"),
@@ -297,20 +381,29 @@ class DividendsSpec extends UnitSpec {
         ("16000", "3000", "8000", "5000")
       )
 
-      TableDrivenPropertyChecks.forAll(inputs) { (profitFromSelfEmployment: String, savingsIncome: String, dividendIncome: String,
-                                                  personalDividendAllowance: String) =>
+      TableDrivenPropertyChecks.forAll(inputs) {
+        (profitFromSelfEmployment: String, savingsIncome: String,
+         dividendIncome: String, personalDividendAllowance: String) =>
+          val profits =
+            Print(BigDecimal(profitFromSelfEmployment.toInt)).as("profits")
+          val savings = Print(BigDecimal(savingsIncome.toInt)).as("savings")
+          val dividends =
+            Print(BigDecimal(dividendIncome.toInt)).as("dividends")
 
-        val profits = Print(BigDecimal(profitFromSelfEmployment.toInt)).as("profits")
-        val savings = Print(BigDecimal(savingsIncome.toInt)).as("savings")
-        val dividends = Print(BigDecimal(dividendIncome.toInt)).as("dividends")
+          val totalIncome =
+            Print(profits + savings + dividends).as("totalIncome")
+          val totalDeduction = Print(
+            Deductions.Total(2000,
+                             Deductions.PersonalAllowance(totalIncome, 0, 0),
+                             0)).as("totalDeduction")
+          val taxableDividendIncome = Print(
+            Dividends
+              .TotalTaxableIncome(dividends, profits, savings, totalDeduction))
+            .as("taxableDividendIncome")
 
-        val totalIncome = Print(profits + savings + dividends).as("totalIncome")
-        val totalDeduction = Print(Deductions.Total(2000, Deductions.PersonalAllowance(totalIncome, 0, 0), 0)).as("totalDeduction")
-        val taxableDividendIncome = Print(Dividends.TotalTaxableIncome(dividends, profits, savings, totalDeduction)).as("taxableDividendIncome")
+          println("=======================================")
 
-        println("=======================================")
-
-        Dividends.PersonalAllowance(taxableDividendIncome) shouldBe personalDividendAllowance.toInt
+          Dividends.PersonalAllowance(taxableDividendIncome) shouldBe personalDividendAllowance.toInt
       }
     }
 

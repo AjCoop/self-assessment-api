@@ -21,23 +21,34 @@ import uk.gov.hmrc.api.controllers.ErrorResponse
 import uk.gov.hmrc.selfassessmentapi.controllers.api.ErrorCode
 import ErrorCode.ErrorCode
 
+case object ErrorSaUtrInvalid
+    extends ErrorResponse(400,
+                          "SA_UTR_INVALID",
+                          "The provided SA UTR is invalid")
 
-case object ErrorSaUtrInvalid extends ErrorResponse(400, "SA_UTR_INVALID", "The provided SA UTR is invalid")
+case object ErrorNotImplemented
+    extends ErrorResponse(501,
+                          "NOT_IMPLEMENTED",
+                          "The resource is not implemented")
 
-case object ErrorNotImplemented extends ErrorResponse(501, "NOT_IMPLEMENTED", "The resource is not implemented")
-
-case object ErrorFeatureSwitched extends ErrorResponse(400, "INVALID_REQUEST", "The provided JSON object contains disabled properties")
+case object ErrorFeatureSwitched
+    extends ErrorResponse(
+      400,
+      "INVALID_REQUEST",
+      "The provided JSON object contains disabled properties")
 
 case class ErrorBadRequest(code: ErrorCode, override val message: String)
-  extends ErrorResponse(400, code.toString, message)
+    extends ErrorResponse(400, code.toString, message)
 
-case class InvalidPart(code: ErrorCode, message: String, path : String)
+case class InvalidPart(code: ErrorCode, message: String, path: String)
 
 object InvalidPart {
   implicit val writes = Json.writes[InvalidPart]
 }
 
-case class InvalidRequest(code: ErrorCode, message: String, errors: Seq[InvalidPart])
+case class InvalidRequest(code: ErrorCode,
+                          message: String,
+                          errors: Seq[InvalidPart])
 
 object InvalidRequest {
   implicit val writes = Json.writes[InvalidRequest]
@@ -49,10 +60,10 @@ object LiabilityError {
   implicit val writes = Json.writes[LiabilityError]
 }
 
-case class LiabilityErrors(code: ErrorCode, message: String, errors: Seq[LiabilityError])
+case class LiabilityErrors(code: ErrorCode,
+                           message: String,
+                           errors: Seq[LiabilityError])
 
 object LiabilityErrors {
   implicit val writes = Json.writes[LiabilityErrors]
 }
-
-

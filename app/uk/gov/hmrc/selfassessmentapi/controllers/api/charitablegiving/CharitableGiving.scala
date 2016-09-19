@@ -23,42 +23,58 @@ import play.api.libs.json._
 import uk.gov.hmrc.selfassessmentapi.controllers.api.ErrorCode._
 import uk.gov.hmrc.selfassessmentapi.controllers.api._
 
-case class GiftAidPayments( totalInTaxYear: Option[BigDecimal] = None,
-                            oneOff: Option[BigDecimal] = None,
-                            toNonUkCharities: Option[BigDecimal] = None,
-                            carriedBackToPreviousTaxYear: Option[BigDecimal] = None,
-                            carriedFromNextTaxYear: Option[BigDecimal] = None)
+case class GiftAidPayments(totalInTaxYear: Option[BigDecimal] = None,
+                           oneOff: Option[BigDecimal] = None,
+                           toNonUkCharities: Option[BigDecimal] = None,
+                           carriedBackToPreviousTaxYear: Option[BigDecimal] =
+                             None,
+                           carriedFromNextTaxYear: Option[BigDecimal] = None)
 
 object GiftAidPayments extends JsonMarshaller[GiftAidPayments] {
 
   override implicit val writes = Json.writes[GiftAidPayments]
 
   override implicit val reads = (
-      (__ \ "totalInTaxYear").readNullable[BigDecimal](positiveAmountValidator("totalInTaxYear")) and
-      (__ \ "oneOff").readNullable[BigDecimal](positiveAmountValidator("oneOff")) and
-      (__ \ "toNonUkCharities").readNullable[BigDecimal](positiveAmountValidator("toNonUkCharities")) and
-      (__ \ "carriedBackToPreviousTaxYear").readNullable[BigDecimal](positiveAmountValidator("carriedBackToPreviousTaxYear")) and
-      (__ \ "carriedFromNextTaxYear").readNullable[BigDecimal](positiveAmountValidator("carriedFromNextTaxYear"))
-    ) (GiftAidPayments.apply _)
+    (__ \ "totalInTaxYear").readNullable[BigDecimal](
+      positiveAmountValidator("totalInTaxYear")) and
+      (__ \ "oneOff").readNullable[BigDecimal](
+        positiveAmountValidator("oneOff")) and
+      (__ \ "toNonUkCharities").readNullable[BigDecimal](
+        positiveAmountValidator("toNonUkCharities")) and
+      (__ \ "carriedBackToPreviousTaxYear").readNullable[BigDecimal](
+        positiveAmountValidator("carriedBackToPreviousTaxYear")) and
+      (__ \ "carriedFromNextTaxYear").readNullable[BigDecimal](
+        positiveAmountValidator("carriedFromNextTaxYear"))
+  )(GiftAidPayments.apply _)
     .filter(
-      ValidationError("totalInTaxYear must be defined if oneOff or toNonUkCharities or carriedBackToPreviousTaxYear is defined", UNDEFINED_REQUIRED_ELEMENT)
+      ValidationError(
+        "totalInTaxYear must be defined if oneOff or toNonUkCharities or carriedBackToPreviousTaxYear is defined",
+        UNDEFINED_REQUIRED_ELEMENT)
     ) { p =>
       p.totalInTaxYear.isDefined || (p.oneOff.isEmpty && p.toNonUkCharities.isEmpty && p.carriedBackToPreviousTaxYear.isEmpty)
     }
     .filter(
-      ValidationError("totalInTaxYear must be greater or equal to oneOff", MAXIMUM_AMOUNT_EXCEEDED)
+      ValidationError("totalInTaxYear must be greater or equal to oneOff",
+                      MAXIMUM_AMOUNT_EXCEEDED)
     ) { p =>
-      p.totalInTaxYear.getOrElse(BigDecimal(0)) >= p.oneOff.getOrElse(BigDecimal(0))
+      p.totalInTaxYear.getOrElse(BigDecimal(0)) >= p.oneOff.getOrElse(
+        BigDecimal(0))
     }
     .filter(
-      ValidationError("totalInTaxYear must be greater or equal to toNonUkCharities", MAXIMUM_AMOUNT_EXCEEDED)
+      ValidationError(
+        "totalInTaxYear must be greater or equal to toNonUkCharities",
+        MAXIMUM_AMOUNT_EXCEEDED)
     ) { p =>
-      p.totalInTaxYear.getOrElse(BigDecimal(0)) >= p.toNonUkCharities.getOrElse(BigDecimal(0))
+      p.totalInTaxYear.getOrElse(BigDecimal(0)) >= p.toNonUkCharities
+        .getOrElse(BigDecimal(0))
     }
     .filter(
-      ValidationError("totalInTaxYear must be greater or equal to carriedBackToPreviousTaxYear", MAXIMUM_AMOUNT_EXCEEDED)
+      ValidationError(
+        "totalInTaxYear must be greater or equal to carriedBackToPreviousTaxYear",
+        MAXIMUM_AMOUNT_EXCEEDED)
     ) { p =>
-      p.totalInTaxYear.getOrElse(BigDecimal(0)) >= p.carriedBackToPreviousTaxYear.getOrElse(BigDecimal(0))
+      p.totalInTaxYear.getOrElse(BigDecimal(0)) >= p.carriedBackToPreviousTaxYear
+        .getOrElse(BigDecimal(0))
     }
 
   override def example(id: Option[String] = None) =
@@ -71,22 +87,25 @@ object GiftAidPayments extends JsonMarshaller[GiftAidPayments] {
     )
 }
 
-case class SharesAndSecurities( totalInTaxYear: BigDecimal,
-                                toNonUkCharities: Option[BigDecimal] = None)
+case class SharesAndSecurities(totalInTaxYear: BigDecimal,
+                               toNonUkCharities: Option[BigDecimal] = None)
 
 object SharesAndSecurities extends JsonMarshaller[SharesAndSecurities] {
 
   override implicit val writes = Json.writes[SharesAndSecurities]
 
   override implicit val reads = (
-      (__ \ "totalInTaxYear").read[BigDecimal](positiveAmountValidator("totalInTaxYear")) and
-      (__ \ "toNonUkCharities").readNullable[BigDecimal](positiveAmountValidator("toNonUkCharities"))
-    ) (SharesAndSecurities.apply _)
-    .filter(
-      ValidationError("totalInTaxYear must be greater or equal to toNonUkCharities", MAXIMUM_AMOUNT_EXCEEDED)
-    ) { p =>
-      p.totalInTaxYear >= p.toNonUkCharities.getOrElse(BigDecimal(0))
-    }
+    (__ \ "totalInTaxYear").read[BigDecimal](
+      positiveAmountValidator("totalInTaxYear")) and
+      (__ \ "toNonUkCharities").readNullable[BigDecimal](
+        positiveAmountValidator("toNonUkCharities"))
+  )(SharesAndSecurities.apply _).filter(
+    ValidationError(
+      "totalInTaxYear must be greater or equal to toNonUkCharities",
+      MAXIMUM_AMOUNT_EXCEEDED)
+  ) { p =>
+    p.totalInTaxYear >= p.toNonUkCharities.getOrElse(BigDecimal(0))
+  }
 
   override def example(id: Option[String] = None) =
     SharesAndSecurities(
@@ -95,22 +114,25 @@ object SharesAndSecurities extends JsonMarshaller[SharesAndSecurities] {
     )
 }
 
-case class LandAndProperties( totalInTaxYear: BigDecimal,
-                              toNonUkCharities: Option[BigDecimal] = None)
+case class LandAndProperties(totalInTaxYear: BigDecimal,
+                             toNonUkCharities: Option[BigDecimal] = None)
 
 object LandAndProperties extends JsonMarshaller[LandAndProperties] {
 
   override implicit val writes = Json.writes[LandAndProperties]
 
   override implicit val reads = (
-      (__ \ "totalInTaxYear").read[BigDecimal](positiveAmountValidator("totalInTaxYear")) and
-      (__ \ "toNonUkCharities").readNullable[BigDecimal](positiveAmountValidator("toNonUkCharities"))
-    ) (LandAndProperties.apply _)
-    .filter(
-      ValidationError("totalInTaxYear must be greater or equal to toNonUkCharities", MAXIMUM_AMOUNT_EXCEEDED)
-    ) { p =>
-      p.totalInTaxYear >= p.toNonUkCharities.getOrElse(BigDecimal(0))
-    }
+    (__ \ "totalInTaxYear").read[BigDecimal](
+      positiveAmountValidator("totalInTaxYear")) and
+      (__ \ "toNonUkCharities").readNullable[BigDecimal](
+        positiveAmountValidator("toNonUkCharities"))
+  )(LandAndProperties.apply _).filter(
+    ValidationError(
+      "totalInTaxYear must be greater or equal to toNonUkCharities",
+      MAXIMUM_AMOUNT_EXCEEDED)
+  ) { p =>
+    p.totalInTaxYear >= p.toNonUkCharities.getOrElse(BigDecimal(0))
+  }
 
   override def example(id: Option[String] = None) =
     LandAndProperties(
@@ -119,19 +141,20 @@ object LandAndProperties extends JsonMarshaller[LandAndProperties] {
     )
 }
 
-case class CharitableGiving( giftAidPayments: Option[GiftAidPayments] = None,
-                             sharesSecurities: Option[SharesAndSecurities] = None,
-                             landProperties: Option[LandAndProperties] = None)
+case class CharitableGiving(giftAidPayments: Option[GiftAidPayments] = None,
+                            sharesSecurities: Option[SharesAndSecurities] =
+                              None,
+                            landProperties: Option[LandAndProperties] = None)
 
 object CharitableGiving extends JsonMarshaller[CharitableGiving] {
 
   override implicit val writes = Json.writes[CharitableGiving]
 
   override implicit val reads = (
-      (__ \ "giftAidPayments").readNullable[GiftAidPayments] and
-      (__ \ "sharesSecurities").readNullable[SharesAndSecurities]and
+    (__ \ "giftAidPayments").readNullable[GiftAidPayments] and
+      (__ \ "sharesSecurities").readNullable[SharesAndSecurities] and
       (__ \ "landProperties").readNullable[LandAndProperties]
-    ) (CharitableGiving.apply _)
+  )(CharitableGiving.apply _)
 
   override def example(id: Option[String] = None) =
     CharitableGiving(

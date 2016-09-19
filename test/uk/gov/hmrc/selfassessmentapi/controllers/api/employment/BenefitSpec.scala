@@ -26,16 +26,20 @@ class BenefitSpec extends JsonSpec {
 
   "format" should {
     "round trip Benefit json" in {
-      BenefitType.values.foreach {
-        cat => roundTripJson(Benefit(`type` = cat, amount = BigDecimal(1000.99)))
+      BenefitType.values.foreach { cat =>
+        roundTripJson(Benefit(`type` = cat, amount = BigDecimal(1000.99)))
       }
     }
   }
 
   "validate" should {
     "reject amounts with more than 2 decimal values" in {
-      Seq(BigDecimal(1000.123), BigDecimal(1000.1234), BigDecimal(1000.12345), BigDecimal(1000.123456789)).foreach { testAmount =>
-        val empBenefit = Benefit(`type` = PrivateInsurance, amount = testAmount)
+      Seq(BigDecimal(1000.123),
+          BigDecimal(1000.1234),
+          BigDecimal(1000.12345),
+          BigDecimal(1000.123456789)).foreach { testAmount =>
+        val empBenefit =
+          Benefit(`type` = PrivateInsurance, amount = testAmount)
         assertValidationError[Benefit](
           empBenefit,
           Map("/amount" -> INVALID_MONETARY_AMOUNT),
@@ -45,7 +49,8 @@ class BenefitSpec extends JsonSpec {
 
     "reject negative monetary amounts" in {
       Seq(BigDecimal(-1000.12), BigDecimal(-10.12)).foreach { testAmount =>
-        val empBenefit = Benefit(`type` = PrivateInsurance, amount = testAmount)
+        val empBenefit =
+          Benefit(`type` = PrivateInsurance, amount = testAmount)
         assertValidationError[Benefit](
           empBenefit,
           Map("/amount" -> INVALID_MONETARY_AMOUNT),
@@ -54,7 +59,8 @@ class BenefitSpec extends JsonSpec {
     }
 
     "reject negative amount" in {
-      val empBenefit = Benefit(`type` = PrivateInsurance, amount = BigDecimal(-1000.12))
+      val empBenefit =
+        Benefit(`type` = PrivateInsurance, amount = BigDecimal(-1000.12))
       assertValidationError[Benefit](
         empBenefit,
         Map("/amount" -> INVALID_MONETARY_AMOUNT),
@@ -62,13 +68,11 @@ class BenefitSpec extends JsonSpec {
     }
 
     "reject invalid Benefit category" in {
-      val json = Json.parse(
-        """
+      val json = Json.parse("""
           |{ "type": "BAR",
           |"amount" : 10000.45
           |}
-        """.
-          stripMargin)
+        """.stripMargin)
 
       assertValidationError[Benefit](
         json,

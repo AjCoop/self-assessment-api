@@ -24,15 +24,20 @@ import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 import uk.gov.hmrc.selfassessmentapi.controllers.api.furnishedholidaylettings.ExpenseType.ExpenseType
 import uk.gov.hmrc.selfassessmentapi.controllers.api.furnishedholidaylettings.PropertyLocationType.PropertyLocationType
 import uk.gov.hmrc.selfassessmentapi.controllers.api.furnishedholidaylettings._
-import uk.gov.hmrc.selfassessmentapi.controllers.api.{SourceId, SummaryId, TaxYear}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.{
+  SourceId,
+  SummaryId,
+  TaxYear
+}
 
 case class FurnishedHolidayLettingsIncomeSummary(summaryId: SummaryId,
-                                                 amount: BigDecimal) extends Summary with AmountHolder {
+                                                 amount: BigDecimal)
+    extends Summary
+    with AmountHolder {
   val arrayName = FurnishedHolidayLettingsIncomeSummary.arrayName
 
   def toIncome: Income =
-    Income(id = Some(summaryId),
-      amount = amount)
+    Income(id = Some(summaryId), amount = amount)
 
   def toBsonDocument = BSONDocument(
     "summaryId" -> summaryId,
@@ -46,7 +51,9 @@ object FurnishedHolidayLettingsIncomeSummary {
 
   implicit val format = Json.format[FurnishedHolidayLettingsIncomeSummary]
 
-  def toMongoSummary(income: Income, id: Option[SummaryId] = None): FurnishedHolidayLettingsIncomeSummary = {
+  def toMongoSummary(
+      income: Income,
+      id: Option[SummaryId] = None): FurnishedHolidayLettingsIncomeSummary = {
     FurnishedHolidayLettingsIncomeSummary(
       summaryId = id.getOrElse(BSONObjectID.generate.stringify),
       amount = income.amount
@@ -56,13 +63,13 @@ object FurnishedHolidayLettingsIncomeSummary {
 
 case class FurnishedHolidayLettingsExpenseSummary(summaryId: SummaryId,
                                                   `type`: ExpenseType,
-                                                  amount: BigDecimal) extends Summary with AmountHolder {
+                                                  amount: BigDecimal)
+    extends Summary
+    with AmountHolder {
   val arrayName = FurnishedHolidayLettingsExpenseSummary.arrayName
 
   def toExpense: Expense =
-    Expense(id = Some(summaryId),
-      `type` = `type`,
-      amount = amount)
+    Expense(id = Some(summaryId), `type` = `type`, amount = amount)
 
   def toBsonDocument = BSONDocument(
     "summaryId" -> summaryId,
@@ -77,7 +84,9 @@ object FurnishedHolidayLettingsExpenseSummary {
 
   implicit val format = Json.format[FurnishedHolidayLettingsExpenseSummary]
 
-  def toMongoSummary(expense: Expense, id: Option[SummaryId] = None): FurnishedHolidayLettingsExpenseSummary = {
+  def toMongoSummary(
+      expense: Expense,
+      id: Option[SummaryId] = None): FurnishedHolidayLettingsExpenseSummary = {
     FurnishedHolidayLettingsExpenseSummary(
       summaryId = id.getOrElse(BSONObjectID.generate.stringify),
       `type` = expense.`type`,
@@ -87,12 +96,13 @@ object FurnishedHolidayLettingsExpenseSummary {
 }
 
 case class FurnishedHolidayLettingsBalancingChargeSummary(summaryId: SummaryId,
-                                                          amount: BigDecimal) extends Summary with AmountHolder {
+                                                          amount: BigDecimal)
+    extends Summary
+    with AmountHolder {
   val arrayName = FurnishedHolidayLettingsBalancingChargeSummary.arrayName
 
   def toBalancingCharge =
-    BalancingCharge(id = Some(summaryId),
-      amount = amount)
+    BalancingCharge(id = Some(summaryId), amount = amount)
 
   def toBsonDocument = BSONDocument(
     "summaryId" -> summaryId,
@@ -104,9 +114,12 @@ object FurnishedHolidayLettingsBalancingChargeSummary {
 
   val arrayName = "balancingCharges"
 
-  implicit val format = Json.format[FurnishedHolidayLettingsBalancingChargeSummary]
+  implicit val format =
+    Json.format[FurnishedHolidayLettingsBalancingChargeSummary]
 
-  def toMongoSummary(balancingCharge: BalancingCharge, id: Option[SummaryId] = None): FurnishedHolidayLettingsBalancingChargeSummary = {
+  def toMongoSummary(balancingCharge: BalancingCharge,
+                     id: Option[SummaryId] = None)
+    : FurnishedHolidayLettingsBalancingChargeSummary = {
     FurnishedHolidayLettingsBalancingChargeSummary(
       summaryId = id.getOrElse(BSONObjectID.generate.stringify),
       amount = balancingCharge.amount
@@ -114,12 +127,16 @@ object FurnishedHolidayLettingsBalancingChargeSummary {
   }
 }
 
-case class FurnishedHolidayLettingsPrivateUseAdjustmentSummary(summaryId: SummaryId, amount: BigDecimal) extends Summary
-  with AmountHolder {
+case class FurnishedHolidayLettingsPrivateUseAdjustmentSummary(
+    summaryId: SummaryId,
+    amount: BigDecimal)
+    extends Summary
+    with AmountHolder {
 
   val arrayName = FurnishedHolidayLettingsPrivateUseAdjustmentSummary.arrayName
 
-  def toPrivateUseAdjustment = PrivateUseAdjustment(id = Some(summaryId), amount = amount)
+  def toPrivateUseAdjustment =
+    PrivateUseAdjustment(id = Some(summaryId), amount = amount)
 
   def toBsonDocument = BSONDocument(
     "summaryId" -> summaryId,
@@ -131,9 +148,12 @@ object FurnishedHolidayLettingsPrivateUseAdjustmentSummary {
 
   val arrayName = "privateUseAdjustment"
 
-  implicit val format = Json.format[FurnishedHolidayLettingsPrivateUseAdjustmentSummary]
+  implicit val format =
+    Json.format[FurnishedHolidayLettingsPrivateUseAdjustmentSummary]
 
-  def toMongoSummary(privateUseAdjustment: PrivateUseAdjustment, id: Option[SummaryId] = None): FurnishedHolidayLettingsPrivateUseAdjustmentSummary = {
+  def toMongoSummary(privateUseAdjustment: PrivateUseAdjustment,
+                     id: Option[SummaryId] = None)
+    : FurnishedHolidayLettingsPrivateUseAdjustmentSummary = {
     FurnishedHolidayLettingsPrivateUseAdjustmentSummary(
       summaryId = id.getOrElse(BSONObjectID.generate.stringify),
       amount = privateUseAdjustment.amount
@@ -141,29 +161,31 @@ object FurnishedHolidayLettingsPrivateUseAdjustmentSummary {
   }
 }
 
-case class FurnishedHolidayLettings(id: BSONObjectID,
-                                    sourceId: SourceId,
-                                    saUtr: SaUtr,
-                                    taxYear: TaxYear,
-                                    lastModifiedDateTime: DateTime,
-                                    createdDateTime: DateTime,
-                                    propertyLocation: PropertyLocationType,
-                                    allowances: Option[Allowances] = None,
-                                    adjustments: Option[Adjustments] = None,
-                                    incomes: Seq[FurnishedHolidayLettingsIncomeSummary] = Nil,
-                                    expenses: Seq[FurnishedHolidayLettingsExpenseSummary] = Nil,
-                                    balancingCharges: Seq[FurnishedHolidayLettingsBalancingChargeSummary] = Nil,
-                                    privateUseAdjustment: Seq[FurnishedHolidayLettingsPrivateUseAdjustmentSummary] = Nil) extends SourceMetadata {
+case class FurnishedHolidayLettings(
+    id: BSONObjectID,
+    sourceId: SourceId,
+    saUtr: SaUtr,
+    taxYear: TaxYear,
+    lastModifiedDateTime: DateTime,
+    createdDateTime: DateTime,
+    propertyLocation: PropertyLocationType,
+    allowances: Option[Allowances] = None,
+    adjustments: Option[Adjustments] = None,
+    incomes: Seq[FurnishedHolidayLettingsIncomeSummary] = Nil,
+    expenses: Seq[FurnishedHolidayLettingsExpenseSummary] = Nil,
+    balancingCharges: Seq[FurnishedHolidayLettingsBalancingChargeSummary] = Nil,
+    privateUseAdjustment: Seq[
+      FurnishedHolidayLettingsPrivateUseAdjustmentSummary] = Nil)
+    extends SourceMetadata {
 
+  def capitalAllowance: BigDecimal =
+    allowances.flatMap(_.capitalAllowance).getOrElse(0)
 
-  def capitalAllowance: BigDecimal = allowances.flatMap(_.capitalAllowance).getOrElse(0)
-
-
-  def toFurnishedHolidayLettings = FurnishedHolidayLetting(
-    id = Some(sourceId),
-    propertyLocation = propertyLocation,
-    allowances = allowances,
-    adjustments = adjustments)
+  def toFurnishedHolidayLettings =
+    FurnishedHolidayLetting(id = Some(sourceId),
+                            propertyLocation = propertyLocation,
+                            allowances = allowances,
+                            adjustments = adjustments)
 }
 
 object FurnishedHolidayLettings {
@@ -171,24 +193,29 @@ object FurnishedHolidayLettings {
   implicit val localDateFormat = ReactiveMongoFormats.localDateFormats
 
   implicit val mongoFormats = ReactiveMongoFormats.mongoEntity({
-    implicit val BSONObjectIDFormat: Format[BSONObjectID] = ReactiveMongoFormats.objectIdFormats
-    implicit val dateTimeFormat: Format[DateTime] = ReactiveMongoFormats.dateTimeFormats
-    implicit val localDateFormat: Format[LocalDate] = ReactiveMongoFormats.localDateFormats
-    Format(Json.reads[FurnishedHolidayLettings], Json.writes[FurnishedHolidayLettings])
+    implicit val BSONObjectIDFormat: Format[BSONObjectID] =
+      ReactiveMongoFormats.objectIdFormats
+    implicit val dateTimeFormat: Format[DateTime] =
+      ReactiveMongoFormats.dateTimeFormats
+    implicit val localDateFormat: Format[LocalDate] =
+      ReactiveMongoFormats.localDateFormats
+    Format(Json.reads[FurnishedHolidayLettings],
+           Json.writes[FurnishedHolidayLettings])
   })
 
-  def create(saUtr: SaUtr, taxYear: TaxYear, fhl: FurnishedHolidayLetting): FurnishedHolidayLettings = {
+  def create(saUtr: SaUtr,
+             taxYear: TaxYear,
+             fhl: FurnishedHolidayLetting): FurnishedHolidayLettings = {
     val id = BSONObjectID.generate
     val now = DateTime.now(DateTimeZone.UTC)
-    FurnishedHolidayLettings(
-      id = id,
-      sourceId = id.stringify,
-      saUtr = saUtr,
-      taxYear = taxYear,
-      lastModifiedDateTime = now,
-      createdDateTime = now,
-      propertyLocation = fhl.propertyLocation,
-      allowances = fhl.allowances,
-      adjustments = fhl.adjustments)
+    FurnishedHolidayLettings(id = id,
+                             sourceId = id.stringify,
+                             saUtr = saUtr,
+                             taxYear = taxYear,
+                             lastModifiedDateTime = now,
+                             createdDateTime = now,
+                             propertyLocation = fhl.propertyLocation,
+                             allowances = fhl.allowances,
+                             adjustments = fhl.adjustments)
   }
 }

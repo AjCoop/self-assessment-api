@@ -16,7 +16,7 @@ class AuthorisationSpec extends BaseFunctionalSpec {
         .thenAssertThat()
         .statusIs(401)
         .contentTypeIsJson()
-        // TODO - check the body (and add whatever code is need to create that body)
+      // TODO - check the body (and add whatever code is need to create that body)
     }
   }
 }

@@ -23,6 +23,6 @@ import uk.gov.hmrc.selfassessmentapi.controllers.api.TaxYear
 trait LiabilityController extends BaseController with Links {
 
   def requestLiability(utr: SaUtr, taxYear: TaxYear): Action[AnyContent]
-  def retrieveLiability(utr: SaUtr, taxYear: TaxYear) : Action[AnyContent]
+  def retrieveLiability(utr: SaUtr, taxYear: TaxYear): Action[AnyContent]
 
 }

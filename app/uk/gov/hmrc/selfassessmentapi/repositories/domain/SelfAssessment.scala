@@ -29,12 +29,14 @@ case class SelfAssessment(id: BSONObjectID,
                           taxYear: TaxYear,
                           createdDateTime: DateTime,
                           lastModifiedDateTime: DateTime,
-                          taxYearProperties: Option[api.TaxYearProperties] = None)
-  extends SelfAssessmentMetadata
+                          taxYearProperties: Option[api.TaxYearProperties] =
+                            None)
+    extends SelfAssessmentMetadata
 
 object SelfAssessment {
   implicit val dateTimeFormat = ReactiveMongoFormats.dateTimeFormats
-  implicit val BSONObjectIDFormat: Format[BSONObjectID] = ReactiveMongoFormats.objectIdFormats
+  implicit val BSONObjectIDFormat: Format[BSONObjectID] =
+    ReactiveMongoFormats.objectIdFormats
   implicit val mongoFormats = ReactiveMongoFormats.mongoEntity(
     Format(Json.reads[SelfAssessment], Json.writes[SelfAssessment]))
 }

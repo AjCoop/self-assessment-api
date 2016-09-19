@@ -27,35 +27,43 @@ class ExpensesSpec extends JsonSpec {
   "format" should {
 
     "round trip valid Expenses json" in {
-      roundTripJson(Expense(`type` = RepairsAndMaintenance, amount = BigDecimal(1000.99)))
+      roundTripJson(
+        Expense(`type` = RepairsAndMaintenance, amount = BigDecimal(1000.99)))
     }
   }
 
   "validate" should {
     "reject amounts with more than 2 decimal values" in {
-      Seq(BigDecimal(1000.123), BigDecimal(1000.1234), BigDecimal(1000.12345), BigDecimal(1000.123456789)).foreach { testAmount =>
+      Seq(BigDecimal(1000.123),
+          BigDecimal(1000.1234),
+          BigDecimal(1000.12345),
+          BigDecimal(1000.123456789)).foreach { testAmount =>
         assertValidationError[Expense](
           Expense(`type` = RepairsAndMaintenance, amount = testAmount),
-          Map("/amount" -> INVALID_MONETARY_AMOUNT), "Expected invalid uk-property-expense with more than 2 decimal places")
+          Map("/amount" -> INVALID_MONETARY_AMOUNT),
+          "Expected invalid uk-property-expense with more than 2 decimal places")
       }
     }
 
     "reject invalid Expense type" in {
-      val json = Json.parse(
-        """
+      val json = Json.parse("""
           |{ "type": "FOO",
           |"amount" : 10000.45
           |}
         """.stripMargin)
 
-      assertValidationError[Expense](
-        json, Map("/type" -> NO_VALUE_FOUND), "should fail with invalid type")
+      assertValidationError[Expense](json,
+                                     Map("/type" -> NO_VALUE_FOUND),
+                                     "should fail with invalid type")
     }
 
     "reject negative amount" in {
-      val seIncome = Expense(`type` = RepairsAndMaintenance, amount = BigDecimal(-1000.12))
+      val seIncome =
+        Expense(`type` = RepairsAndMaintenance, amount = BigDecimal(-1000.12))
       assertValidationError[Expense](
-        seIncome, Map("/amount" -> INVALID_MONETARY_AMOUNT), "should fail with INVALID_MONETARY_AMOUNT error")
+        seIncome,
+        Map("/amount" -> INVALID_MONETARY_AMOUNT),
+        "should fail with INVALID_MONETARY_AMOUNT error")
     }
   }
 }

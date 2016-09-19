@@ -1,7 +1,11 @@
 package uk.gov.hmrc.selfassessmentapi.live
 
 import play.api.libs.json.Json
-import uk.gov.hmrc.selfassessmentapi.controllers.api.{SourceType, SummaryType, SourceTypes}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.{
+  SourceType,
+  SummaryType,
+  SourceTypes
+}
 import SourceTypes._
 import uk.gov.hmrc.selfassessmentapi.controllers.api.{_}
 import uk.gov.hmrc.selfassessmentapi.controllers.api.furnishedholidaylettings.SourceType.FurnishedHolidayLettings
@@ -21,19 +25,21 @@ class SummaryControllerSpec extends BaseFunctionalSpec {
   }
 
   val invalidAmountTestData: Set[SummaryType] = Set(GoodsAndServicesOwnUses) ++
-                                                FurnishedHolidayLettings.summaryTypes ++ Employments.summaryTypes ++
-                                                UKProperties.summaryTypes
+      FurnishedHolidayLettings.summaryTypes ++ Employments.summaryTypes ++
+      UKProperties.summaryTypes
 
   private def invalidRequestBody(summaryType: SummaryType) = {
     if (invalidAmountTestData.contains(summaryType)) {
       Some(Json.parse(s"""{"amount":1000.123}"""))
     } else {
-      Some(Json.parse(s"""{"type":"InvalidType", "amount":1000.00, "taxDeduction":1000.00}"""))
+      Some(Json.parse(
+        s"""{"type":"InvalidType", "amount":1000.00, "taxDeduction":1000.00}"""))
     }
   }
 
-  private def invalidErrorResponse(summaryType: SummaryType): (String, String) = {
-    if (invalidAmountTestData.contains (summaryType) ) {
+  private def invalidErrorResponse(
+      summaryType: SummaryType): (String, String) = {
+    if (invalidAmountTestData.contains(summaryType)) {
       ("/amount", "INVALID_MONETARY_AMOUNT")
     } else {
       ("/type", "NO_VALUE_FOUND")
@@ -53,55 +59,77 @@ class SummaryControllerSpec extends BaseFunctionalSpec {
         implementedSummaries(sourceType) foreach { summaryType =>
           given()
             .userIsAuthorisedForTheResource(saUtr)
-          .when()
+            .when()
             .get(s"/$saUtr/$taxYear/${sourceType.name}")
             .thenAssertThat()
             .statusIs(200)
             .butResponseHasNo(sourceType.name)
-          .when()
-            .post(s"/$saUtr/$taxYear/${sourceType.name}", Some(sourceType.example()))
+            .when()
+            .post(s"/$saUtr/$taxYear/${sourceType.name}",
+                  Some(sourceType.example()))
             .thenAssertThat()
             .statusIs(201)
             .contentTypeIsHalJson()
-            .bodyHasLink("self", s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/.+".r)
-          .when()
+            .bodyHasLink(
+              "self",
+              s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/.+".r)
+            .when()
             .get(s"/$saUtr/$taxYear/${sourceType.name}/%sourceId%")
             .thenAssertThat()
             .statusIs(200)
-          .when()
-            .get(s"/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}")
+            .when()
+            .get(
+              s"/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}")
             .thenAssertThat()
             .statusIs(200)
             .butResponseHasNo(sourceType.name, summaryType.name)
-          .when()
-            .post(s"/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}", Some(summaryType.example()))
+            .when()
+            .post(
+              s"/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}",
+              Some(summaryType.example()))
             .thenAssertThat()
             .statusIs(201)
             .contentTypeIsHalJson()
-            .bodyHasLink("self", s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}/%summaryId%")
-          .when()
-            .get(s"/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}/%summaryId%")
+            .bodyHasLink(
+              "self",
+              s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}/%summaryId%")
+            .when()
+            .get(
+              s"/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}/%summaryId%")
             .thenAssertThat()
             .statusIs(200)
-            .body(_ \ "type").is(exampleSummaryTypeValue(summaryType)).body(_ \ "amount").is((summaryType.example() \ "amount").as[BigDecimal])
-          .when()
-            .put(s"/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}/%summaryId%",
-              Some(Json.parse(s"""{"type":"${exampleSummaryTypeValue(summaryType)}", "amount":1200.00, "taxDeduction":1000.00}""")))
+            .body(_ \ "type")
+            .is(exampleSummaryTypeValue(summaryType))
+            .body(_ \ "amount")
+            .is((summaryType.example() \ "amount").as[BigDecimal])
+            .when()
+            .put(
+              s"/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}/%summaryId%",
+              Some(Json.parse(s"""{"type":"${exampleSummaryTypeValue(
+                summaryType)}", "amount":1200.00, "taxDeduction":1000.00}""")))
             .thenAssertThat()
             .statusIs(200)
             .contentTypeIsHalJson()
-            .bodyHasLink("self", s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}/%summaryId%")
-          .when()
-            .get(s"/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}/%summaryId%")
+            .bodyHasLink(
+              "self",
+              s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}/%summaryId%")
+            .when()
+            .get(
+              s"/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}/%summaryId%")
             .thenAssertThat()
             .statusIs(200)
-            .body(_ \ "type").is(exampleSummaryTypeValue(summaryType)).body(_ \ "amount").is(1200.00)
-          .when()
-            .delete(s"/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}/%summaryId%")
+            .body(_ \ "type")
+            .is(exampleSummaryTypeValue(summaryType))
+            .body(_ \ "amount")
+            .is(1200.00)
+            .when()
+            .delete(
+              s"/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}/%summaryId%")
             .thenAssertThat()
             .statusIs(204)
-          .when()
-            .get(s"/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}/%summaryId%")
+            .when()
+            .get(
+              s"/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}/%summaryId%")
             .withAcceptHeader()
             .thenAssertThat()
             .isNotFound
@@ -116,14 +144,18 @@ class SummaryControllerSpec extends BaseFunctionalSpec {
         implementedSummaries(sourceType) foreach { summaryType =>
           given()
             .userIsAuthorisedForTheResource(saUtr)
-          .when()
-            .post(s"/$saUtr/$taxYear/${sourceType.name}", Some(sourceType.example()))
+            .when()
+            .post(s"/$saUtr/$taxYear/${sourceType.name}",
+                  Some(sourceType.example()))
             .thenAssertThat()
             .statusIs(201)
             .contentTypeIsHalJson()
-            .bodyHasLink("self", s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/.+".r)
-          .when()
-            .post(s"/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}",
+            .bodyHasLink(
+              "self",
+              s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/.+".r)
+            .when()
+            .post(
+              s"/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}",
               invalidRequestBody(summaryType))
             .withAcceptHeader()
             .thenAssertThat()
@@ -135,12 +167,14 @@ class SummaryControllerSpec extends BaseFunctionalSpec {
 
   "I" should {
     "not be able to create summary for a non existent source" in {
-      val summaryTypes = uk.gov.hmrc.selfassessmentapi.controllers.api.selfemployment.SummaryTypes
+      val summaryTypes =
+        uk.gov.hmrc.selfassessmentapi.controllers.api.selfemployment.SummaryTypes
 
       given()
         .userIsAuthorisedForTheResource(saUtr)
         .when()
-        .post(s"/$saUtr/$taxYear/${SourceTypes.SelfEmployments.name}/1234567890/${summaryTypes.Incomes.name}",
+        .post(
+          s"/$saUtr/$taxYear/${SourceTypes.SelfEmployments.name}/1234567890/${summaryTypes.Incomes.name}",
           Some(summaryTypes.Incomes.example()))
         .withAcceptHeader()
         .thenAssertThat()
@@ -154,20 +188,28 @@ class SummaryControllerSpec extends BaseFunctionalSpec {
         implementedSummaries(sourceType) foreach { summaryType =>
           given()
             .userIsAuthorisedForTheResource(saUtr)
-          .when()
-            .post(s"/$saUtr/$taxYear/${sourceType.name}", Some(sourceType.example()))
+            .when()
+            .post(s"/$saUtr/$taxYear/${sourceType.name}",
+                  Some(sourceType.example()))
             .thenAssertThat()
             .statusIs(201)
             .contentTypeIsHalJson()
-            .bodyHasLink("self", s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/.+".r)
-          .when()
-            .post(s"/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}", Some(summaryType.example()))
+            .bodyHasLink(
+              "self",
+              s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/.+".r)
+            .when()
+            .post(
+              s"/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}",
+              Some(summaryType.example()))
             .thenAssertThat()
             .statusIs(201)
             .contentTypeIsHalJson()
-            .bodyHasLink("self", s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}/%summaryId%")
-          .when()
-            .put(s"/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}/%summaryId%",
+            .bodyHasLink(
+              "self",
+              s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}/%summaryId%")
+            .when()
+            .put(
+              s"/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}/%summaryId%",
               invalidRequestBody(summaryType))
             .withAcceptHeader()
             .thenAssertThat()
@@ -183,14 +225,18 @@ class SummaryControllerSpec extends BaseFunctionalSpec {
         implementedSummaries(sourceType) foreach { summaryType =>
           given()
             .userIsAuthorisedForTheResource(saUtr)
-          .when()
-            .post(s"/$saUtr/$taxYear/${sourceType.name}", Some(sourceType.example()))
+            .when()
+            .post(s"/$saUtr/$taxYear/${sourceType.name}",
+                  Some(sourceType.example()))
             .thenAssertThat()
             .statusIs(201)
             .contentTypeIsHalJson()
-            .bodyHasLink("self", s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/.+".r)
-          .when()
-            .get(s"/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}/12334567")
+            .bodyHasLink(
+              "self",
+              s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/.+".r)
+            .when()
+            .get(
+              s"/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}/12334567")
             .withAcceptHeader()
             .thenAssertThat()
             .isNotFound
@@ -205,14 +251,18 @@ class SummaryControllerSpec extends BaseFunctionalSpec {
         implementedSummaries(sourceType) foreach { summaryType =>
           given()
             .userIsAuthorisedForTheResource(saUtr)
-          .when()
-            .post(s"/$saUtr/$taxYear/${sourceType.name}", Some(sourceType.example()))
+            .when()
+            .post(s"/$saUtr/$taxYear/${sourceType.name}",
+                  Some(sourceType.example()))
             .thenAssertThat()
             .statusIs(201)
             .contentTypeIsHalJson()
-            .bodyHasLink("self", s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/.+".r)
-          .when()
-            .delete(s"/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}/12334567")
+            .bodyHasLink(
+              "self",
+              s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/.+".r)
+            .when()
+            .delete(
+              s"/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}/12334567")
             .withAcceptHeader()
             .thenAssertThat()
             .isNotFound
@@ -227,14 +277,19 @@ class SummaryControllerSpec extends BaseFunctionalSpec {
         implementedSummaries(sourceType) foreach { summaryType =>
           given()
             .userIsAuthorisedForTheResource(saUtr)
-          .when()
-            .post(s"/$saUtr/$taxYear/${sourceType.name}", Some(sourceType.example()))
+            .when()
+            .post(s"/$saUtr/$taxYear/${sourceType.name}",
+                  Some(sourceType.example()))
             .thenAssertThat()
             .statusIs(201)
             .contentTypeIsHalJson()
-            .bodyHasLink("self", s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/.+".r)
-          .when()
-            .put(s"/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}/12334567", Some(summaryType.example()))
+            .bodyHasLink(
+              "self",
+              s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/.+".r)
+            .when()
+            .put(
+              s"/$saUtr/$taxYear/${sourceType.name}/%sourceId%/${summaryType.name}/12334567",
+              Some(summaryType.example()))
             .withAcceptHeader()
             .thenAssertThat()
             .isNotFound

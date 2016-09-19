@@ -19,24 +19,48 @@ package uk.gov.hmrc.selfassessmentapi.controllers.api.furnishedholidaylettings
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json._
 import uk.gov.hmrc.selfassessmentapi.controllers.api._
-import uk.gov.hmrc.selfassessmentapi.controllers.api.furnishedholidaylettings.SummaryTypes.{BalancingCharges, Expenses, Incomes, PrivateUseAdjustments}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.furnishedholidaylettings.SummaryTypes.{
+  BalancingCharges,
+  Expenses,
+  Incomes,
+  PrivateUseAdjustments
+}
 
 object SourceType {
 
   case object FurnishedHolidayLettings extends SourceType {
     override val name = "furnished-holiday-lettings"
-    override def example(sourceId: Option[SourceId] = None): JsValue = toJson(FurnishedHolidayLetting.example(sourceId))
-    override val summaryTypes : Set[SummaryType] = Set(Incomes, Expenses, PrivateUseAdjustments, BalancingCharges)
+    override def example(sourceId: Option[SourceId] = None): JsValue =
+      toJson(FurnishedHolidayLetting.example(sourceId))
+    override val summaryTypes: Set[SummaryType] =
+      Set(Incomes, Expenses, PrivateUseAdjustments, BalancingCharges)
     override val title = "Sample furnished holiday lettings"
 
-    override def description(action: String) = s"$action a furnished holiday letting"
+    override def description(action: String) =
+      s"$action a furnished holiday letting"
 
     override val fieldDescriptions = Seq(
-      FullFieldDescription(name, "propertyLocation", "Enum", "The location of the property"),
-      FullFieldDescription(name, "allowances", "Object", "Allowances claimed for this property", optional = true),
-      PositiveMonetaryFieldDescription(name, "capitalAllowance", "Amount claimed for any equipment or vehicles for your FHL (not other furnished residential lettings)"),
-      FullFieldDescription(name, "adjustments", "Object", "Adjustments for this property", optional = true),
-      PositiveMonetaryFieldDescription(name, "lossBroughtForward",
+      FullFieldDescription(name,
+                           "propertyLocation",
+                           "Enum",
+                           "The location of the property"),
+      FullFieldDescription(name,
+                           "allowances",
+                           "Object",
+                           "Allowances claimed for this property",
+                           optional = true),
+      PositiveMonetaryFieldDescription(
+        name,
+        "capitalAllowance",
+        "Amount claimed for any equipment or vehicles for your FHL (not other furnished residential lettings)"),
+      FullFieldDescription(name,
+                           "adjustments",
+                           "Object",
+                           "Adjustments for this property",
+                           optional = true),
+      PositiveMonetaryFieldDescription(
+        name,
+        "lossBroughtForward",
         """If a loss was made in the previous or earlier tax years, this can be used against the profits from this tax year.
           |The loss claimed cannot be more than the adjusted profit for this tax year""".stripMargin)
     )

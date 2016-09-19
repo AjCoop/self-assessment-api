@@ -9,11 +9,13 @@ object MicroServiceBuild extends Build with MicroService {
   val appName = "self-assessment-api"
 
   override lazy val plugins: Seq[Plugins] = Seq(
-    SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin
+    SbtAutoBuildPlugin,
+    SbtGitVersioning,
+    SbtDistributablesPlugin
   )
 
   override lazy val appDependencies: Seq[ModuleID] = AppDependencies()
-  override lazy val playSettings : Seq[Setting[_]] = Seq(
+  override lazy val playSettings: Seq[Setting[_]] = Seq(
     routesImport += "uk.gov.hmrc.selfassessmentapi.controllers.Binders._"
   )
 }
@@ -38,7 +40,7 @@ private object AppDependencies {
 
   val compile = Seq(
     "uk.gov.hmrc" %% "play-reactivemongo" % playReactivemongoVersion,
-    ws exclude("org.apache.httpcomponents", "httpclient") exclude("org.apache.httpcomponents", "httpcore"),
+    ws exclude ("org.apache.httpcomponents", "httpclient") exclude ("org.apache.httpcomponents", "httpcore"),
     "uk.gov.hmrc" %% "microservice-bootstrap" % microserviceBootstrapVersion,
     "uk.gov.hmrc" %% "play-authorisation" % playAuthVersion,
     "uk.gov.hmrc" %% "play-health" % playHealthVersion,
@@ -57,43 +59,43 @@ private object AppDependencies {
   }
 
   object Test {
-    def apply() = new TestDependencies {
-      override lazy val test = Seq(
-        "uk.gov.hmrc" %% "hmrctest" % hmrcTestVersion % scope,
-        "org.scalatest" %% "scalatest" % "2.2.6" % scope,
-        "org.pegdown" % "pegdown" % "1.5.0" % scope,
-        "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
-        "org.scalatestplus" %% "play" % "1.2.0" % scope,
-        "com.github.tomakehurst" % "wiremock" % "1.54" % scope,
-        "uk.gov.hmrc" %% "reactivemongo-test"   % "1.6.0" % scope,
-        "de.flapdoodle.embed" % "de.flapdoodle.embed.mongo" % "1.50.3" % scope,
-        "org.mongodb" %% "casbah" % "3.1.0" % scope,
-        "org.scalacheck" %% "scalacheck" % "1.12.5" % scope
-
-      )
-    }.test
+    def apply() =
+      new TestDependencies {
+        override lazy val test = Seq(
+          "uk.gov.hmrc" %% "hmrctest" % hmrcTestVersion % scope,
+          "org.scalatest" %% "scalatest" % "2.2.6" % scope,
+          "org.pegdown" % "pegdown" % "1.5.0" % scope,
+          "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
+          "org.scalatestplus" %% "play" % "1.2.0" % scope,
+          "com.github.tomakehurst" % "wiremock" % "1.54" % scope,
+          "uk.gov.hmrc" %% "reactivemongo-test" % "1.6.0" % scope,
+          "de.flapdoodle.embed" % "de.flapdoodle.embed.mongo" % "1.50.3" % scope,
+          "org.mongodb" %% "casbah" % "3.1.0" % scope,
+          "org.scalacheck" %% "scalacheck" % "1.12.5" % scope
+        )
+      }.test
   }
 
   object IntegrationTest {
-    def apply() = new TestDependencies {
+    def apply() =
+      new TestDependencies {
 
-      override lazy val scope: String = "func"
+        override lazy val scope: String = "func"
 
-      override lazy val test = Seq(
-        "uk.gov.hmrc" %% "hmrctest" % hmrcTestVersion % scope,
-        "org.scalatest" %% "scalatest" % "2.2.6" % scope,
-        "org.pegdown" % "pegdown" % "1.5.0" % scope,
-        "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
-        "org.scalatestplus" %% "play" % "1.2.0" % scope,
-        "com.github.tomakehurst" % "wiremock" % "1.54" % scope,
-        "de.flapdoodle.embed" % "de.flapdoodle.embed.mongo" % "1.50.3" % scope,
-        "org.mongodb" %% "casbah" % "3.1.0" % scope,
-        // this line is only needed for coverage
-        "org.scoverage" %% "scalac-scoverage-runtime" % "1.1.1" % scope
-      )
-    }.test
+        override lazy val test = Seq(
+          "uk.gov.hmrc" %% "hmrctest" % hmrcTestVersion % scope,
+          "org.scalatest" %% "scalatest" % "2.2.6" % scope,
+          "org.pegdown" % "pegdown" % "1.5.0" % scope,
+          "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
+          "org.scalatestplus" %% "play" % "1.2.0" % scope,
+          "com.github.tomakehurst" % "wiremock" % "1.54" % scope,
+          "de.flapdoodle.embed" % "de.flapdoodle.embed.mongo" % "1.50.3" % scope,
+          "org.mongodb" %% "casbah" % "3.1.0" % scope,
+          // this line is only needed for coverage
+          "org.scoverage" %% "scalac-scoverage-runtime" % "1.1.1" % scope
+        )
+      }.test
   }
 
   def apply() = compile ++ Test() ++ IntegrationTest()
 }
-

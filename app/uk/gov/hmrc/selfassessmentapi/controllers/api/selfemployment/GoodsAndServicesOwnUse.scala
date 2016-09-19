@@ -20,15 +20,17 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import uk.gov.hmrc.selfassessmentapi.controllers.api._
 
-case class GoodsAndServicesOwnUse(id: Option[String] = None, amount: BigDecimal)
+case class GoodsAndServicesOwnUse(id: Option[String] = None,
+                                  amount: BigDecimal)
 
-object GoodsAndServicesOwnUse extends JsonMarshaller[GoodsAndServicesOwnUse]{
+object GoodsAndServicesOwnUse extends JsonMarshaller[GoodsAndServicesOwnUse] {
   implicit val writes = Json.writes[GoodsAndServicesOwnUse]
 
   implicit val reads = (
     Reads.pure(None) and
       (__ \ "amount").read[BigDecimal](positiveAmountValidator("amount"))
-    ) (GoodsAndServicesOwnUse.apply _)
+  )(GoodsAndServicesOwnUse.apply _)
 
-  override def example(id: Option[SummaryId]) = GoodsAndServicesOwnUse(id, amount = BigDecimal(1000))
+  override def example(id: Option[SummaryId]) =
+    GoodsAndServicesOwnUse(id, amount = BigDecimal(1000))
 }

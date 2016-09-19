@@ -54,19 +54,21 @@ class LiabilitySpec extends JsonSpec {
 
   "AllowancesAndReliefs" should {
     "correctly map to JSON" in {
-      roundTripJson(AllowancesAndReliefs(Some(500), Some(500), None, Some(500), None))
+      roundTripJson(
+        AllowancesAndReliefs(Some(500), Some(500), None, Some(500), None))
     }
   }
 
   "MongoTaxDeducted" should {
     "correctly map to JSON" in {
-      roundTripJson(domain.TaxDeducted(
-        interestFromUk = 500,
-        totalDeductionFromUkProperties =
-          500,
-        deductionFromUkProperties = Seq(TaxPaidForUkProperty(sourceId = "abc", taxPaid = 500)),
-        ukTaxPaid = 500,
-        ukTaxesPaidForEmployments = Seq(UkTaxPaidForEmployment("abc", 500))))
+      roundTripJson(
+        domain.TaxDeducted(
+          interestFromUk = 500,
+          totalDeductionFromUkProperties = 500,
+          deductionFromUkProperties =
+            Seq(TaxPaidForUkProperty(sourceId = "abc", taxPaid = 500)),
+          ukTaxPaid = 500,
+          ukTaxesPaidForEmployments = Seq(UkTaxPaidForEmployment("abc", 500))))
     }
   }
 
@@ -79,8 +81,12 @@ class LiabilitySpec extends JsonSpec {
   private implicit class JsValueComparator(jsValue: JsValue) {
     def bodyIs(expectedBody: String) = {
       jsValue match {
-        case arr: JsArray => assertEquals(expectedBody, new JSONArray(arr.toString()), STRICT)
-        case _ => assertEquals(expectedBody, new JSONObject(jsValue.toString()), STRICT)
+        case arr: JsArray =>
+          assertEquals(expectedBody, new JSONArray(arr.toString()), STRICT)
+        case _ =>
+          assertEquals(expectedBody,
+                       new JSONObject(jsValue.toString()),
+                       STRICT)
       }
       this
     }

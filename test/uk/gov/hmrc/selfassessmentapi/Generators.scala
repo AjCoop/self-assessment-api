@@ -27,13 +27,18 @@ object Generators {
     } yield BigDecimal.valueOf(value)
 
   val basicTaxBandAmountGen: Gen[BigDecimal] =
-    amountGen(TaxBand.BasicTaxBand().lowerBound, TaxBand.BasicTaxBand().upperBound.get)
+    amountGen(TaxBand.BasicTaxBand().lowerBound,
+              TaxBand.BasicTaxBand().upperBound.get)
 
   val higherTaxBandAmountGen: Gen[BigDecimal] =
-    amountGen(TaxBand.HigherTaxBand().lowerBound, TaxBand.HigherTaxBand().upperBound.get)
+    amountGen(TaxBand.HigherTaxBand().lowerBound,
+              TaxBand.HigherTaxBand().upperBound.get)
 
   val additionalHigherTaxBandAmountGen: Gen[BigDecimal] = amountGen(
     TaxBand.AdditionalHigherTaxBand().lowerBound,
-    TaxBand.AdditionalHigherTaxBand().upperBound.getOrElse(BigDecimal.valueOf(Int.MaxValue)))
+    TaxBand
+      .AdditionalHigherTaxBand()
+      .upperBound
+      .getOrElse(BigDecimal.valueOf(Int.MaxValue)))
 
 }

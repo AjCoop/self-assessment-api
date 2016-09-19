@@ -16,25 +16,37 @@
 
 package uk.gov.hmrc.selfassessmentapi.services.live.calculation
 
-import uk.gov.hmrc.selfassessmentapi.controllers.api.{UkTaxPaidForEmployment, ErrorCode}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.{
+  UkTaxPaidForEmployment,
+  ErrorCode
+}
 import ErrorCode.INVALID_EMPLOYMENT_TAX_PAID
-import uk.gov.hmrc.selfassessmentapi.repositories.domain.{Liability, LiabilityError, LiabilityErrors, LiabilityResult}
+import uk.gov.hmrc.selfassessmentapi.repositories.domain.{
+  Liability,
+  LiabilityError,
+  LiabilityErrors,
+  LiabilityResult
+}
 
 object LiabilityOrError {
   def apply(liability: Liability): LiabilityResult = {
     liability.taxDeducted.ukTaxesPaidForEmployments match {
-      case taxesPaidForEmployments if allTaxPaidAreNegative(taxesPaidForEmployments) =>
+      case taxesPaidForEmployments
+          if allTaxPaidAreNegative(taxesPaidForEmployments) =>
         LiabilityErrors.create(
           liability.saUtr,
           liability.taxYear,
           errors = Seq(
-            LiabilityError(INVALID_EMPLOYMENT_TAX_PAID,
-                           "The UK tax paid must be positive for at least one employment source")))
+            LiabilityError(
+              INVALID_EMPLOYMENT_TAX_PAID,
+              "The UK tax paid must be positive for at least one employment source")))
       case _ => liability
     }
   }
 
-  private def allTaxPaidAreNegative(taxesPaidForEmployments: Seq[UkTaxPaidForEmployment]) =
-    taxesPaidForEmployments.nonEmpty && taxesPaidForEmployments.forall(_.taxPaid < 0)
+  private def allTaxPaidAreNegative(
+      taxesPaidForEmployments: Seq[UkTaxPaidForEmployment]) =
+    taxesPaidForEmployments.nonEmpty && taxesPaidForEmployments.forall(
+      _.taxPaid < 0)
 
 }

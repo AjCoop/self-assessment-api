@@ -16,11 +16,14 @@
 
 package uk.gov.hmrc.selfassessmentapi.repositories.domain.calculations
 
-import uk.gov.hmrc.selfassessmentapi.controllers.api.{SelfAssessment, TaxBandAllocation, TaxBandSummary}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.{
+  SelfAssessment,
+  TaxBandAllocation,
+  TaxBandSummary
+}
 import uk.gov.hmrc.selfassessmentapi.repositories.domain.{IncomeTax, TaxBand}
 
 object PensionSavingsCharges {
-
 
   private def getPensionSavings(selfAssessment: SelfAssessment) = {
     for {
@@ -32,35 +35,46 @@ object PensionSavingsCharges {
 
   object TotalTaxPaid {
     def apply(selfAssessment: SelfAssessment): BigDecimal = {
-      getPensionSavings(selfAssessment).flatMap( _.taxPaidByPensionScheme).getOrElse(BigDecimal(0))
+      getPensionSavings(selfAssessment)
+        .flatMap(_.taxPaidByPensionScheme)
+        .getOrElse(BigDecimal(0))
     }
   }
 
-  object IncomeTaxBandSummary  {
+  object IncomeTaxBandSummary {
 
-    def apply(totalTaxableIncome: BigDecimal, ukPensionContribution: BigDecimal = 0, pensionContributionExcess: BigDecimal): Seq[TaxBandSummary] = {
-      val basicTaxBand = TaxBand.BasicTaxBand(reductionInUpperBound = totalTaxableIncome, additionsToUpperBound = ukPensionContribution)
-      val higherTaxBand = TaxBand.HigherTaxBand(basicTaxBand, totalTaxableIncome, ukPensionContribution)
-      Seq(basicTaxBand, higherTaxBand, TaxBand.AdditionalHigherTaxBand(higherTaxBand)).map { taxBand =>
-        TaxBandAllocation(taxBand.allocate2(pensionContributionExcess), taxBand).toTaxBandSummary
+    def apply(totalTaxableIncome: BigDecimal,
+              ukPensionContribution: BigDecimal = 0,
+              pensionContributionExcess: BigDecimal): Seq[TaxBandSummary] = {
+      val basicTaxBand = TaxBand.BasicTaxBand(
+        reductionInUpperBound = totalTaxableIncome,
+        additionsToUpperBound = ukPensionContribution)
+      val higherTaxBand = TaxBand
+        .HigherTaxBand(basicTaxBand, totalTaxableIncome, ukPensionContribution)
+      Seq(basicTaxBand,
+          higherTaxBand,
+          TaxBand.AdditionalHigherTaxBand(higherTaxBand)).map { taxBand =>
+        TaxBandAllocation(taxBand.allocate2(pensionContributionExcess),
+                          taxBand).toTaxBandSummary
       }
     }
 
     def apply(selfAssessment: SelfAssessment): Seq[TaxBandSummary] = {
-      apply(NonSavings.TotalTaxableIncome(selfAssessment) + Savings.TotalTaxableIncome(selfAssessment) +
-            Dividends.TotalTaxableIncome(selfAssessment),
-        Deductions.TotalUkPensionContributions(selfAssessment),
-        getPensionSavings(selfAssessment).flatMap(_.excessOfAnnualAllowance).getOrElse(BigDecimal(0)))
+      apply(NonSavings.TotalTaxableIncome(selfAssessment) + Savings
+              .TotalTaxableIncome(selfAssessment) +
+              Dividends.TotalTaxableIncome(selfAssessment),
+            Deductions.TotalUkPensionContributions(selfAssessment),
+            getPensionSavings(selfAssessment)
+              .flatMap(_.excessOfAnnualAllowance)
+              .getOrElse(BigDecimal(0)))
     }
   }
 
   object IncomeTax extends IncomeTax {
-    def apply(selfAssessment: SelfAssessment): BigDecimal = apply(IncomeTaxBandSummary(selfAssessment))
-    def apply(taxBandSummaries: Seq[TaxBandSummary]): BigDecimal = incomeTax(taxBandSummaries)
+    def apply(selfAssessment: SelfAssessment): BigDecimal =
+      apply(IncomeTaxBandSummary(selfAssessment))
+    def apply(taxBandSummaries: Seq[TaxBandSummary]): BigDecimal =
+      incomeTax(taxBandSummaries)
   }
 
 }
-
-
-
-

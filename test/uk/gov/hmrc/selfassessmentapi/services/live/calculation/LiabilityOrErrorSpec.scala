@@ -16,7 +16,10 @@
 
 package uk.gov.hmrc.selfassessmentapi.services.live.calculation
 
-import uk.gov.hmrc.selfassessmentapi.controllers.api.{UkTaxPaidForEmployment, ErrorCode}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.{
+  UkTaxPaidForEmployment,
+  ErrorCode
+}
 import uk.gov.hmrc.selfassessmentapi.{LiabilitySugar, UnitSpec}
 import ErrorCode._
 import uk.gov.hmrc.selfassessmentapi.repositories.domain.TaxDeducted
@@ -37,8 +40,8 @@ class LiabilityOrErrorSpec extends UnitSpec {
     "return the same liability passed if it contains a tax paid containing a positive number" in {
       val taxDeducted = TaxDeducted(
         ukTaxesPaidForEmployments = Seq(UkTaxPaidForEmployment("", -200.15),
-          UkTaxPaidForEmployment("", -300.33),
-          UkTaxPaidForEmployment("", 256.84)))
+                                        UkTaxPaidForEmployment("", -300.33),
+                                        UkTaxPaidForEmployment("", 256.84)))
 
       val liability = LiabilitySugar.aLiability(taxDeducted = taxDeducted)
 
@@ -48,8 +51,8 @@ class LiabilityOrErrorSpec extends UnitSpec {
     "return a calculation error if passed a liability that contains invalid employment tax paid" in {
       val taxDeducted = TaxDeducted(
         ukTaxesPaidForEmployments = Seq(UkTaxPaidForEmployment("", -200.15),
-          UkTaxPaidForEmployment("", -300.33),
-          UkTaxPaidForEmployment("", -22)))
+                                        UkTaxPaidForEmployment("", -300.33),
+                                        UkTaxPaidForEmployment("", -22)))
 
       val liability = LiabilitySugar.aLiability(taxDeducted = taxDeducted)
 
@@ -57,7 +60,7 @@ class LiabilityOrErrorSpec extends UnitSpec {
       result.fold({ errors =>
         errors.errors.size shouldBe 1
         errors.errors.head.code shouldBe INVALID_EMPLOYMENT_TAX_PAID
-      },{ results =>
+      }, { results =>
         fail("This calculation should fail validation")
       })
 

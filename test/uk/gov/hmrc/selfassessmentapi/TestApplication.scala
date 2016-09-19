@@ -29,8 +29,15 @@ import org.scalatestplus.play.OneServerPerSuite
 
 import scala.concurrent.duration.FiniteDuration
 
-trait TestApplication extends UnitSpec with Matchers with OneServerPerSuite with Eventually with ScalaFutures
-  with IntegrationPatience with MockitoSugar with MongoEmbeddedDatabase {
+trait TestApplication
+    extends UnitSpec
+    with Matchers
+    with OneServerPerSuite
+    with Eventually
+    with ScalaFutures
+    with IntegrationPatience
+    with MockitoSugar
+    with MongoEmbeddedDatabase {
 
   override implicit val defaultTimeout = FiniteDuration(100, TimeUnit.SECONDS)
 
@@ -38,14 +45,17 @@ trait TestApplication extends UnitSpec with Matchers with OneServerPerSuite with
   val stubHost = "localhost"
 
   protected val wiremockBaseUrl: String = s"http://$stubHost:$WIREMOCK_PORT"
-  private val wireMockServer = new WireMockServer(wireMockConfig().port(WIREMOCK_PORT))
+  private val wireMockServer = new WireMockServer(
+    wireMockConfig().port(WIREMOCK_PORT))
 
   protected def baseBeforeAll() = {
     wireMockServer.stop()
     wireMockServer.start()
     WireMock.configureFor(stubHost, WIREMOCK_PORT)
     // the below stub is here so that the application finds the registration endpoint which is called on startup
-    stubFor(post(urlPathEqualTo("/registration")).willReturn(aResponse().withStatus(200)))
+    stubFor(
+      post(urlPathEqualTo("/registration"))
+        .willReturn(aResponse().withStatus(200)))
   }
 
   override def beforeAll = {
@@ -57,7 +67,6 @@ trait TestApplication extends UnitSpec with Matchers with OneServerPerSuite with
     super.afterAll
     wireMockServer.stop()
   }
-
 
   override def beforeEach = {
     clearMongoCollections

@@ -24,17 +24,21 @@ class UkTaxPaidSpec extends JsonSpec {
 
   "format" should {
     "round trip UkTaxPaid json" in {
-        roundTripJson(UkTaxPaid(amount = BigDecimal(1000)))
+      roundTripJson(UkTaxPaid(amount = BigDecimal(1000)))
     }
   }
 
   "validate" should {
 
     "reject amounts with more than 2 decimal values" in {
-      Seq(BigDecimal(1000.123), BigDecimal(1000.12456), BigDecimal(1000.123454), BigDecimal(1000.123456789)).foreach { testAmount =>
+      Seq(BigDecimal(1000.123),
+          BigDecimal(1000.12456),
+          BigDecimal(1000.123454),
+          BigDecimal(1000.123456789)).foreach { testAmount =>
         assertValidationError[UkTaxPaid](
           UkTaxPaid(amount = testAmount),
-          Map("/amount" -> INVALID_MONETARY_AMOUNT), "Expected invalid employments-ukTaxPaid")
+          Map("/amount" -> INVALID_MONETARY_AMOUNT),
+          "Expected invalid employments-ukTaxPaid")
       }
     }
 

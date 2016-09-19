@@ -18,23 +18,60 @@ package uk.gov.hmrc.selfassessmentapi.controllers.live.selfemployment
 
 import uk.gov.hmrc.play.http.NotImplementedException
 import uk.gov.hmrc.selfassessmentapi.controllers.api.SummaryType
-import uk.gov.hmrc.selfassessmentapi.controllers.{SourceHandler, SummaryHandler}
+import uk.gov.hmrc.selfassessmentapi.controllers.{
+  SourceHandler,
+  SummaryHandler
+}
 import uk.gov.hmrc.selfassessmentapi.controllers.api.selfemployment.SourceType.SelfEmployments
-import uk.gov.hmrc.selfassessmentapi.controllers.api.selfemployment.SummaryTypes.{BalancingCharges, Expenses, GoodsAndServicesOwnUses, Incomes}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.selfemployment.SummaryTypes.{
+  BalancingCharges,
+  Expenses,
+  GoodsAndServicesOwnUses,
+  Incomes
+}
 import uk.gov.hmrc.selfassessmentapi.controllers.api.selfemployment._
 import uk.gov.hmrc.selfassessmentapi.controllers.api._
-import uk.gov.hmrc.selfassessmentapi.repositories.{SourceRepositoryWrapper, SummaryRepositoryWrapper}
+import uk.gov.hmrc.selfassessmentapi.repositories.{
+  SourceRepositoryWrapper,
+  SummaryRepositoryWrapper
+}
 import uk.gov.hmrc.selfassessmentapi.repositories.live.SelfEmploymentRepository
 
-object SelfEmploymentSourceHandler extends SourceHandler(SelfEmployment, SelfEmployments.name) {
+object SelfEmploymentSourceHandler
+    extends SourceHandler(SelfEmployment, SelfEmployments.name) {
 
-  override def summaryHandler(summaryType: SummaryType): Option[SummaryHandler[_]] = {
+  override def summaryHandler(
+      summaryType: SummaryType): Option[SummaryHandler[_]] = {
     summaryType match {
-      case Incomes =>  Some(SummaryHandler(SummaryRepositoryWrapper(SelfEmploymentRepository().IncomeRepository), Income, Incomes.name))
-      case Expenses => Some(SummaryHandler(SummaryRepositoryWrapper(SelfEmploymentRepository().ExpenseRepository), Expense, Expenses.name))
-      case BalancingCharges => Some(SummaryHandler(SummaryRepositoryWrapper(SelfEmploymentRepository().BalancingChargeRepository), BalancingCharge, BalancingCharges.name))
-      case GoodsAndServicesOwnUses => Some(SummaryHandler(SummaryRepositoryWrapper(SelfEmploymentRepository().GoodsAndServicesOwnUseRepository), GoodsAndServicesOwnUse, GoodsAndServicesOwnUses.name))
-      case _ => throw new NotImplementedException(s"${SelfEmployments.name} ${summaryType.name} is not implemented")
+      case Incomes =>
+        Some(
+          SummaryHandler(SummaryRepositoryWrapper(
+                           SelfEmploymentRepository().IncomeRepository),
+                         Income,
+                         Incomes.name))
+      case Expenses =>
+        Some(
+          SummaryHandler(SummaryRepositoryWrapper(
+                           SelfEmploymentRepository().ExpenseRepository),
+                         Expense,
+                         Expenses.name))
+      case BalancingCharges =>
+        Some(
+          SummaryHandler(
+            SummaryRepositoryWrapper(
+              SelfEmploymentRepository().BalancingChargeRepository),
+            BalancingCharge,
+            BalancingCharges.name))
+      case GoodsAndServicesOwnUses =>
+        Some(
+          SummaryHandler(
+            SummaryRepositoryWrapper(
+              SelfEmploymentRepository().GoodsAndServicesOwnUseRepository),
+            GoodsAndServicesOwnUse,
+            GoodsAndServicesOwnUses.name))
+      case _ =>
+        throw new NotImplementedException(
+          s"${SelfEmployments.name} ${summaryType.name} is not implemented")
     }
   }
 

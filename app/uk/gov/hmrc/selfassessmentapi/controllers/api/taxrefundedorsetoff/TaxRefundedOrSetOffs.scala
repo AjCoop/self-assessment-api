@@ -25,11 +25,15 @@ case object TaxRefundedOrSetOffs extends TaxYearPropertyType {
   override val name: String = "taxRefundedOrSetOff"
   override val example: JsValue = toJson(TaxRefundedOrSetOff.example())
 
-  override def description(action: String): String = s"$action a taxRefundedOrSetOff"
+  override def description(action: String): String =
+    s"$action a taxRefundedOrSetOff"
 
   override val title: String = "Sample tax refunded or set off"
 
   override val fieldDescriptions = Seq(
-    PositiveMonetaryFieldDescription(name, "amount", "Amount of Income Tax refunded or set off by HMRC or Jobcentre Plus")
+    PositiveMonetaryFieldDescription(
+      name,
+      "amount",
+      "Amount of Income Tax refunded or set off by HMRC or Jobcentre Plus")
   )
 }

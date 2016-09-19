@@ -17,12 +17,30 @@
 package uk.gov.hmrc.selfassessmentapi.controllers.api
 
 import uk.gov.hmrc.selfassessmentapi.config.{AppContext, FeatureSwitch}
-import uk.gov.hmrc.selfassessmentapi.controllers.api.blindperson.{BlindPerson, BlindPersons}
-import uk.gov.hmrc.selfassessmentapi.controllers.api.charitablegiving.{CharitableGiving, CharitableGivings}
-import uk.gov.hmrc.selfassessmentapi.controllers.api.childbenefit.{ChildBenefit, ChildBenefits}
-import uk.gov.hmrc.selfassessmentapi.controllers.api.pensioncontribution.{PensionContribution, PensionContributions}
-import uk.gov.hmrc.selfassessmentapi.controllers.api.studentsloan.{StudentLoan, StudentLoans}
-import uk.gov.hmrc.selfassessmentapi.controllers.api.taxrefundedorsetoff.{TaxRefundedOrSetOff, TaxRefundedOrSetOffs}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.blindperson.{
+  BlindPerson,
+  BlindPersons
+}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.charitablegiving.{
+  CharitableGiving,
+  CharitableGivings
+}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.childbenefit.{
+  ChildBenefit,
+  ChildBenefits
+}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.pensioncontribution.{
+  PensionContribution,
+  PensionContributions
+}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.studentsloan.{
+  StudentLoan,
+  StudentLoans
+}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.taxrefundedorsetoff.{
+  TaxRefundedOrSetOff,
+  TaxRefundedOrSetOffs
+}
 
 object FeatureSwitchedTaxProperties {
 
@@ -38,11 +56,27 @@ object FeatureSwitchedTaxProperties {
 
   def apply() =
     TaxYearProperties(
-      pensionContributions = if(featureSwitch.isEnabled(PensionContributions)) Some(PensionContribution.example()) else None,
-      charitableGivings = if(featureSwitch.isEnabled(CharitableGivings)) Some(CharitableGiving.example()) else None,
-      blindPerson = if(featureSwitch.isEnabled(BlindPersons)) Some(BlindPerson.example()) else None,
-      studentLoan = if(featureSwitch.isEnabled(StudentLoans)) Some(StudentLoan.example()) else None,
-      taxRefundedOrSetOff = if(featureSwitch.isEnabled(TaxRefundedOrSetOffs)) Some(TaxRefundedOrSetOff.example()) else None,
-      childBenefit = if(featureSwitch.isEnabled(ChildBenefits)) Some(ChildBenefit.example()) else None
+      pensionContributions =
+        if (featureSwitch.isEnabled(PensionContributions))
+          Some(PensionContribution.example())
+        else None,
+      charitableGivings =
+        if (featureSwitch.isEnabled(CharitableGivings))
+          Some(CharitableGiving.example())
+        else None,
+      blindPerson =
+        if (featureSwitch.isEnabled(BlindPersons)) Some(BlindPerson.example())
+        else None,
+      studentLoan =
+        if (featureSwitch.isEnabled(StudentLoans)) Some(StudentLoan.example())
+        else None,
+      taxRefundedOrSetOff =
+        if (featureSwitch.isEnabled(TaxRefundedOrSetOffs))
+          Some(TaxRefundedOrSetOff.example())
+        else None,
+      childBenefit =
+        if (featureSwitch.isEnabled(ChildBenefits))
+          Some(ChildBenefit.example())
+        else None
     )
 }

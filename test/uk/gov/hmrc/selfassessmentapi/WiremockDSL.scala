@@ -17,7 +17,11 @@
 package uk.gov.hmrc.selfassessmentapi
 
 import com.github.tomakehurst.wiremock.client.WireMock._
-import com.github.tomakehurst.wiremock.client.{MappingBuilder, UrlMatchingStrategy, WireMock}
+import com.github.tomakehurst.wiremock.client.{
+  MappingBuilder,
+  UrlMatchingStrategy,
+  WireMock
+}
 
 trait WiremockDSL {
 
@@ -28,15 +32,16 @@ trait WiremockDSL {
 
     class Result(mappingBuilder: MappingBuilder) {
       def returns(responseBody: String) = {
-        stubFor(mappingBuilder.willReturn(aResponse()
-          .withStatus(200)
-          .withHeader("Content-Type", "application/json")
-          .withBody(responseBody)))
+        stubFor(
+          mappingBuilder.willReturn(
+            aResponse()
+              .withStatus(200)
+              .withHeader("Content-Type", "application/json")
+              .withBody(responseBody)))
       }
 
       def returns(statusCode: Int) = {
-        stubFor(mappingBuilder.willReturn(aResponse()
-          .withStatus(statusCode)))
+        stubFor(mappingBuilder.willReturn(aResponse().withStatus(statusCode)))
       }
 
     }

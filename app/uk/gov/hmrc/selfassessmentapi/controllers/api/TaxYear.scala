@@ -27,6 +27,8 @@ case class TaxYear(taxYear: String) extends SimpleName {
 }
 
 object TaxYear extends (String => TaxYear) {
-  implicit val taxYearWrite: Writes[TaxYear] = new SimpleObjectWrites[TaxYear](_.value)
-  implicit val taxYearRead: Reads[TaxYear] = new SimpleObjectReads[TaxYear]("taxYear", TaxYear.apply)
+  implicit val taxYearWrite: Writes[TaxYear] =
+    new SimpleObjectWrites[TaxYear](_.value)
+  implicit val taxYearRead: Reads[TaxYear] =
+    new SimpleObjectReads[TaxYear]("taxYear", TaxYear.apply)
 }

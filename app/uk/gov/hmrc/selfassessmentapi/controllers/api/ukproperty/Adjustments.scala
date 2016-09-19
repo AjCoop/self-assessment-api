@@ -24,7 +24,9 @@ case class Adjustments(lossBroughtForward: Option[BigDecimal] = None)
 object Adjustments {
   implicit val writes = Json.writes[Adjustments]
 
-  implicit val reads: Reads[Adjustments] = (__ \ "lossBroughtForward").readNullable[BigDecimal](positiveAmountValidator("lossBroughtForward")).map {
-    Adjustments(_)
-  }
+  implicit val reads: Reads[Adjustments] = (__ \ "lossBroughtForward")
+    .readNullable[BigDecimal](positiveAmountValidator("lossBroughtForward"))
+    .map {
+      Adjustments(_)
+    }
 }

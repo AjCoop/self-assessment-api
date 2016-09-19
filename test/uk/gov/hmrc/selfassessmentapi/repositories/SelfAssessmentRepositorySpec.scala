@@ -22,12 +22,17 @@ import reactivemongo.bson.BSONObjectID
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.selfassessmentapi.MongoEmbeddedDatabase
 import uk.gov.hmrc.selfassessmentapi.controllers.api.TaxYearProperties
-import uk.gov.hmrc.selfassessmentapi.controllers.api.pensioncontribution.{PensionContribution, PensionSaving}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.pensioncontribution.{
+  PensionContribution,
+  PensionSaving
+}
 import uk.gov.hmrc.selfassessmentapi.repositories.domain.SelfAssessment
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class SelfAssessmentRepositorySpec extends MongoEmbeddedDatabase with BeforeAndAfterEach {
+class SelfAssessmentRepositorySpec
+    extends MongoEmbeddedDatabase
+    with BeforeAndAfterEach {
 
   private val mongoRepository = new SelfAssessmentMongoRepository
 
@@ -54,7 +59,11 @@ class SelfAssessmentRepositorySpec extends MongoEmbeddedDatabase with BeforeAndA
     }
 
     "update last modified if it does exist" in {
-      val sa1 = SelfAssessment(BSONObjectID.generate, saUtr, taxYear, DateTime.now().minusMonths(1), DateTime.now().minusWeeks(1))
+      val sa1 = SelfAssessment(BSONObjectID.generate,
+                               saUtr,
+                               taxYear,
+                               DateTime.now().minusMonths(1),
+                               DateTime.now().minusWeeks(1))
 
       await(mongoRepository.insert(sa1))
       await(mongoRepository.touch(saUtr, taxYear))
@@ -62,7 +71,8 @@ class SelfAssessmentRepositorySpec extends MongoEmbeddedDatabase with BeforeAndA
       val sa = await(mongoRepository.findBy(saUtr, taxYear))
 
       sa match {
-        case Some(updated) => updated.lastModifiedDateTime.isAfter(sa1.lastModifiedDateTime) shouldEqual true
+        case Some(updated) =>
+          updated.lastModifiedDateTime.isAfter(sa1.lastModifiedDateTime) shouldEqual true
         case None => fail("SA does not exist")
       }
     }
@@ -71,12 +81,19 @@ class SelfAssessmentRepositorySpec extends MongoEmbeddedDatabase with BeforeAndA
   "findBy" should {
     "return records matching utr and tax year" in {
       val utr2: SaUtr = generateSaUtr()
-      val sa1 = SelfAssessment(BSONObjectID.generate, saUtr, taxYear, DateTime.now(), DateTime.now())
-      val sa2 = SelfAssessment(BSONObjectID.generate, utr2, taxYear, DateTime.now(), DateTime.now())
+      val sa1 = SelfAssessment(BSONObjectID.generate,
+                               saUtr,
+                               taxYear,
+                               DateTime.now(),
+                               DateTime.now())
+      val sa2 = SelfAssessment(BSONObjectID.generate,
+                               utr2,
+                               taxYear,
+                               DateTime.now(),
+                               DateTime.now())
 
       await(mongoRepository.insert(sa1))
       await(mongoRepository.insert(sa2))
-
 
       val records = await(mongoRepository.findBy(saUtr, taxYear))
 
@@ -87,15 +104,28 @@ class SelfAssessmentRepositorySpec extends MongoEmbeddedDatabase with BeforeAndA
 
   "findOlderThan" should {
     "return records modified older than the lastModifiedDate" in {
-      val sa1 = SelfAssessment(BSONObjectID.generate, saUtr, taxYear, DateTime.now().minusMonths(1), DateTime.now().minusMonths(1))
-      val sa2 = SelfAssessment(BSONObjectID.generate, generateSaUtr(), taxYear, DateTime.now().minusWeeks(2), DateTime.now().minusWeeks(2))
-      val sa3 = SelfAssessment(BSONObjectID.generate, generateSaUtr(), taxYear, DateTime.now().minusDays(1), DateTime.now().minusDays(1))
+      val sa1 = SelfAssessment(BSONObjectID.generate,
+                               saUtr,
+                               taxYear,
+                               DateTime.now().minusMonths(1),
+                               DateTime.now().minusMonths(1))
+      val sa2 = SelfAssessment(BSONObjectID.generate,
+                               generateSaUtr(),
+                               taxYear,
+                               DateTime.now().minusWeeks(2),
+                               DateTime.now().minusWeeks(2))
+      val sa3 = SelfAssessment(BSONObjectID.generate,
+                               generateSaUtr(),
+                               taxYear,
+                               DateTime.now().minusDays(1),
+                               DateTime.now().minusDays(1))
 
       await(mongoRepository.insert(sa1))
       await(mongoRepository.insert(sa2))
       await(mongoRepository.insert(sa3))
 
-      val records = await(mongoRepository.findOlderThan(DateTime.now().minusWeeks(1)))
+      val records =
+        await(mongoRepository.findOlderThan(DateTime.now().minusWeeks(1)))
 
       records.size shouldBe 2
       records.head.saUtr shouldEqual sa1.saUtr
@@ -106,8 +136,16 @@ class SelfAssessmentRepositorySpec extends MongoEmbeddedDatabase with BeforeAndA
   "delete" should {
     "only delete records matching utr and tax year" in {
       val utr2: SaUtr = generateSaUtr()
-      val sa1 = SelfAssessment(BSONObjectID.generate, saUtr, taxYear, DateTime.now(), DateTime.now())
-      val sa2 = SelfAssessment(BSONObjectID.generate, utr2, taxYear, DateTime.now(), DateTime.now())
+      val sa1 = SelfAssessment(BSONObjectID.generate,
+                               saUtr,
+                               taxYear,
+                               DateTime.now(),
+                               DateTime.now())
+      val sa2 = SelfAssessment(BSONObjectID.generate,
+                               utr2,
+                               taxYear,
+                               DateTime.now(),
+                               DateTime.now())
 
       await(mongoRepository.insert(sa1))
       await(mongoRepository.insert(sa2))
@@ -123,10 +161,18 @@ class SelfAssessmentRepositorySpec extends MongoEmbeddedDatabase with BeforeAndA
 
   "findTaxYearProperties" should {
     "return tax year properties matching utr and tax year" in {
-      val taxYearProps = TaxYearProperties(pensionContributions = Some(PensionContribution(ukRegisteredPension = Some(10000.00))))
-      val sa = SelfAssessment(BSONObjectID.generate, saUtr, taxYear, DateTime.now(), DateTime.now(), Some(taxYearProps))
+      val taxYearProps = TaxYearProperties(
+        pensionContributions =
+          Some(PensionContribution(ukRegisteredPension = Some(10000.00))))
+      val sa = SelfAssessment(BSONObjectID.generate,
+                              saUtr,
+                              taxYear,
+                              DateTime.now(),
+                              DateTime.now(),
+                              Some(taxYearProps))
       await(mongoRepository.insert(sa))
-      val records = await(mongoRepository.findTaxYearProperties(saUtr, taxYear))
+      val records =
+        await(mongoRepository.findTaxYearProperties(saUtr, taxYear))
       records.size shouldBe 1
       records shouldEqual Some(taxYearProps)
     }
@@ -134,15 +180,27 @@ class SelfAssessmentRepositorySpec extends MongoEmbeddedDatabase with BeforeAndA
 
   "updateTaxYearProperties" should {
     "update tax year properties matching utr and tax year" in {
-      val taxYearProps1 = TaxYearProperties(pensionContributions = Some(PensionContribution(ukRegisteredPension = Some(10000.00))))
-      val sa = SelfAssessment(BSONObjectID.generate, saUtr, taxYear, DateTime.now(), DateTime.now(), Some(taxYearProps1))
+      val taxYearProps1 = TaxYearProperties(
+        pensionContributions =
+          Some(PensionContribution(ukRegisteredPension = Some(10000.00))))
+      val sa = SelfAssessment(BSONObjectID.generate,
+                              saUtr,
+                              taxYear,
+                              DateTime.now(),
+                              DateTime.now(),
+                              Some(taxYearProps1))
       await(mongoRepository.insert(sa))
-      val taxYearProps2 = TaxYearProperties(pensionContributions = Some(PensionContribution(ukRegisteredPension = Some(50000.00),
-        pensionSavings = Some(PensionSaving(Some(500.00), Some(500.00))))))
+      val taxYearProps2 = TaxYearProperties(
+        pensionContributions = Some(
+          PensionContribution(
+            ukRegisteredPension = Some(50000.00),
+            pensionSavings = Some(PensionSaving(Some(500.00), Some(500.00))))))
 
-      await(mongoRepository.updateTaxYearProperties(saUtr, taxYear, taxYearProps2))
+      await(
+        mongoRepository.updateTaxYearProperties(saUtr, taxYear, taxYearProps2))
 
-      val records = await(mongoRepository.findTaxYearProperties(saUtr, taxYear))
+      val records =
+        await(mongoRepository.findTaxYearProperties(saUtr, taxYear))
       records shouldEqual Some(taxYearProps2)
     }
   }

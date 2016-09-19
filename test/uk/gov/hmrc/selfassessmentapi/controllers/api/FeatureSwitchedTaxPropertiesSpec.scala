@@ -16,6 +16,4 @@
 
 package uk.gov.hmrc.selfassessmentapi.controllers.api
 
-class FeatureSwitchedTaxPropertiesSpec {
-
-}
+class FeatureSwitchedTaxPropertiesSpec {}

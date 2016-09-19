@@ -33,14 +33,21 @@ object Adjustments {
   implicit val writes = Json.writes[Adjustments]
 
   implicit val reads: Reads[Adjustments] = (
-    (__ \ "includedNonTaxableProfits").readNullable[BigDecimal](positiveAmountValidator("includedNonTaxableProfits")) and
-      (__ \ "basisAdjustment").readNullable[BigDecimal](amountValidator("basisAdjustment")) and
-      (__ \ "overlapReliefUsed").readNullable[BigDecimal](positiveAmountValidator("overlapReliefUsed")) and
-      (__ \ "accountingAdjustment").readNullable[BigDecimal](positiveAmountValidator("accountingAdjustment")) and
-      (__ \ "averagingAdjustment").readNullable[BigDecimal](amountValidator("averagingAdjustment")) and
-      (__ \ "lossBroughtForward").readNullable[BigDecimal](positiveAmountValidator("lossBroughtForward")) and
-      (__ \ "outstandingBusinessIncome").readNullable[BigDecimal](positiveAmountValidator("outstandingBusinessIncome"))
-    ) (Adjustments.apply _)
+    (__ \ "includedNonTaxableProfits").readNullable[BigDecimal](
+      positiveAmountValidator("includedNonTaxableProfits")) and
+      (__ \ "basisAdjustment")
+        .readNullable[BigDecimal](amountValidator("basisAdjustment")) and
+      (__ \ "overlapReliefUsed").readNullable[BigDecimal](
+        positiveAmountValidator("overlapReliefUsed")) and
+      (__ \ "accountingAdjustment").readNullable[BigDecimal](
+        positiveAmountValidator("accountingAdjustment")) and
+      (__ \ "averagingAdjustment")
+        .readNullable[BigDecimal](amountValidator("averagingAdjustment")) and
+      (__ \ "lossBroughtForward").readNullable[BigDecimal](
+        positiveAmountValidator("lossBroughtForward")) and
+      (__ \ "outstandingBusinessIncome").readNullable[BigDecimal](
+        positiveAmountValidator("outstandingBusinessIncome"))
+  )(Adjustments.apply _)
 
   lazy val example = Adjustments(
     includedNonTaxableProfits = Some(BigDecimal(50.00)),

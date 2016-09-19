@@ -26,13 +26,15 @@ class SelfAssessmentApiDefinitionSpec extends TestApplication {
 
   "Self Assessment API Definition" should {
     "round trip json" in {
-      val definition = new SelfAssessmentApiDefinition("self-assessment", APIStatus.PROTOTYPED).definition
-
+      val definition =
+        new SelfAssessmentApiDefinition("self-assessment",
+                                        APIStatus.PROTOTYPED).definition
 
       val json = Json.toJson(definition)
       json.validate[Definition].asEither map {
         case Right(result) =>
-        case Left(errors) => fail(s"Failed to validate definition json: ${errors.mkString(",")}")
+        case Left(errors) =>
+          fail(s"Failed to validate definition json: ${errors.mkString(",")}")
       }
     }
   }

@@ -8,7 +8,8 @@ class MetricsSpec extends BaseFunctionalSpec {
     "return 200" in {
       given()
         .when()
-        .get("/admin/metrics").withoutAcceptHeader()
+        .get("/admin/metrics")
+        .withoutAcceptHeader()
         .thenAssertThat()
         .statusIs(200)
     }

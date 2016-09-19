@@ -24,7 +24,10 @@ import org.scalatest.mock.MockitoSugar
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.selfassessmentapi.UnitSpec
 import uk.gov.hmrc.selfassessmentapi.config.FeatureSwitch
-import uk.gov.hmrc.selfassessmentapi.controllers.api.{TaxYear, TaxYearProperties}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.{
+  TaxYear,
+  TaxYearProperties
+}
 import uk.gov.hmrc.selfassessmentapi.controllers.api.blindperson.BlindPersons
 import uk.gov.hmrc.selfassessmentapi.controllers.api.charitablegiving.CharitableGivings
 import uk.gov.hmrc.selfassessmentapi.controllers.api.childbenefit.ChildBenefits
@@ -35,11 +38,15 @@ import uk.gov.hmrc.selfassessmentapi.repositories.SelfAssessmentMongoRepository
 
 import scala.concurrent.Future
 
-class TaxYearPropertiesServiceSpec extends UnitSpec with MockitoSugar with BeforeAndAfterEach {
+class TaxYearPropertiesServiceSpec
+    extends UnitSpec
+    with MockitoSugar
+    with BeforeAndAfterEach {
 
   val mockSaRepository = mock[SelfAssessmentMongoRepository]
   val mockFeatureSwitch = mock[FeatureSwitch]
-  val service = new TaxYearPropertiesService(mockSaRepository, mockFeatureSwitch)
+  val service =
+    new TaxYearPropertiesService(mockSaRepository, mockFeatureSwitch)
 
   override def beforeEach() = {
     Mockito.reset(mockSaRepository)
@@ -58,12 +65,18 @@ class TaxYearPropertiesServiceSpec extends UnitSpec with MockitoSugar with Befor
       when(mockFeatureSwitch.isEnabled(TaxRefundedOrSetOffs)).thenReturn(false)
       when(mockFeatureSwitch.isEnabled(ChildBenefits)).thenReturn(false)
 
-      when(mockSaRepository.findTaxYearProperties(any[SaUtr], any[TaxYear])).thenReturn(Future.successful(Some(taxYearProperties)))
+      when(mockSaRepository.findTaxYearProperties(any[SaUtr], any[TaxYear]))
+        .thenReturn(Future.successful(Some(taxYearProperties)))
 
-      val actualProperties = await(service.findTaxYearProperties(generateSaUtr(), taxYear))
+      val actualProperties =
+        await(service.findTaxYearProperties(generateSaUtr(), taxYear))
 
-      actualProperties.flatMap(_.studentLoan) shouldBe TaxYearProperties.example().studentLoan
-      actualProperties.flatMap(_.blindPerson) shouldBe TaxYearProperties.example().blindPerson
+      actualProperties.flatMap(_.studentLoan) shouldBe TaxYearProperties
+        .example()
+        .studentLoan
+      actualProperties.flatMap(_.blindPerson) shouldBe TaxYearProperties
+        .example()
+        .blindPerson
       actualProperties.flatMap(_.childBenefit) shouldBe None
       actualProperties.flatMap(_.childBenefit) shouldBe None
     }
@@ -80,11 +93,16 @@ class TaxYearPropertiesServiceSpec extends UnitSpec with MockitoSugar with Befor
       when(mockFeatureSwitch.isEnabled(TaxRefundedOrSetOffs)).thenReturn(false)
       when(mockFeatureSwitch.isEnabled(ChildBenefits)).thenReturn(false)
 
-      val onlySwitchedOnProperties = taxYearProperties.copy(childBenefit = None).copy(taxRefundedOrSetOff = None)
+      val onlySwitchedOnProperties = taxYearProperties
+        .copy(childBenefit = None)
+        .copy(taxRefundedOrSetOff = None)
 
-      await(service.updateTaxYearProperties(saUtr, taxYear, onlySwitchedOnProperties))
+      await(
+        service
+          .updateTaxYearProperties(saUtr, taxYear, onlySwitchedOnProperties))
 
-      verify(mockSaRepository, times(1)).updateTaxYearProperties(saUtr, taxYear, onlySwitchedOnProperties)
+      verify(mockSaRepository, times(1))
+        .updateTaxYearProperties(saUtr, taxYear, onlySwitchedOnProperties)
     }
 
     "not update the tax year properties when the provided TaxYearProperties object contains disabled features" in {
@@ -95,9 +113,15 @@ class TaxYearPropertiesServiceSpec extends UnitSpec with MockitoSugar with Befor
       when(mockFeatureSwitch.isEnabled(TaxRefundedOrSetOffs)).thenReturn(false)
       when(mockFeatureSwitch.isEnabled(ChildBenefits)).thenReturn(false)
 
-      await(service.updateTaxYearProperties(generateSaUtr(), taxYear, taxYearProperties)) shouldBe false
+      await(
+        service.updateTaxYearProperties(generateSaUtr(),
+                                        taxYear,
+                                        taxYearProperties)) shouldBe false
 
-      verify(mockSaRepository, times(0)).updateTaxYearProperties(any[SaUtr], any[TaxYear], any[TaxYearProperties])
+      verify(mockSaRepository, times(0)).updateTaxYearProperties(
+        any[SaUtr],
+        any[TaxYear],
+        any[TaxYearProperties])
     }
   }
 }

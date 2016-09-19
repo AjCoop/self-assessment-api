@@ -19,7 +19,8 @@ package uk.gov.hmrc.selfassessmentapi
 import play.api.Logger
 
 trait LoggingService {
-  def error(message: String, exception: Throwable) = Logger.error(message, exception)
+  def error(message: String, exception: Throwable) =
+    Logger.error(message, exception)
 }
 
 object LoggingService extends LoggingService

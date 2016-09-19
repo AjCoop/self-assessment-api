@@ -26,19 +26,29 @@ import uk.gov.hmrc.selfassessmentapi.controllers.api.JsonMarshaller
 import uk.gov.hmrc.selfassessmentapi.controllers.api.furnishedholidaylettings.FurnishedHolidayLetting
 import uk.gov.hmrc.selfassessmentapi.controllers.api.furnishedholidaylettings.PropertyLocationType.EEA
 import uk.gov.hmrc.selfassessmentapi.controllers.api.furnishedholidaylettings._
-import uk.gov.hmrc.selfassessmentapi.repositories.domain.{FurnishedHolidayLettings, FurnishedHolidayLettingsIncomeSummary}
-import uk.gov.hmrc.selfassessmentapi.repositories.{SourceRepository, SummaryRepository}
+import uk.gov.hmrc.selfassessmentapi.repositories.domain.{
+  FurnishedHolidayLettings,
+  FurnishedHolidayLettingsIncomeSummary
+}
+import uk.gov.hmrc.selfassessmentapi.repositories.{
+  SourceRepository,
+  SummaryRepository
+}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class FurnishedHolidayLettingsRepositorySpec extends MongoEmbeddedDatabase with BeforeAndAfterEach {
+class FurnishedHolidayLettingsRepositorySpec
+    extends MongoEmbeddedDatabase
+    with BeforeAndAfterEach {
 
   private val mongoRepository = new FurnishedHolidayLettingsMongoRepository
-  private val furnishedHolidayLettingsRepository: SourceRepository[FurnishedHolidayLetting] = mongoRepository
-  private val summariesMap: Map[JsonMarshaller[_], SummaryRepository[_]] = Map(Income -> mongoRepository.IncomeRepository,
-    Expense -> mongoRepository.ExpenseRepository, BalancingCharge -> mongoRepository.BalancingChargeRepository,
+  private val furnishedHolidayLettingsRepository: SourceRepository[
+    FurnishedHolidayLetting] = mongoRepository
+  private val summariesMap: Map[JsonMarshaller[_], SummaryRepository[_]] = Map(
+    Income -> mongoRepository.IncomeRepository,
+    Expense -> mongoRepository.ExpenseRepository,
+    BalancingCharge -> mongoRepository.BalancingChargeRepository,
     PrivateUseAdjustment -> mongoRepository.PrivateUseAdjustmentRepository)
-
 
   override def beforeEach() {
     await(mongoRepository.drop)
@@ -47,13 +57,16 @@ class FurnishedHolidayLettingsRepositorySpec extends MongoEmbeddedDatabase with 
 
   val saUtr = generateSaUtr()
 
-  def furnishedHolidayLetting(): FurnishedHolidayLetting = FurnishedHolidayLetting.example()
+  def furnishedHolidayLetting(): FurnishedHolidayLetting =
+    FurnishedHolidayLetting.example()
 
   "round trip" should {
     "create and retrieve using generated id" in {
       val source = furnishedHolidayLetting()
-      val id = await(furnishedHolidayLettingsRepository.create(saUtr, taxYear, source))
-      val found: FurnishedHolidayLetting = await(furnishedHolidayLettingsRepository.findById(saUtr, taxYear, id)).get
+      val id = await(
+        furnishedHolidayLettingsRepository.create(saUtr, taxYear, source))
+      val found: FurnishedHolidayLetting = await(
+        furnishedHolidayLettingsRepository.findById(saUtr, taxYear, id)).get
 
       found.propertyLocation shouldBe source.propertyLocation
     }
@@ -62,16 +75,21 @@ class FurnishedHolidayLettingsRepositorySpec extends MongoEmbeddedDatabase with 
   "delete by Id" should {
     "return true when furnished holiday letting is deleted" in {
       val source = furnishedHolidayLetting()
-      val id = await(furnishedHolidayLettingsRepository.create(saUtr, taxYear, source))
-      val result = await(furnishedHolidayLettingsRepository.delete(saUtr, taxYear, id))
+      val id = await(
+        furnishedHolidayLettingsRepository.create(saUtr, taxYear, source))
+      val result =
+        await(furnishedHolidayLettingsRepository.delete(saUtr, taxYear, id))
 
       result shouldBe true
     }
 
     "return false when furnished holiday letting is not deleted" in {
       val source = furnishedHolidayLetting()
-      val id = await(furnishedHolidayLettingsRepository.create(saUtr, taxYear, source))
-      val result = await(furnishedHolidayLettingsRepository.delete(generateSaUtr(), taxYear, id))
+      val id = await(
+        furnishedHolidayLettingsRepository.create(saUtr, taxYear, source))
+      val result = await(
+        furnishedHolidayLettingsRepository
+          .delete(generateSaUtr(), taxYear, id))
 
       result shouldBe false
     }
@@ -82,72 +100,87 @@ class FurnishedHolidayLettingsRepositorySpec extends MongoEmbeddedDatabase with 
       for {
         n <- 1 to 10
         source = furnishedHolidayLetting()
-        id = await(furnishedHolidayLettingsRepository.create(saUtr, taxYear, source))
+        id = await(
+          furnishedHolidayLettingsRepository.create(saUtr, taxYear, source))
       } yield source.copy(id = Some(id))
-
 
       await(furnishedHolidayLettingsRepository.delete(saUtr, taxYear))
 
-      val found: Seq[FurnishedHolidayLetting] = await(furnishedHolidayLettingsRepository.list(saUtr, taxYear))
+      val found: Seq[FurnishedHolidayLetting] =
+        await(furnishedHolidayLettingsRepository.list(saUtr, taxYear))
 
       found shouldBe empty
     }
 
     "not delete furnished holiday letting for different utr" in {
       val saUtr2: SaUtr = generateSaUtr()
-      await(furnishedHolidayLettingsRepository.create(saUtr, taxYear, furnishedHolidayLetting()))
-      val source2 = await(furnishedHolidayLettingsRepository.create(saUtr2, taxYear, furnishedHolidayLetting()))
+      await(
+        furnishedHolidayLettingsRepository
+          .create(saUtr, taxYear, furnishedHolidayLetting()))
+      val source2 = await(
+        furnishedHolidayLettingsRepository
+          .create(saUtr2, taxYear, furnishedHolidayLetting()))
 
       await(furnishedHolidayLettingsRepository.delete(saUtr, taxYear))
-      val found: Seq[FurnishedHolidayLetting] = await(furnishedHolidayLettingsRepository.list(saUtr2, taxYear))
+      val found: Seq[FurnishedHolidayLetting] =
+        await(furnishedHolidayLettingsRepository.list(saUtr2, taxYear))
 
       found.flatMap(_.id) should contain theSameElementsAs Seq(source2)
     }
   }
-
 
   "list" should {
     "retrieve all furnished holiday letting for utr/tax year" in {
       val sources = for {
         n <- 1 to 10
         source = furnishedHolidayLetting()
-        id = await(furnishedHolidayLettingsRepository.create(saUtr, taxYear, source))
+        id = await(
+          furnishedHolidayLettingsRepository.create(saUtr, taxYear, source))
       } yield source.copy(id = Some(id))
 
-
-      val found: Seq[FurnishedHolidayLetting] = await(furnishedHolidayLettingsRepository.list(saUtr, taxYear))
+      val found: Seq[FurnishedHolidayLetting] =
+        await(furnishedHolidayLettingsRepository.list(saUtr, taxYear))
 
       found should contain theSameElementsAs sources
     }
 
     "not include furnished holiday letting for different utr" in {
-      val source1 = await(furnishedHolidayLettingsRepository.create(saUtr, taxYear, furnishedHolidayLetting()))
-      await(furnishedHolidayLettingsRepository.create(generateSaUtr(), taxYear, furnishedHolidayLetting()))
+      val source1 = await(
+        furnishedHolidayLettingsRepository
+          .create(saUtr, taxYear, furnishedHolidayLetting()))
+      await(
+        furnishedHolidayLettingsRepository
+          .create(generateSaUtr(), taxYear, furnishedHolidayLetting()))
 
-      val found: Seq[FurnishedHolidayLetting] = await(furnishedHolidayLettingsRepository.list(saUtr, taxYear))
+      val found: Seq[FurnishedHolidayLetting] =
+        await(furnishedHolidayLettingsRepository.list(saUtr, taxYear))
 
       found.flatMap(_.id) should contain theSameElementsAs Seq(source1)
     }
   }
 
   "update" should {
-    def verifyUpdate(original: FurnishedHolidayLetting, updated: FurnishedHolidayLetting) = {
-      val sourceId = await(furnishedHolidayLettingsRepository.create(saUtr, taxYear, original))
-      val result = await(furnishedHolidayLettingsRepository.update(saUtr, taxYear, sourceId, updated))
+    def verifyUpdate(original: FurnishedHolidayLetting,
+                     updated: FurnishedHolidayLetting) = {
+      val sourceId = await(
+        furnishedHolidayLettingsRepository.create(saUtr, taxYear, original))
+      val result = await(
+        furnishedHolidayLettingsRepository
+          .update(saUtr, taxYear, sourceId, updated))
       result shouldEqual true
 
-      val found = await(furnishedHolidayLettingsRepository.findById(saUtr, taxYear, sourceId))
+      val found = await(
+        furnishedHolidayLettingsRepository.findById(saUtr, taxYear, sourceId))
       found shouldEqual Some(updated.copy(id = Some(sourceId)))
 
     }
     "return true when the furnished holiday letting exists and has been updated" in {
       val source = furnishedHolidayLetting()
 
-      val allowances = Allowances(
-        capitalAllowance = Some(BigDecimal(10.00)))
+      val allowances = Allowances(capitalAllowance = Some(BigDecimal(10.00)))
 
-      val adjustments = Adjustments(
-        lossBroughtForward = Some(BigDecimal(10.00)))
+      val adjustments =
+        Adjustments(lossBroughtForward = Some(BigDecimal(10.00)))
 
       val updatedSource = source.copy(
         propertyLocation = EEA,
@@ -179,15 +212,28 @@ class FurnishedHolidayLettingsRepositorySpec extends MongoEmbeddedDatabase with 
     }
 
     "return false when the furnished holiday letting does not exist" in {
-      val result = await(furnishedHolidayLettingsRepository.update(saUtr, taxYear, UUID.randomUUID().toString, furnishedHolidayLetting()))
+      val result = await(
+        furnishedHolidayLettingsRepository.update(saUtr,
+                                                  taxYear,
+                                                  UUID.randomUUID().toString,
+                                                  furnishedHolidayLetting()))
       result shouldEqual false
     }
 
     "not remove incomes" in {
-      val source = FurnishedHolidayLettings.create(saUtr, taxYear, furnishedHolidayLetting()).copy(incomes = Seq(FurnishedHolidayLettingsIncomeSummary(BSONObjectID.generate.stringify,  10)))
+      val source = FurnishedHolidayLettings
+        .create(saUtr, taxYear, furnishedHolidayLetting())
+        .copy(
+          incomes = Seq(
+            FurnishedHolidayLettingsIncomeSummary(
+              BSONObjectID.generate.stringify,
+              10)))
       await(mongoRepository.insert(source))
-      val found = await(mongoRepository.findById(saUtr, taxYear, source.sourceId)).get
-      await(furnishedHolidayLettingsRepository.update(saUtr, taxYear, source.sourceId, found))
+      val found =
+        await(mongoRepository.findById(saUtr, taxYear, source.sourceId)).get
+      await(
+        furnishedHolidayLettingsRepository
+          .update(saUtr, taxYear, source.sourceId, found))
 
       val found1 = await(mongoRepository.findById(source.id))
 
@@ -196,14 +242,19 @@ class FurnishedHolidayLettingsRepositorySpec extends MongoEmbeddedDatabase with 
 
     "update last modified" in {
       val source = furnishedHolidayLetting()
-      val sourceId = await(furnishedHolidayLettingsRepository.create(saUtr, taxYear, source))
+      val sourceId = await(
+        furnishedHolidayLettingsRepository.create(saUtr, taxYear, source))
       val found = await(mongoRepository.findById(BSONObjectID(sourceId)))
-      await(furnishedHolidayLettingsRepository.update(saUtr, taxYear, sourceId, source))
+      await(
+        furnishedHolidayLettingsRepository
+          .update(saUtr, taxYear, sourceId, source))
 
       val found1 = await(mongoRepository.findById(BSONObjectID(sourceId)))
 
       // Added the equals clauses as it was failing locally once, can fail if the test runs faster and has the same time for create and update
-      found1.get.lastModifiedDateTime.isEqual(found.get.lastModifiedDateTime) || found1.get.lastModifiedDateTime.isAfter(found.get.lastModifiedDateTime) shouldBe true
+      found1.get.lastModifiedDateTime
+        .isEqual(found.get.lastModifiedDateTime) || found1.get.lastModifiedDateTime
+        .isAfter(found.get.lastModifiedDateTime) shouldBe true
     }
   }
 
@@ -212,9 +263,12 @@ class FurnishedHolidayLettingsRepositorySpec extends MongoEmbeddedDatabase with 
   "create summary" should {
     "add a summary to an empty list when source exists and return id" in {
       for ((summaryItem, repo) <- summariesMap) {
-        val sourceId = await(furnishedHolidayLettingsRepository.create(saUtr, taxYear, furnishedHolidayLetting()))
+        val sourceId = await(
+          furnishedHolidayLettingsRepository
+            .create(saUtr, taxYear, furnishedHolidayLetting()))
         val summary = summaryItem.example()
-        val summaryId = await(repo.create(saUtr, taxYear, sourceId, cast(summary)))
+        val summaryId =
+          await(repo.create(saUtr, taxYear, sourceId, cast(summary)))
 
         summaryId.isDefined shouldEqual true
         val dbSummaries = await(repo.list(saUtr, taxYear, sourceId))
@@ -226,23 +280,33 @@ class FurnishedHolidayLettingsRepositorySpec extends MongoEmbeddedDatabase with 
 
     "add a summary to the existing list when source exists and return id" in {
       for ((summaryItem, repo) <- summariesMap) {
-        val sourceId = await(furnishedHolidayLettingsRepository.create(saUtr, taxYear, furnishedHolidayLetting()))
+        val sourceId = await(
+          furnishedHolidayLettingsRepository
+            .create(saUtr, taxYear, furnishedHolidayLetting()))
         val summary = summaryItem.example()
         val summary1 = summaryItem.example()
-        val summaryId = await(repo.create(saUtr, taxYear, sourceId, cast(summary)))
-        val summaryId1 = await(repo.create(saUtr, taxYear, sourceId, cast(summary1)))
+        val summaryId =
+          await(repo.create(saUtr, taxYear, sourceId, cast(summary)))
+        val summaryId1 =
+          await(repo.create(saUtr, taxYear, sourceId, cast(summary1)))
 
         val summaries = await(repo.list(saUtr, taxYear, sourceId))
 
         val found = summaries.get
-        found should contain theSameElementsAs Seq(summaryItem.example(id = summaryId), summaryItem.example(id = summaryId1))
+        found should contain theSameElementsAs Seq(
+          summaryItem.example(id = summaryId),
+          summaryItem.example(id = summaryId1))
       }
     }
 
     "return none when source does not exist" in {
       for ((summaryItem, repo) <- summariesMap) {
         val summary = summaryItem.example()
-        val summaryId = await(repo.create(saUtr, taxYear, BSONObjectID.generate.stringify, cast(summary)))
+        val summaryId = await(
+          repo.create(saUtr,
+                      taxYear,
+                      BSONObjectID.generate.stringify,
+                      cast(summary)))
         summaryId shouldEqual None
       }
     }
@@ -251,22 +315,35 @@ class FurnishedHolidayLettingsRepositorySpec extends MongoEmbeddedDatabase with 
   "find summary by id" should {
     "return none if the source does not exist" in {
       for ((summaryItem, repo) <- summariesMap) {
-        await(repo.findById(saUtr, taxYear, BSONObjectID.generate.stringify, BSONObjectID.generate.stringify)) shouldEqual None
+        await(
+          repo.findById(saUtr,
+                        taxYear,
+                        BSONObjectID.generate.stringify,
+                        BSONObjectID.generate.stringify)) shouldEqual None
       }
     }
 
     "return none if the summary does not exist" in {
       for ((summaryItem, repo) <- summariesMap) {
-        val sourceId = await(furnishedHolidayLettingsRepository.create(saUtr, taxYear, furnishedHolidayLetting()))
-        await(repo.findById(saUtr, taxYear, sourceId, BSONObjectID.generate.stringify)) shouldEqual None
+        val sourceId = await(
+          furnishedHolidayLettingsRepository
+            .create(saUtr, taxYear, furnishedHolidayLetting()))
+        await(
+          repo.findById(saUtr,
+                        taxYear,
+                        sourceId,
+                        BSONObjectID.generate.stringify)) shouldEqual None
       }
     }
 
     "return the summary if found" in {
       for ((summaryItem, repo) <- summariesMap) {
-        val sourceId = await(furnishedHolidayLettingsRepository.create(saUtr, taxYear, furnishedHolidayLetting()))
+        val sourceId = await(
+          furnishedHolidayLettingsRepository
+            .create(saUtr, taxYear, furnishedHolidayLetting()))
         val summary = summaryItem.example()
-        val summaryId = await(repo.create(saUtr, taxYear, sourceId, cast(summary))).get
+        val summaryId =
+          await(repo.create(saUtr, taxYear, sourceId, cast(summary))).get
         val found = await(repo.findById(saUtr, taxYear, sourceId, summaryId))
 
         found shouldEqual Some(summaryItem.example(id = Some(summaryId)))
@@ -277,7 +354,9 @@ class FurnishedHolidayLettingsRepositorySpec extends MongoEmbeddedDatabase with 
   "list summaries" should {
     "return empty list when source has no summaries" in {
       for ((summaryItem, repo) <- summariesMap) {
-        val sourceId = await(furnishedHolidayLettingsRepository.create(saUtr, taxYear, furnishedHolidayLetting()))
+        val sourceId = await(
+          furnishedHolidayLettingsRepository
+            .create(saUtr, taxYear, furnishedHolidayLetting()))
         await(repo.list(saUtr, taxYear, sourceId)) shouldEqual Some(Seq.empty)
       }
     }
@@ -292,19 +371,26 @@ class FurnishedHolidayLettingsRepositorySpec extends MongoEmbeddedDatabase with 
   "delete summary" should {
     "return true when the summary has been deleted" in {
       for ((summaryItem, repo) <- summariesMap) {
-        val sourceId = await(furnishedHolidayLettingsRepository.create(saUtr, taxYear, furnishedHolidayLetting()))
+        val sourceId = await(
+          furnishedHolidayLettingsRepository
+            .create(saUtr, taxYear, furnishedHolidayLetting()))
         val summary = summaryItem.example()
-        val summaryId = await(repo.create(saUtr, taxYear, sourceId, cast(summary))).get
+        val summaryId =
+          await(repo.create(saUtr, taxYear, sourceId, cast(summary))).get
         await(repo.delete(saUtr, taxYear, sourceId, summaryId)) shouldEqual true
       }
     }
 
     "only delete the specified summary" in {
       for ((summaryItem, repo) <- summariesMap) {
-        val sourceId = await(furnishedHolidayLettingsRepository.create(saUtr, taxYear, furnishedHolidayLetting()))
+        val sourceId = await(
+          furnishedHolidayLettingsRepository
+            .create(saUtr, taxYear, furnishedHolidayLetting()))
         val summary = summaryItem.example()
-        val summaryId = await(repo.create(saUtr, taxYear, sourceId, cast(summary))).get
-        val summaryId1 = await(repo.create(saUtr, taxYear, sourceId, cast(summary)))
+        val summaryId =
+          await(repo.create(saUtr, taxYear, sourceId, cast(summary))).get
+        val summaryId1 =
+          await(repo.create(saUtr, taxYear, sourceId, cast(summary)))
         await(repo.delete(saUtr, taxYear, sourceId, summaryId))
 
         val found = await(repo.list(saUtr, taxYear, sourceId)).get
@@ -315,14 +401,24 @@ class FurnishedHolidayLettingsRepositorySpec extends MongoEmbeddedDatabase with 
 
     "return false when the source does not exist" in {
       for ((summaryItem, repo) <- summariesMap) {
-        await(repo.delete(saUtr, taxYear, BSONObjectID.generate.stringify, BSONObjectID.generate.stringify)) shouldEqual false
+        await(
+          repo.delete(saUtr,
+                      taxYear,
+                      BSONObjectID.generate.stringify,
+                      BSONObjectID.generate.stringify)) shouldEqual false
       }
     }
 
     "return false when the summary does not exist" in {
       for ((summaryItem, repo) <- summariesMap) {
-        val sourceId = await(furnishedHolidayLettingsRepository.create(saUtr, taxYear, furnishedHolidayLetting()))
-        await(repo.delete(saUtr, taxYear, sourceId, BSONObjectID.generate.stringify)) shouldEqual false
+        val sourceId = await(
+          furnishedHolidayLettingsRepository
+            .create(saUtr, taxYear, furnishedHolidayLetting()))
+        await(
+          repo.delete(saUtr,
+                      taxYear,
+                      sourceId,
+                      BSONObjectID.generate.stringify)) shouldEqual false
       }
     }
   }
@@ -330,12 +426,20 @@ class FurnishedHolidayLettingsRepositorySpec extends MongoEmbeddedDatabase with 
   "update income" should {
     "return true when the income has been updated" in {
       for ((summaryItem, repo) <- summariesMap) {
-        val sourceId = await(furnishedHolidayLettingsRepository.create(saUtr, taxYear, furnishedHolidayLetting()))
+        val sourceId = await(
+          furnishedHolidayLettingsRepository
+            .create(saUtr, taxYear, furnishedHolidayLetting()))
         val summary = summaryItem.example()
-        val summaryId = await(repo.create(saUtr, taxYear, sourceId, cast(summary))).get
+        val summaryId =
+          await(repo.create(saUtr, taxYear, sourceId, cast(summary))).get
 
         val summaryToUpdate = summaryItem.example()
-        await(repo.update(saUtr, taxYear, sourceId, summaryId, cast(summaryToUpdate))) shouldEqual true
+        await(
+          repo.update(saUtr,
+                      taxYear,
+                      sourceId,
+                      summaryId,
+                      cast(summaryToUpdate))) shouldEqual true
 
         val found = await(repo.findById(saUtr, taxYear, sourceId, summaryId))
 
@@ -345,34 +449,56 @@ class FurnishedHolidayLettingsRepositorySpec extends MongoEmbeddedDatabase with 
 
     "only update the specified income" in {
       for ((summaryItem, repo) <- summariesMap) {
-        val sourceId = await(furnishedHolidayLettingsRepository.create(saUtr, taxYear, furnishedHolidayLetting()))
+        val sourceId = await(
+          furnishedHolidayLettingsRepository
+            .create(saUtr, taxYear, furnishedHolidayLetting()))
         val summary1 = summaryItem.example()
-        val summaryId1 = await(repo.create(saUtr, taxYear, sourceId, cast(summary1))).get
+        val summaryId1 =
+          await(repo.create(saUtr, taxYear, sourceId, cast(summary1))).get
         val summary2 = summaryItem.example()
-        val summaryId2 = await(repo.create(saUtr, taxYear, sourceId, cast(summary2))).get
+        val summaryId2 =
+          await(repo.create(saUtr, taxYear, sourceId, cast(summary2))).get
 
         val summaryToUpdate = summaryItem.example()
-        await(repo.update(saUtr, taxYear, sourceId, summaryId2, cast(summaryToUpdate))) shouldEqual true
+        await(
+          repo.update(saUtr,
+                      taxYear,
+                      sourceId,
+                      summaryId2,
+                      cast(summaryToUpdate))) shouldEqual true
 
         val found = await(repo.list(saUtr, taxYear, sourceId)).get
 
-        found should contain theSameElementsAs Seq(summaryItem.example(id = Some(summaryId1)), summaryItem.example(id = Some(summaryId2)))
+        found should contain theSameElementsAs Seq(
+          summaryItem.example(id = Some(summaryId1)),
+          summaryItem.example(id = Some(summaryId2)))
       }
     }
 
     "return false when the source does not exist" in {
       for ((summaryItem, repo) <- summariesMap) {
-        await(repo.update(saUtr, taxYear, BSONObjectID.generate.stringify, BSONObjectID.generate.stringify, cast(summaryItem.example()))) shouldEqual false
+        await(
+          repo.update(saUtr,
+                      taxYear,
+                      BSONObjectID.generate.stringify,
+                      BSONObjectID.generate.stringify,
+                      cast(summaryItem.example()))) shouldEqual false
       }
     }
 
     "return false when the income does not exist" in {
-      val sourceId = await(furnishedHolidayLettingsRepository.create(saUtr, taxYear, furnishedHolidayLetting()))
+      val sourceId = await(
+        furnishedHolidayLettingsRepository
+          .create(saUtr, taxYear, furnishedHolidayLetting()))
       for ((summaryItem, repo) <- summariesMap) {
-        await(repo.update(saUtr, taxYear, sourceId, BSONObjectID.generate.stringify, cast(summaryItem.example()))) shouldEqual false
+        await(
+          repo.update(saUtr,
+                      taxYear,
+                      sourceId,
+                      BSONObjectID.generate.stringify,
+                      cast(summaryItem.example()))) shouldEqual false
       }
     }
   }
-
 
 }

@@ -25,7 +25,8 @@ import uk.gov.hmrc.selfassessmentapi.repositories.SourceRepository
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-abstract class SourceHandler[T](jsonMarshaller: JsonMarshaller[T], val listName: String) {
+abstract class SourceHandler[T](jsonMarshaller: JsonMarshaller[T],
+                                val listName: String) {
 
   val repository: SourceRepository[T]
   implicit val reads = jsonMarshaller.reads
@@ -37,7 +38,10 @@ abstract class SourceHandler[T](jsonMarshaller: JsonMarshaller[T], val listName:
     }
   }
 
-  def update(saUtr: SaUtr, taxYear: TaxYear, sourceId: SourceId, jsValue: JsValue) = {
+  def update(saUtr: SaUtr,
+             taxYear: TaxYear,
+             sourceId: SourceId,
+             jsValue: JsValue) = {
     validate[T, Boolean](jsValue) {
       repository.update(saUtr, taxYear, sourceId, _)
     }
@@ -47,18 +51,11 @@ abstract class SourceHandler[T](jsonMarshaller: JsonMarshaller[T], val listName:
     repository.findById(saUtr, taxYear, sourceId).map(_.map(toJson(_)))
   }
 
-  def find(saUtr: SaUtr, taxYear: TaxYear) = repository.listAsJsonItem(saUtr, taxYear)
+  def find(saUtr: SaUtr, taxYear: TaxYear) =
+    repository.listAsJsonItem(saUtr, taxYear)
 
-  def delete(saUtr: SaUtr, taxYear: TaxYear, sourceId: SourceId) = repository.delete(saUtr, taxYear, sourceId)
+  def delete(saUtr: SaUtr, taxYear: TaxYear, sourceId: SourceId) =
+    repository.delete(saUtr, taxYear, sourceId)
 
   def summaryHandler(summaryType: SummaryType): Option[SummaryHandler[_]]
 }
-
-
-
-
-
-
-
-
-

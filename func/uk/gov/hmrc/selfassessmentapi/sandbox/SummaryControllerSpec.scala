@@ -17,10 +17,14 @@ class SummaryControllerSpec extends BaseFunctionalSpec {
       SourceTypes.types.foreach { sourceType =>
         sourceType.summaryTypes.foreach { summaryType =>
           when()
-            .post(s"/sandbox/$saUtr/$taxYear/${sourceType.name}/$sourceId/${summaryType.name}", Some(summaryType.example()))
+            .post(
+              s"/sandbox/$saUtr/$taxYear/${sourceType.name}/$sourceId/${summaryType.name}",
+              Some(summaryType.example()))
             .thenAssertThat()
             .statusIs(201)
-            .bodyHasLink("self", s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/$sourceId/${summaryType.name}/.+".r)
+            .bodyHasLink(
+              "self",
+              s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/$sourceId/${summaryType.name}/.+".r)
         }
       }
     }
@@ -30,7 +34,8 @@ class SummaryControllerSpec extends BaseFunctionalSpec {
   "Create summary with invalid data" should {
     "return a 400 validation error" in {
       when()
-        .post(s"/sandbox/$saUtr/$taxYear/self-employments/$sourceId/incomes", Some(toJson(Income(None, Turnover, BigDecimal(-1000.12)))))
+        .post(s"/sandbox/$saUtr/$taxYear/self-employments/$sourceId/incomes",
+              Some(toJson(Income(None, Turnover, BigDecimal(-1000.12)))))
         .thenAssertThat()
         .isValidationError("/amount", "INVALID_MONETARY_AMOUNT")
     }
@@ -39,7 +44,8 @@ class SummaryControllerSpec extends BaseFunctionalSpec {
   "Creating summary with invalid summary type" should {
     "return a 404" in {
       when()
-        .post(s"/sandbox/$saUtr/$taxYear/self-employments/$sourceId/incoms", Some(toJson(Income(None, Turnover, BigDecimal(-1000.12)))))
+        .post(s"/sandbox/$saUtr/$taxYear/self-employments/$sourceId/incoms",
+              Some(toJson(Income(None, Turnover, BigDecimal(-1000.12)))))
         .thenAssertThat()
         .isNotFound
     }
@@ -50,11 +56,14 @@ class SummaryControllerSpec extends BaseFunctionalSpec {
       SourceTypes.types.foreach { sourceType =>
         sourceType.summaryTypes.foreach { summaryType =>
           when()
-            .get(s"/sandbox/$saUtr/$taxYear/${sourceType.name}/$sourceId/${summaryType.name}/$summaryId")
+            .get(
+              s"/sandbox/$saUtr/$taxYear/${sourceType.name}/$sourceId/${summaryType.name}/$summaryId")
             .thenAssertThat()
             .statusIs(200)
             .contentTypeIsHalJson()
-            .bodyHasLink("self", s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/$sourceId/${summaryType.name}/$summaryId")
+            .bodyHasLink(
+              "self",
+              s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/$sourceId/${summaryType.name}/$summaryId")
         }
       }
     }
@@ -65,14 +74,23 @@ class SummaryControllerSpec extends BaseFunctionalSpec {
       SourceTypes.types.foreach { sourceType =>
         sourceType.summaryTypes.foreach { summaryType =>
           when()
-            .get(s"/sandbox/$saUtr/$taxYear/${sourceType.name}/$sourceId/${summaryType.name}")
+            .get(
+              s"/sandbox/$saUtr/$taxYear/${sourceType.name}/$sourceId/${summaryType.name}")
             .thenAssertThat()
             .statusIs(200)
             .contentTypeIsHalJson()
-            .bodyHasLink("self", s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/$sourceId/${summaryType.name}")
-            .bodyHasPath(s"""_embedded \\ ${summaryType.name}(0) \\ _links \\ self \\ href""", s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/$sourceId/${summaryType.name}/.+".r)
-            .bodyHasPath(s"""_embedded \\ ${summaryType.name}(1) \\ _links \\ self \\ href""", s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/$sourceId/${summaryType.name}/.+".r)
-            .bodyHasPath(s"""_embedded \\ ${summaryType.name}(2) \\ _links \\ self \\ href""", s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/$sourceId/${summaryType.name}/.+".r)
+            .bodyHasLink(
+              "self",
+              s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/$sourceId/${summaryType.name}")
+            .bodyHasPath(
+              s"""_embedded \\ ${summaryType.name}(0) \\ _links \\ self \\ href""",
+              s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/$sourceId/${summaryType.name}/.+".r)
+            .bodyHasPath(
+              s"""_embedded \\ ${summaryType.name}(1) \\ _links \\ self \\ href""",
+              s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/$sourceId/${summaryType.name}/.+".r)
+            .bodyHasPath(
+              s"""_embedded \\ ${summaryType.name}(2) \\ _links \\ self \\ href""",
+              s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/$sourceId/${summaryType.name}/.+".r)
         }
       }
     }
@@ -83,11 +101,15 @@ class SummaryControllerSpec extends BaseFunctionalSpec {
       SourceTypes.types.foreach { sourceType =>
         sourceType.summaryTypes.foreach { summaryType =>
           when()
-            .put(s"/sandbox/$saUtr/$taxYear/${sourceType.name}/$sourceId/${summaryType.name}/$summaryId", Some(summaryType.example()))
+            .put(
+              s"/sandbox/$saUtr/$taxYear/${sourceType.name}/$sourceId/${summaryType.name}/$summaryId",
+              Some(summaryType.example()))
             .thenAssertThat()
             .statusIs(200)
             .contentTypeIsHalJson()
-            .bodyHasLink("self", s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/$sourceId/${summaryType.name}/$summaryId")
+            .bodyHasLink(
+              "self",
+              s"/self-assessment/$saUtr/$taxYear/${sourceType.name}/$sourceId/${summaryType.name}/$summaryId")
         }
       }
     }
@@ -98,7 +120,8 @@ class SummaryControllerSpec extends BaseFunctionalSpec {
       SourceTypes.types.foreach { sourceType =>
         sourceType.summaryTypes.foreach { summaryType =>
           when()
-            .delete(s"/sandbox/$saUtr/$taxYear/${sourceType.name}/$sourceId/${summaryType.name}/$summaryId")
+            .delete(
+              s"/sandbox/$saUtr/$taxYear/${sourceType.name}/$sourceId/${summaryType.name}/$summaryId")
             .thenAssertThat()
             .statusIs(204)
         }

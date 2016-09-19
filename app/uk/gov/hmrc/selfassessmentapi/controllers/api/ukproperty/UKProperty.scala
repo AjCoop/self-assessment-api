@@ -28,10 +28,11 @@ case class UKProperty(id: Option[SourceId] = None,
                       adjustments: Option[Adjustments] = None,
                       rentARoomRelief: Option[BigDecimal] = None)
 
-
 object UKProperty extends JsonMarshaller[UKProperty] {
 
-  implicit val propertyLocationTypes = EnumJson.enumFormat(PropertyLocationType, Some("Furnished holiday lettings property location type is invalid"))
+  implicit val propertyLocationTypes = EnumJson.enumFormat(
+    PropertyLocationType,
+    Some("Furnished holiday lettings property location type is invalid"))
 
   implicit val writes = Json.writes[UKProperty]
 
@@ -39,13 +40,17 @@ object UKProperty extends JsonMarshaller[UKProperty] {
     Reads.pure(None) and
       (__ \ "allowances").readNullable[Allowances] and
       (__ \ "adjustments").readNullable[Adjustments] and
-      (__ \ "rentARoomRelief").readNullable[BigDecimal](positiveAmountValidator("rentARoomRelief"))
-    ) (UKProperty.apply _)
+      (__ \ "rentARoomRelief")
+        .readNullable[BigDecimal](positiveAmountValidator("rentARoomRelief"))
+  )(UKProperty.apply _)
 
-
-  def example(id: Option[SourceId]): UKProperty = UKProperty(
-    id,
-    Some(Allowances(Some(BigDecimal(1000.00)), Some(BigDecimal(600.00)), Some(BigDecimal(50.00)), Some(BigDecimal(3399.99)))),
-    Some(Adjustments(Some(BigDecimal(250.00)))),
-    Some(BigDecimal(7500.00)))
+  def example(id: Option[SourceId]): UKProperty =
+    UKProperty(id,
+               Some(
+                 Allowances(Some(BigDecimal(1000.00)),
+                            Some(BigDecimal(600.00)),
+                            Some(BigDecimal(50.00)),
+                            Some(BigDecimal(3399.99)))),
+               Some(Adjustments(Some(BigDecimal(250.00)))),
+               Some(BigDecimal(7500.00)))
 }

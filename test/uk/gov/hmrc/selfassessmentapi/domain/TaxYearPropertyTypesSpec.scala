@@ -29,13 +29,20 @@ import uk.gov.hmrc.selfassessmentapi.controllers.api.pensioncontribution.Pension
 import uk.gov.hmrc.selfassessmentapi.controllers.api.studentsloan.StudentLoans
 import uk.gov.hmrc.selfassessmentapi.controllers.api.taxrefundedorsetoff.TaxRefundedOrSetOffs
 
-class TaxYearPropertyTypesSpec extends UnitSpec with MockitoSugar with Matchers {
+class TaxYearPropertyTypesSpec
+    extends UnitSpec
+    with MockitoSugar
+    with Matchers {
 
   val featureSwitch = mock[FeatureSwitch]
 
   "types" should {
-    Seq(PensionContributions, CharitableGivings, BlindPersons,
-      TaxRefundedOrSetOffs, StudentLoans, ChildBenefits).foreach { taxYearPropertyType =>
+    Seq(PensionContributions,
+        CharitableGivings,
+        BlindPersons,
+        TaxRefundedOrSetOffs,
+        StudentLoans,
+        ChildBenefits).foreach { taxYearPropertyType =>
       s"return $taxYearPropertyType if it is switched on" in {
         given(featureSwitch.isEnabled(taxYearPropertyType)).willReturn(true)
         TestTaxYearPropertyTypes(featureSwitch).types should contain only taxYearPropertyType
@@ -52,15 +59,22 @@ class TaxYearPropertyTypesSpec extends UnitSpec with MockitoSugar with Matchers 
       TestTaxYearPropertyTypes(featureSwitch).fromName("nonsense") shouldBe None
     }
 
-    Seq(PensionContributions, CharitableGivings, BlindPersons,
-      TaxRefundedOrSetOffs, StudentLoans, ChildBenefits).foreach { taxYearPropertyType =>
+    Seq(PensionContributions,
+        CharitableGivings,
+        BlindPersons,
+        TaxRefundedOrSetOffs,
+        StudentLoans,
+        ChildBenefits).foreach { taxYearPropertyType =>
       s"return the corresponding type object when given valid name: $taxYearPropertyType" in {
         given(featureSwitch.isEnabled(taxYearPropertyType)).willReturn(true)
-        TestTaxYearPropertyTypes(featureSwitch).fromName(taxYearPropertyType.name) shouldBe Some(taxYearPropertyType)
+        TestTaxYearPropertyTypes(featureSwitch).fromName(
+          taxYearPropertyType.name) shouldBe Some(taxYearPropertyType)
       }
     }
 
   }
 }
 
-sealed case class TestTaxYearPropertyTypes(override val featureSwitch: FeatureSwitch) extends FeatureSwitchedTaxYearPropertyTypes
+sealed case class TestTaxYearPropertyTypes(
+    override val featureSwitch: FeatureSwitch)
+    extends FeatureSwitchedTaxYearPropertyTypes

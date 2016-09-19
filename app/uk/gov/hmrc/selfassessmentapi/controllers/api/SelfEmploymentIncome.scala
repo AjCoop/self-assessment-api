@@ -19,7 +19,9 @@ package uk.gov.hmrc.selfassessmentapi.controllers.api
 import play.api.libs.json.Json
 import uk.gov.hmrc.selfassessmentapi.controllers.api._
 
-case class SelfEmploymentIncome(sourceId: SourceId, taxableProfit: BigDecimal, profit: BigDecimal)
+case class SelfEmploymentIncome(sourceId: SourceId,
+                                taxableProfit: BigDecimal,
+                                profit: BigDecimal)
 
 object SelfEmploymentIncome {
   implicit val selfEmploymentIncomeFormats = Json.format[SelfEmploymentIncome]

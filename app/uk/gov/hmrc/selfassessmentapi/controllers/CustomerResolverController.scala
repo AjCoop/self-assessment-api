@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.selfassessmentapi.controllers
 
-
 import play.api.hal.HalLink
 import play.api.libs.json.JsObject
 import play.api.mvc.Action
@@ -32,9 +31,10 @@ trait CustomerResolverController extends BaseController with Links {
 
   val confidenceLevel: ConfidenceLevel
 
-  def saUtr(confidenceLevel: ConfidenceLevel)(implicit hc: HeaderCarrier): Future[Option[SaUtr]] = {
-      val utrGenerator = new SaUtrGenerator()
-      Future.successful(Some(utrGenerator.nextSaUtr))
+  def saUtr(confidenceLevel: ConfidenceLevel)(
+      implicit hc: HeaderCarrier): Future[Option[SaUtr]] = {
+    val utrGenerator = new SaUtrGenerator()
+    Future.successful(Some(utrGenerator.nextSaUtr))
   }
 
   final def resolve = Action.async { request =>

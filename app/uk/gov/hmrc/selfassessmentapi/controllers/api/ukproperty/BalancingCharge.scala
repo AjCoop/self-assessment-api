@@ -21,16 +21,16 @@ import play.api.libs.json.Reads._
 import play.api.libs.json._
 import uk.gov.hmrc.selfassessmentapi.controllers.api._
 
-case class BalancingCharge(id: Option[SummaryId] = None,
-                           amount: BigDecimal)
+case class BalancingCharge(id: Option[SummaryId] = None, amount: BigDecimal)
 
-object BalancingCharge extends JsonMarshaller[BalancingCharge]{
+object BalancingCharge extends JsonMarshaller[BalancingCharge] {
 
   implicit val writes = Json.writes[BalancingCharge]
   implicit val reads: Reads[BalancingCharge] = (
     Reads.pure(None) and
       (__ \ "amount").read[BigDecimal](positiveAmountValidator("amount"))
-    ) (BalancingCharge.apply _)
+  )(BalancingCharge.apply _)
 
-  override def example(id: Option[SummaryId]) = BalancingCharge(id, BigDecimal(1000))
+  override def example(id: Option[SummaryId]) =
+    BalancingCharge(id, BigDecimal(1000))
 }

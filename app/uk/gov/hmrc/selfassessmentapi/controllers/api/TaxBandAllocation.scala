@@ -21,11 +21,18 @@ import uk.gov.hmrc.selfassessmentapi.repositories.domain.TaxBand
 case class TaxBandAllocation(amount: BigDecimal, taxBand: TaxBand) {
 
   def toTaxBandSummary(chargedAt: BigDecimal) =
-    uk.gov.hmrc.selfassessmentapi.controllers.api.TaxBandSummary(taxBand.name, amount, s"$chargedAt%", tax(chargedAt))
+    uk.gov.hmrc.selfassessmentapi.controllers.api
+      .TaxBandSummary(taxBand.name, amount, s"$chargedAt%", tax(chargedAt))
 
-  def toTaxBandSummary = uk.gov.hmrc.selfassessmentapi.controllers.api.TaxBandSummary(taxBand.name, amount, s"${taxBand.chargedAt}%", tax(taxBand.chargedAt))
+  def toTaxBandSummary =
+    uk.gov.hmrc.selfassessmentapi.controllers.api.TaxBandSummary(
+      taxBand.name,
+      amount,
+      s"${taxBand.chargedAt}%",
+      tax(taxBand.chargedAt))
 
-  def tax(chargedAt: BigDecimal): BigDecimal = RoundDownToPennies(amount * chargedAt / 100)
+  def tax(chargedAt: BigDecimal): BigDecimal =
+    RoundDownToPennies(amount * chargedAt / 100)
 
   def available: BigDecimal = PositiveOrZero(taxBand.width - amount)
 

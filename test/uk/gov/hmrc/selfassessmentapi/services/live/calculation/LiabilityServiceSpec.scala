@@ -42,7 +42,8 @@ class LiabilityServiceSpec extends UnitSpec with MockitoSugar {
   private val selfEmploymentRepo = mock[SelfEmploymentMongoRepository]
   private val unearnedIncomeRepo = mock[UnearnedIncomeMongoRepository]
   private val ukPropertyRepo = mock[UKPropertiesMongoRepository]
-  private val furnishedHolidayLettingsRepo = mock[FurnishedHolidayLettingsMongoRepository]
+  private val furnishedHolidayLettingsRepo =
+    mock[FurnishedHolidayLettingsMongoRepository]
   private val taxYearPropertiesService = mock[TaxYearPropertiesService]
   private val featureSwitch = mock[FeatureSwitch]
   private val service = new LiabilityService(employmentRepo,
@@ -56,15 +57,19 @@ class LiabilityServiceSpec extends UnitSpec with MockitoSugar {
 
   "calculate" should {
 
-    when(taxYearPropertiesService.findTaxYearProperties(any[SaUtr], any[TaxYear])).thenReturn(Future.successful(None))
+    when(
+      taxYearPropertiesService.findTaxYearProperties(any[SaUtr], any[TaxYear]))
+      .thenReturn(Future.successful(None))
 
     // Stub save and calculate methods to return the same item they are given.
-    when(liabilityRepo.save(any[LiabilityResult])).thenAnswer(new Answer[Future[LiabilityResult]] {
-      override def answer(invocation: InvocationOnMock): Future[LiabilityResult] = {
-        val arg = invocation.getArguments.head.asInstanceOf[LiabilityResult]
-        Future.successful(arg)
-      }
-    })
+    when(liabilityRepo.save(any[LiabilityResult]))
+      .thenAnswer(new Answer[Future[LiabilityResult]] {
+        override def answer(
+            invocation: InvocationOnMock): Future[LiabilityResult] = {
+          val arg = invocation.getArguments.head.asInstanceOf[LiabilityResult]
+          Future.successful(arg)
+        }
+      })
 
     "not get employment sources from repository when Employment source is switched on" in {
       when(featureSwitch.isEnabled(Employments)).thenReturn(true)

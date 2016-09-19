@@ -23,36 +23,53 @@ import uk.gov.hmrc.selfassessmentapi.controllers.api.furnishedholidaylettings.Pr
 import uk.gov.hmrc.selfassessmentapi.repositories.domain._
 
 case class FurnishedHolidayLettingBuilder(capitalAllowance: BigDecimal = 0,
-                                          location: PropertyLocationType = PropertyLocationType.UK) {
+                                          location: PropertyLocationType =
+                                            PropertyLocationType.UK) {
   import uk.gov.hmrc.selfassessmentapi.controllers.api.furnishedholidaylettings._
 
   private val objectID = BSONObjectID.generate
 
   private var furnishedHolidayLetting: FurnishedHolidayLettings =
-    FurnishedHolidayLettings(objectID, objectID.stringify, generateSaUtr(), taxYear, now, now, location, allowances = Some(Allowances(Some(capitalAllowance))))
+    FurnishedHolidayLettings(objectID,
+                             objectID.stringify,
+                             generateSaUtr(),
+                             taxYear,
+                             now,
+                             now,
+                             location,
+                             allowances =
+                               Some(Allowances(Some(capitalAllowance))))
 
   def lossBroughtForward(amount: BigDecimal) = {
-    furnishedHolidayLetting = furnishedHolidayLetting.copy(adjustments = Some(Adjustments(lossBroughtForward = Some(amount))))
+    furnishedHolidayLetting = furnishedHolidayLetting.copy(
+      adjustments = Some(Adjustments(lossBroughtForward = Some(amount))))
     this
   }
 
   def incomes(incomes: BigDecimal*) = {
-    furnishedHolidayLetting = furnishedHolidayLetting.copy(incomes = incomes.map (FurnishedHolidayLettingsIncomeSummary("", _)))
+    furnishedHolidayLetting = furnishedHolidayLetting.copy(
+      incomes = incomes.map(FurnishedHolidayLettingsIncomeSummary("", _)))
     this
   }
 
   def expenses(expenses: (ExpenseType.ExpenseType, BigDecimal)*) = {
-    furnishedHolidayLetting = furnishedHolidayLetting.copy(expenses = expenses.map (expense => FurnishedHolidayLettingsExpenseSummary("", expense._1, expense._2)))
+    furnishedHolidayLetting =
+      furnishedHolidayLetting.copy(expenses = expenses.map(expense =>
+        FurnishedHolidayLettingsExpenseSummary("", expense._1, expense._2)))
     this
   }
 
   def balancingCharges(amounts: BigDecimal*) = {
-    furnishedHolidayLetting = furnishedHolidayLetting.copy(balancingCharges = amounts.map (FurnishedHolidayLettingsBalancingChargeSummary("", _)))
+    furnishedHolidayLetting = furnishedHolidayLetting.copy(
+      balancingCharges =
+        amounts.map(FurnishedHolidayLettingsBalancingChargeSummary("", _)))
     this
   }
 
   def privateUseAdjustments(amounts: BigDecimal*) = {
-    furnishedHolidayLetting = furnishedHolidayLetting.copy(privateUseAdjustment = amounts.map (FurnishedHolidayLettingsPrivateUseAdjustmentSummary("", _)))
+    furnishedHolidayLetting = furnishedHolidayLetting.copy(
+      privateUseAdjustment = amounts.map(
+        FurnishedHolidayLettingsPrivateUseAdjustmentSummary("", _)))
     this
   }
 

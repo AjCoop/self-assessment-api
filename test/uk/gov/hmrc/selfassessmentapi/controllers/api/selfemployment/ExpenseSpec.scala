@@ -25,46 +25,53 @@ class ExpenseSpec extends JsonSpec {
 
   "format" should {
     "round trip Expense json" in {
-      ExpenseType.values.foreach {
-        cat => roundTripJson(Expense(`type` = cat, amount = BigDecimal(1000.99)))
+      ExpenseType.values.foreach { cat =>
+        roundTripJson(Expense(`type` = cat, amount = BigDecimal(1000.99)))
       }
     }
   }
 
   "validate" should {
     "reject amounts with more than 2 decimal values" in {
-      Seq(BigDecimal(1000.123), BigDecimal(1000.1234), BigDecimal(1000.12345), BigDecimal(1000.123456789)).foreach { testAmount =>
-        val seExpense = Expense(`type` = CISPaymentsToSubcontractors, amount = testAmount)
+      Seq(BigDecimal(1000.123),
+          BigDecimal(1000.1234),
+          BigDecimal(1000.12345),
+          BigDecimal(1000.123456789)).foreach { testAmount =>
+        val seExpense =
+          Expense(`type` = CISPaymentsToSubcontractors, amount = testAmount)
         assertValidationError[Expense](
           seExpense,
-          Map("/amount" -> INVALID_MONETARY_AMOUNT), "Expected invalid self-employment-income")
+          Map("/amount" -> INVALID_MONETARY_AMOUNT),
+          "Expected invalid self-employment-income")
       }
     }
 
     "reject negative monetary amounts" in {
       Seq(BigDecimal(-1000.12), BigDecimal(-10.12)).foreach { testAmount =>
-        val seExpense = Expense(`type` = CISPaymentsToSubcontractors, amount = testAmount)
+        val seExpense =
+          Expense(`type` = CISPaymentsToSubcontractors, amount = testAmount)
         assertValidationError[Expense](
           seExpense,
-          Map("/amount" -> INVALID_MONETARY_AMOUNT), "Expected invalid self-employment-income")
+          Map("/amount" -> INVALID_MONETARY_AMOUNT),
+          "Expected invalid self-employment-income")
       }
     }
 
     "reject negative amount" in {
-      val seExpense = Expense(`type` = CISPaymentsToSubcontractors, amount = BigDecimal(-1000.12))
+      val seExpense = Expense(`type` = CISPaymentsToSubcontractors,
+                              amount = BigDecimal(-1000.12))
       assertValidationError[Expense](
         seExpense,
-        Map("/amount" -> INVALID_MONETARY_AMOUNT), "Expected negative self-employment expense")
+        Map("/amount" -> INVALID_MONETARY_AMOUNT),
+        "Expected negative self-employment expense")
     }
 
     "reject invalid Expense category" in {
-      val json = Json.parse(
-        """
+      val json = Json.parse("""
           |{ "type": "BAZ",
           |"amount" : 10000.45
           |}
-        """.
-          stripMargin)
+        """.stripMargin)
 
       assertValidationError[Expense](
         json,

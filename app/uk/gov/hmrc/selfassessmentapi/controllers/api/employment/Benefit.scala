@@ -22,26 +22,29 @@ import uk.gov.hmrc.selfassessmentapi.controllers.api._
 import uk.gov.hmrc.selfassessmentapi.controllers.definition.EnumJson
 import uk.gov.hmrc.selfassessmentapi.controllers.api.employment.BenefitType.BenefitType
 
-
 object BenefitType extends Enumeration {
   type BenefitType = Value
-  val CompanyVehicle, Fuel, PrivateInsurance, VouchersCCAndExcessMileage, GoodsProvidedByEmployer,
-      Accommodation, ExpensesPayments, Other = Value
-  implicit val employmentBenefitTypes = EnumJson.enumFormat(BenefitType, Some("Employment Benefit type is invalid"))
+  val CompanyVehicle, Fuel, PrivateInsurance, VouchersCCAndExcessMileage,
+  GoodsProvidedByEmployer, Accommodation, ExpensesPayments, Other = Value
+  implicit val employmentBenefitTypes = EnumJson
+    .enumFormat(BenefitType, Some("Employment Benefit type is invalid"))
 }
 
 case class Benefit(id: Option[SummaryId] = None,
-                   `type`: BenefitType, amount: BigDecimal)
+                   `type`: BenefitType,
+                   amount: BigDecimal)
 
 object Benefit extends JsonMarshaller[Benefit] {
 
-  implicit val seExpenseTypes = EnumJson.enumFormat(BenefitType, Some("Employment Benefit type is invalid"))
+  implicit val seExpenseTypes = EnumJson
+    .enumFormat(BenefitType, Some("Employment Benefit type is invalid"))
   implicit val writes = Json.writes[Benefit]
   implicit val reads: Reads[Benefit] = (
     Reads.pure(None) and
       (__ \ "type").read[BenefitType] and
       (__ \ "amount").read[BigDecimal](positiveAmountValidator("amount"))
-    ) (Benefit.apply _)
+  )(Benefit.apply _)
 
-  override def example(id: Option[SummaryId]) = Benefit(id, BenefitType.PrivateInsurance, BigDecimal(1000))
+  override def example(id: Option[SummaryId]) =
+    Benefit(id, BenefitType.PrivateInsurance, BigDecimal(1000))
 }

@@ -5,17 +5,22 @@ import scala.util.matching.Regex
 
 trait UrlInterpolation {
 
-  def interpolated(path: Regex)(implicit urlPathVariables: mutable.Map[String, String]): String = {
+  def interpolated(path: Regex)(
+      implicit urlPathVariables: mutable.Map[String, String]): String = {
     interpolated(path.regex)
   }
 
-  def interpolated(path: String)(implicit urlPathVariables: mutable.Map[String, String]): String = {
-    interpolate(interpolate(interpolate(path, "sourceId"), "summaryId"), "liabilityId")
+  def interpolated(path: String)(
+      implicit urlPathVariables: mutable.Map[String, String]): String = {
+    interpolate(interpolate(interpolate(path, "sourceId"), "summaryId"),
+                "liabilityId")
   }
 
-  private def interpolate(path: String, pathVariable: String)(implicit pathVariablesValues: mutable.Map[String, String]): String = {
+  private def interpolate(path: String, pathVariable: String)(
+      implicit pathVariablesValues: mutable.Map[String, String]): String = {
     pathVariablesValues.get(pathVariable) match {
-      case Some(variableValue) => path.replace(s"%$pathVariable%", variableValue)
+      case Some(variableValue) =>
+        path.replace(s"%$pathVariable%", variableValue)
       case None => path
     }
   }

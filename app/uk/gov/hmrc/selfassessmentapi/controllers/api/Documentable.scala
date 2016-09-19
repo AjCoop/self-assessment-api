@@ -24,19 +24,37 @@ trait FieldDescription {
   val optional: Boolean
 }
 
-case class PositiveMonetaryFieldDescription(source: String, name: String, description: String = "Positive monetary amount", optional: Boolean = false) extends FieldDescription {
+case class PositiveMonetaryFieldDescription(source: String,
+                                            name: String,
+                                            description: String =
+                                              "Positive monetary amount",
+                                            optional: Boolean = false)
+    extends FieldDescription {
   val `type` = "Money"
 }
 
-case class MonetaryFieldDescription(source: String, name: String, description: String = "Monetary amount", optional: Boolean = false) extends FieldDescription {
+case class MonetaryFieldDescription(source: String,
+                                    name: String,
+                                    description: String = "Monetary amount",
+                                    optional: Boolean = false)
+    extends FieldDescription {
   val `type` = "Money"
 }
 
-case class ObjectFieldDescription(source: String, name: String, optional: Boolean = false, description: String = "Object") extends FieldDescription {
+case class ObjectFieldDescription(source: String,
+                                  name: String,
+                                  optional: Boolean = false,
+                                  description: String = "Object")
+    extends FieldDescription {
   val `type` = "Object"
 }
 
-case class FullFieldDescription(source: String, name: String, `type`: String, description: String, optional: Boolean = false) extends FieldDescription
+case class FullFieldDescription(source: String,
+                                name: String,
+                                `type`: String,
+                                description: String,
+                                optional: Boolean = false)
+    extends FieldDescription
 
 trait Documentable {
   val title: String

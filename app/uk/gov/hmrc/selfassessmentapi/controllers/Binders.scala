@@ -20,43 +20,52 @@ import play.api.mvc.PathBindable
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.referencechecker.SelfAssessmentReferenceChecker
 import uk.gov.hmrc.selfassessmentapi.config.AppContext
-import uk.gov.hmrc.selfassessmentapi.controllers.api.{SourceType, SourceTypes, TaxYear}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.{
+  SourceType,
+  SourceTypes,
+  TaxYear
+}
 
 object Binders {
 
-  implicit def saUtrBinder(implicit stringBinder: PathBindable[String]) = new PathBindable[SaUtr] {
+  implicit def saUtrBinder(implicit stringBinder: PathBindable[String]) =
+    new PathBindable[SaUtr] {
 
-    def unbind(key: String, saUtr: SaUtr): String = stringBinder.unbind(key, saUtr.value)
+      def unbind(key: String, saUtr: SaUtr): String =
+        stringBinder.unbind(key, saUtr.value)
 
-    def bind(key: String, value: String): Either[String, SaUtr] = {
-      SelfAssessmentReferenceChecker.isValid(value) match {
-        case true => Right(SaUtr(value))
-        case false => Left("ERROR_SA_UTR_INVALID")
+      def bind(key: String, value: String): Either[String, SaUtr] = {
+        SelfAssessmentReferenceChecker.isValid(value) match {
+          case true => Right(SaUtr(value))
+          case false => Left("ERROR_SA_UTR_INVALID")
+        }
       }
     }
-  }
 
-  implicit def taxYearBinder(implicit stringBinder: PathBindable[String]) = new PathBindable[TaxYear] {
+  implicit def taxYearBinder(implicit stringBinder: PathBindable[String]) =
+    new PathBindable[TaxYear] {
 
-    def unbind(key: String, taxYear: TaxYear): String = stringBinder.unbind(key, taxYear.value)
+      def unbind(key: String, taxYear: TaxYear): String =
+        stringBinder.unbind(key, taxYear.value)
 
-    def bind(key: String, value: String): Either[String, TaxYear] = {
-      AppContext.supportedTaxYears.contains(value) match {
-        case true => Right(TaxYear(value))
-        case false => Left("ERROR_TAX_YEAR_INVALID")
+      def bind(key: String, value: String): Either[String, TaxYear] = {
+        AppContext.supportedTaxYears.contains(value) match {
+          case true => Right(TaxYear(value))
+          case false => Left("ERROR_TAX_YEAR_INVALID")
+        }
       }
     }
-  }
 
-  implicit def sourceTypeBinder(implicit stringBinder: PathBindable[String]) = new PathBindable[SourceType] {
+  implicit def sourceTypeBinder(implicit stringBinder: PathBindable[String]) =
+    new PathBindable[SourceType] {
 
-    def unbind(key: String, `type`: SourceType): String = `type`.name
+      def unbind(key: String, `type`: SourceType): String = `type`.name
 
-    def bind(key: String, value: String): Either[String, SourceType] = {
-      SourceTypes.fromName(value.toLowerCase) match {
-        case Some(v) => Right(v)
-        case None => Left("ERROR_INVALID_SOURCE_TYPE")
+      def bind(key: String, value: String): Either[String, SourceType] = {
+        SourceTypes.fromName(value.toLowerCase) match {
+          case Some(v) => Right(v)
+          case None => Left("ERROR_INVALID_SOURCE_TYPE")
+        }
       }
     }
-  }
 }

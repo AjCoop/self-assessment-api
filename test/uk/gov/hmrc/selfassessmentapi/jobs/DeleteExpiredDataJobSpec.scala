@@ -21,7 +21,10 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import play.api.Configuration
 import uk.gov.hmrc.selfassessmentapi.TestApplication
-import uk.gov.hmrc.selfassessmentapi.jobs.DeleteExpiredDataJob.{DeleteExpiredData, DeleteExpiredDataJobConfig}
+import uk.gov.hmrc.selfassessmentapi.jobs.DeleteExpiredDataJob.{
+  DeleteExpiredData,
+  DeleteExpiredDataJobConfig
+}
 import uk.gov.hmrc.selfassessmentapi.repositories.JobHistoryMongoRepository
 import uk.gov.hmrc.selfassessmentapi.services.DeleteExpiredDataService
 
@@ -55,7 +58,8 @@ class DeleteExpiredDataJobSpec extends TestApplication {
     "retrieve interval from application config" in {
       DateTimeUtils.setCurrentMillisFixed(DateTime.now.getMillis)
 
-      when(config.getMilliseconds("interval")).thenReturn(Some((1 day) toMillis))
+      when(config.getMilliseconds("interval"))
+        .thenReturn(Some((1 day) toMillis))
 
       val deleteConfig = new DeleteExpiredDataJobConfig(config)
 
@@ -69,7 +73,6 @@ class DeleteExpiredDataJobSpec extends TestApplication {
 
       an[IllegalStateException] should be thrownBy deleteConfig.jobInterval
     }
-
 
     "retrieve initialDelay from application config" in {
       DateTimeUtils.setCurrentMillisFixed(DateTime.now.getMillis)
@@ -131,7 +134,8 @@ class DeleteExpiredDataJobSpec extends TestApplication {
     }
 
     "should return an error message when any exceptions occur" in {
-      when(service.deleteExpiredData(any())).thenReturn(Future(throw new RuntimeException("Exception occurred.")))
+      when(service.deleteExpiredData(any()))
+        .thenReturn(Future(throw new RuntimeException("Exception occurred.")))
 
       val message = await(deleteExpiredData.deleteExpiredData(DateTime.now))
 

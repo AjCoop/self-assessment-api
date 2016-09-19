@@ -18,11 +18,12 @@ package uk.gov.hmrc.selfassessmentapi.controllers.api
 
 import play.api.libs.json.Json
 
-case class AllowancesAndReliefs(personalAllowance: Option[BigDecimal] = None,
-                                personalSavingsAllowance: Option[BigDecimal] = None,
-                                incomeTaxRelief: Option[BigDecimal] = None,
-                                savingsStartingRate: Option[BigDecimal] = None,
-                                retirementAnnuityContract: Option[BigDecimal] = None)
+case class AllowancesAndReliefs(
+    personalAllowance: Option[BigDecimal] = None,
+    personalSavingsAllowance: Option[BigDecimal] = None,
+    incomeTaxRelief: Option[BigDecimal] = None,
+    savingsStartingRate: Option[BigDecimal] = None,
+    retirementAnnuityContract: Option[BigDecimal] = None)
 
 object AllowancesAndReliefs {
   implicit val allowancesAndReliefsFormats = Json.format[AllowancesAndReliefs]

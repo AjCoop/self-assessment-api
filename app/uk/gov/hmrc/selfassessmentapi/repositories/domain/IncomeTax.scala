@@ -20,5 +20,7 @@ import uk.gov.hmrc.selfassessmentapi.controllers.api.TaxBandSummary
 
 trait IncomeTax {
   def incomeTax(taxBandSummaries: Seq[TaxBandSummary]): BigDecimal =
-    taxBandSummaries.foldLeft(BigDecimal(0)) { (tax, taxBandSummary) => tax + taxBandSummary.tax}
+    taxBandSummaries.foldLeft(BigDecimal(0)) { (tax, taxBandSummary) =>
+      tax + taxBandSummary.tax
+    }
 }

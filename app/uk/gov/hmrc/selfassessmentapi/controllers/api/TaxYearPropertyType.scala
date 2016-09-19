@@ -22,4 +22,3 @@ trait TaxYearPropertyType extends Documentable {
   val name: String
   val example: JsValue
 }
-

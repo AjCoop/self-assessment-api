@@ -30,10 +30,15 @@ class BaseControllerSpec extends WordSpecLike with Matchers {
   "invalid parts" should {
     "transform validation errors into matching sequence of invalid parts" in {
 
-      val errors = Seq((JsPath \ "commencementDate", List(ValidationError("error.expected.jodadate.format", Seq()))))
+      val errors = Seq(
+        (JsPath \ "commencementDate",
+         List(ValidationError("error.expected.jodadate.format", Seq()))))
       val request = controller.invalidRequest(errors)
 
-      request.errors.head shouldBe InvalidPart(ErrorCode.INVALID_FIELD, "error.expected.jodadate.format", "/commencementDate")
+      request.errors.head shouldBe InvalidPart(
+        ErrorCode.INVALID_FIELD,
+        "error.expected.jodadate.format",
+        "/commencementDate")
     }
   }
 

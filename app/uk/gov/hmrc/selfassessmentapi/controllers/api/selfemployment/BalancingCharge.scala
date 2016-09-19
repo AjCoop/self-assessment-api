@@ -25,10 +25,14 @@ import uk.gov.hmrc.selfassessmentapi.controllers.definition.EnumJson
 object BalancingChargeType extends Enumeration {
   type BalancingChargeType = Value
   val BPRA, Other = Value
-  implicit val balancingChargeCategory = EnumJson.enumFormat(BalancingChargeType, Some("Self Employment Balancing charge type is invalid"))
+  implicit val balancingChargeCategory = EnumJson.enumFormat(
+    BalancingChargeType,
+    Some("Self Employment Balancing charge type is invalid"))
 }
 
-case class BalancingCharge(id: Option[String] = None, `type`: BalancingChargeType, amount: BigDecimal)
+case class BalancingCharge(id: Option[String] = None,
+                           `type`: BalancingChargeType,
+                           amount: BigDecimal)
 
 object BalancingCharge extends JsonMarshaller[BalancingCharge] {
   implicit val writes = Json.writes[BalancingCharge]
@@ -36,7 +40,8 @@ object BalancingCharge extends JsonMarshaller[BalancingCharge] {
     Reads.pure(None) and
       (__ \ "type").read[BalancingChargeType] and
       (__ \ "amount").read[BigDecimal](positiveAmountValidator("amount"))
-    ) (BalancingCharge.apply _)
+  )(BalancingCharge.apply _)
 
-  override def example(id: Option[SummaryId]) = BalancingCharge(id, BalancingChargeType.Other, BigDecimal(100.00))
+  override def example(id: Option[SummaryId]) =
+    BalancingCharge(id, BalancingChargeType.Other, BigDecimal(100.00))
 }

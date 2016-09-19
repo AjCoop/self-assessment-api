@@ -30,16 +30,16 @@ trait AuthConnector {
   val http: HttpGet
   val loggingService: LoggingService
 
-  def saUtr(confidenceLevel: ConfidenceLevel)(implicit hc: HeaderCarrier): Future[Option[SaUtr]] = {
-    http.GET(s"$serviceUrl/auth/authority") map {
-      resp =>
-        val json = resp.json
-        val cl = (json \ "confidenceLevel").as[Int]
-        if (cl >= confidenceLevel.level) {
-          val utr = (json \ "accounts" \ "sa" \ "utr").asOpt[String]
-          utr.map(SaUtr(_))
-        } else
-          None
+  def saUtr(confidenceLevel: ConfidenceLevel)(
+      implicit hc: HeaderCarrier): Future[Option[SaUtr]] = {
+    http.GET(s"$serviceUrl/auth/authority") map { resp =>
+      val json = resp.json
+      val cl = (json \ "confidenceLevel").as[Int]
+      if (cl >= confidenceLevel.level) {
+        val utr = (json \ "accounts" \ "sa" \ "utr").asOpt[String]
+        utr.map(SaUtr(_))
+      } else
+        None
     } recover {
       case e: Throwable =>
         loggingService.error("Error in request to auth", e)

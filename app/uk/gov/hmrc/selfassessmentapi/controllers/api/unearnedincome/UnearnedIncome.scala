@@ -19,7 +19,6 @@ package uk.gov.hmrc.selfassessmentapi.controllers.api.unearnedincome
 import play.api.libs.json._
 import uk.gov.hmrc.selfassessmentapi.controllers.api._
 
-
 case class UnearnedIncome(id: Option[SourceId] = None)
 
 object UnearnedIncome extends JsonMarshaller[UnearnedIncome] {
@@ -28,5 +27,5 @@ object UnearnedIncome extends JsonMarshaller[UnearnedIncome] {
 
   implicit val reads = Reads.pure(None).map(UnearnedIncome(_))
 
-  override def example(id : Option[SourceId]) = UnearnedIncome(id)
+  override def example(id: Option[SourceId]) = UnearnedIncome(id)
 }

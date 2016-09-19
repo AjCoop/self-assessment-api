@@ -6,9 +6,11 @@ import uk.gov.hmrc.support.BaseFunctionalSpec
 
 class TaxYearHalLinksSpec extends BaseFunctionalSpec {
 
-  private val conf: Map[String, Any] = Map("Test.feature-switch.self-employments.enabled" -> false)
+  private val conf: Map[String, Any] = Map(
+    "Test.feature-switch.self-employments.enabled" -> false)
 
-  override lazy val app: FakeApplication = new FakeApplication(additionalConfiguration = conf)
+  override lazy val app: FakeApplication = new FakeApplication(
+    additionalConfiguration = conf)
 
   "Request to discover tax year" should {
     "only have Hal links for enabled sources" in {

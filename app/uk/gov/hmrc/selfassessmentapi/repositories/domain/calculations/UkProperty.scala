@@ -16,54 +16,69 @@
 
 package uk.gov.hmrc.selfassessmentapi.repositories.domain.calculations
 
-import uk.gov.hmrc.selfassessmentapi.controllers.api.{SelfAssessment, TaxPaidForUkProperty}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.{
+  SelfAssessment,
+  TaxPaidForUkProperty
+}
 import uk.gov.hmrc.selfassessmentapi.controllers.api._
 import uk.gov.hmrc.selfassessmentapi.repositories.domain.UKProperties
 
 object UKProperty {
 
   object TaxesPaid {
-    def apply(selfAssessment: SelfAssessment) = selfAssessment.ukProperties.map { property =>
-      TaxPaidForUkProperty(property.sourceId, TaxPaid(property))
-    }
+    def apply(selfAssessment: SelfAssessment) =
+      selfAssessment.ukProperties.map { property =>
+        TaxPaidForUkProperty(property.sourceId, TaxPaid(property))
+      }
   }
 
   object TaxPaid {
-    def apply(ukProperty: UKProperties) = RoundUpToPennies(Total(ukProperty.taxesPaid))
+    def apply(ukProperty: UKProperties) =
+      RoundUpToPennies(Total(ukProperty.taxesPaid))
   }
 
   object TotalTaxPaid {
-    def apply(selfAssessment: SelfAssessment) = selfAssessment.ukProperties.map(TaxPaid(_)).sum
+    def apply(selfAssessment: SelfAssessment) =
+      selfAssessment.ukProperties.map(TaxPaid(_)).sum
   }
 
   object LossBroughtForward {
-    def apply(ukProperty: UKProperties) = ValueOrZero(ukProperty.adjustments.flatMap(_.lossBroughtForward))
+    def apply(ukProperty: UKProperties) =
+      ValueOrZero(ukProperty.adjustments.flatMap(_.lossBroughtForward))
   }
 
   object CappedTotalLossBroughtForward {
-    def apply(selfAssessment: SelfAssessment) = RoundUp(CapAt(selfAssessment.ukProperties.map(LossBroughtForward(_)).sum,
-        selfAssessment.ukProperties.map(AdjustedProfits(_)).sum))
+    def apply(selfAssessment: SelfAssessment) =
+      RoundUp(
+        CapAt(selfAssessment.ukProperties.map(LossBroughtForward(_)).sum,
+              selfAssessment.ukProperties.map(AdjustedProfits(_)).sum))
   }
 
   object AdjustedProfits {
     def apply(ukProperty: UKProperties) = {
-      PositiveOrZero(Total(ukProperty.incomes) + Total(ukProperty.balancingCharges) + Total(ukProperty.privateUseAdjustment) -
-        Total(ukProperty.expenses) - ukProperty.allowancesTotal - ukProperty.rentARoomReliefAmount)
+      PositiveOrZero(
+        Total(ukProperty.incomes) + Total(ukProperty.balancingCharges) + Total(
+          ukProperty.privateUseAdjustment) -
+          Total(ukProperty.expenses) - ukProperty.allowancesTotal - ukProperty.rentARoomReliefAmount)
     }
   }
 
   object Incomes {
-    def apply(selfAssessment: SelfAssessment) = selfAssessment.ukProperties.map { ukProperty =>
-      UkPropertyIncome(ukProperty.sourceId, profit = RoundDown(AdjustedProfits(ukProperty)))
-    }
+    def apply(selfAssessment: SelfAssessment) =
+      selfAssessment.ukProperties.map { ukProperty =>
+        UkPropertyIncome(ukProperty.sourceId,
+                         profit = RoundDown(AdjustedProfits(ukProperty)))
+      }
   }
 
   object TotalProfit {
-    def apply(selfAssessment: SelfAssessment) = selfAssessment.ukProperties.map(AdjustedProfits(_)).sum
+    def apply(selfAssessment: SelfAssessment) =
+      selfAssessment.ukProperties.map(AdjustedProfits(_)).sum
   }
 
   object TotalLossBroughtForward {
-    def apply(selfAssessment: SelfAssessment) = RoundUp(selfAssessment.ukProperties.map(LossBroughtForward(_)).sum)
+    def apply(selfAssessment: SelfAssessment) =
+      RoundUp(selfAssessment.ukProperties.map(LossBroughtForward(_)).sum)
   }
 
 }

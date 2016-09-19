@@ -27,16 +27,23 @@ import uk.gov.hmrc.selfassessmentapi.controllers.api.SourceType
 
 import scala.concurrent.Future
 
-class FeatureSwitchAction(source: SourceType, summary: String) extends ActionBuilder[Request] {
-  val isFeatureEnabled = FeatureSwitch(AppContext.featureSwitch).isEnabled(source, summary)
-  val notImplemented = Future.successful(NotImplemented(Json.toJson(ErrorNotImplemented)))
+class FeatureSwitchAction(source: SourceType, summary: String)
+    extends ActionBuilder[Request] {
+  val isFeatureEnabled =
+    FeatureSwitch(AppContext.featureSwitch).isEnabled(source, summary)
+  val notImplemented =
+    Future.successful(NotImplemented(Json.toJson(ErrorNotImplemented)))
 
-  override def invokeBlock[A](request: Request[A], block: (Request[A]) => Future[Result]): Future[Result] = {
+  override def invokeBlock[A](
+      request: Request[A],
+      block: (Request[A]) => Future[Result]): Future[Result] = {
     block(request)
   }
 
   def asyncFeatureSwitch(block: Request[JsValue] => Future[Result]) = {
-    val emptyJsonParser: BodyParser[JsValue] = BodyParser { request => Done(Right(JsNull), Empty) }
+    val emptyJsonParser: BodyParser[JsValue] = BodyParser { request =>
+      Done(Right(JsNull), Empty)
+    }
 
     if (isFeatureEnabled) async(BodyParsers.parse.json)(block)
     else async[JsValue](emptyJsonParser)(_ => notImplemented)
@@ -50,5 +57,6 @@ class FeatureSwitchAction(source: SourceType, summary: String) extends ActionBui
 }
 
 object FeatureSwitchAction {
-  def apply(source: SourceType, summary: String = "") = new FeatureSwitchAction(source, summary)
+  def apply(source: SourceType, summary: String = "") =
+    new FeatureSwitchAction(source, summary)
 }

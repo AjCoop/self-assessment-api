@@ -32,20 +32,25 @@ class StudentLoanSpec extends JsonSpec {
 
     "reject amounts with more than 2 decimal values" in {
       assertValidationError[StudentLoan](
-        StudentLoan(planType = StudentLoanPlanType.Plan1, deductedByEmployers = Some(BigDecimal(1000.123))),
-        Map("/deductedByEmployers" -> INVALID_MONETARY_AMOUNT), "Expected validation error for deductedByEmployers for amount with more than 2 decimal places"
+        StudentLoan(planType = StudentLoanPlanType.Plan1,
+                    deductedByEmployers = Some(BigDecimal(1000.123))),
+        Map("/deductedByEmployers" -> INVALID_MONETARY_AMOUNT),
+        "Expected validation error for deductedByEmployers for amount with more than 2 decimal places"
       )
     }
 
     "reject negative amount" in {
       assertValidationError[StudentLoan](
-        StudentLoan(planType = StudentLoanPlanType.Plan1, deductedByEmployers = Some(BigDecimal(-1000.00))),
-        Map("/deductedByEmployers" -> INVALID_MONETARY_AMOUNT), "Expected validation error for deductedByEmployers for negative amount"
+        StudentLoan(planType = StudentLoanPlanType.Plan1,
+                    deductedByEmployers = Some(BigDecimal(-1000.00))),
+        Map("/deductedByEmployers" -> INVALID_MONETARY_AMOUNT),
+        "Expected validation error for deductedByEmployers for negative amount"
       )
     }
 
     "accept a student loan without specifying the amount already deducted by employers" in {
-      val sl = StudentLoan(planType = StudentLoanPlanType.Plan1, deductedByEmployers = None)
+      val sl = StudentLoan(planType = StudentLoanPlanType.Plan1,
+                           deductedByEmployers = None)
       assertValidationPasses[StudentLoan](sl)
     }
   }

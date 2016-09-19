@@ -26,9 +26,9 @@ import uk.gov.hmrc.selfassessmentapi.controllers.definition.EnumJson
 object IncomeType extends Enumeration {
   type IncomeType = Value
   val Turnover, Other = Value
-  implicit val seIncomeTypes = EnumJson.enumFormat(IncomeType, Some("Self Employment Income type is invalid"))
+  implicit val seIncomeTypes = EnumJson
+    .enumFormat(IncomeType, Some("Self Employment Income type is invalid"))
 }
-
 
 case class Income(id: Option[SummaryId] = None,
                   `type`: IncomeType,
@@ -41,7 +41,8 @@ object Income extends JsonMarshaller[Income] {
     Reads.pure(None) and
       (__ \ "type").read[IncomeType] and
       (__ \ "amount").read[BigDecimal](positiveAmountValidator("amount"))
-    ) (Income.apply _)
+  )(Income.apply _)
 
-  override def example(id: Option[SummaryId]) = Income(id, IncomeType.Turnover, BigDecimal(1000))
+  override def example(id: Option[SummaryId]) =
+    Income(id, IncomeType.Turnover, BigDecimal(1000))
 }

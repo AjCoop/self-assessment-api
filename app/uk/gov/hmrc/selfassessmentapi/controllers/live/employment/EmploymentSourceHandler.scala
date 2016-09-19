@@ -18,24 +18,61 @@ package uk.gov.hmrc.selfassessmentapi.controllers.live.employment
 
 import uk.gov.hmrc.play.http.NotImplementedException
 import uk.gov.hmrc.selfassessmentapi.controllers.api.{SummaryType, SourceTypes}
-import uk.gov.hmrc.selfassessmentapi.controllers.{SourceHandler, SummaryHandler}
+import uk.gov.hmrc.selfassessmentapi.controllers.{
+  SourceHandler,
+  SummaryHandler
+}
 import SourceTypes._
 import uk.gov.hmrc.selfassessmentapi.controllers.api.employment._
-import uk.gov.hmrc.selfassessmentapi.controllers.api.employment.SummaryTypes.{Benefits, Expenses, Incomes, UkTaxesPaid}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.employment.SummaryTypes.{
+  Benefits,
+  Expenses,
+  Incomes,
+  UkTaxesPaid
+}
 import uk.gov.hmrc.selfassessmentapi.repositories.live.EmploymentRepository
-import uk.gov.hmrc.selfassessmentapi.repositories.{SourceRepository, SourceRepositoryWrapper, SummaryRepositoryWrapper}
+import uk.gov.hmrc.selfassessmentapi.repositories.{
+  SourceRepository,
+  SourceRepositoryWrapper,
+  SummaryRepositoryWrapper
+}
 
-object EmploymentSourceHandler extends SourceHandler(Employment, Employments.name) {
+object EmploymentSourceHandler
+    extends SourceHandler(Employment, Employments.name) {
 
-  override val repository: SourceRepository[Employment] = SourceRepositoryWrapper(EmploymentRepository())
+  override val repository: SourceRepository[Employment] =
+    SourceRepositoryWrapper(EmploymentRepository())
 
-  override def summaryHandler(summaryType: SummaryType): Option[SummaryHandler[_]] = {
+  override def summaryHandler(
+      summaryType: SummaryType): Option[SummaryHandler[_]] = {
     summaryType match {
-      case Incomes => Some(SummaryHandler(SummaryRepositoryWrapper(EmploymentRepository().IncomeRepository), Income, Incomes.name))
-      case Expenses => Some(SummaryHandler(SummaryRepositoryWrapper(EmploymentRepository().ExpenseRepository), Expense, Expenses.name))
-      case Benefits => Some(SummaryHandler(SummaryRepositoryWrapper(EmploymentRepository().BenefitRepository), Benefit, Benefits.name))
-      case UkTaxesPaid => Some(SummaryHandler(SummaryRepositoryWrapper(EmploymentRepository().UkTaxPaidRepository), UkTaxPaid, UkTaxesPaid.name))
-      case _ => throw new NotImplementedException(s"${Employments.name} ${summaryType.name} is not implemented")
+      case Incomes =>
+        Some(
+          SummaryHandler(
+            SummaryRepositoryWrapper(EmploymentRepository().IncomeRepository),
+            Income,
+            Incomes.name))
+      case Expenses =>
+        Some(
+          SummaryHandler(
+            SummaryRepositoryWrapper(EmploymentRepository().ExpenseRepository),
+            Expense,
+            Expenses.name))
+      case Benefits =>
+        Some(
+          SummaryHandler(
+            SummaryRepositoryWrapper(EmploymentRepository().BenefitRepository),
+            Benefit,
+            Benefits.name))
+      case UkTaxesPaid =>
+        Some(
+          SummaryHandler(SummaryRepositoryWrapper(
+                           EmploymentRepository().UkTaxPaidRepository),
+                         UkTaxPaid,
+                         UkTaxesPaid.name))
+      case _ =>
+        throw new NotImplementedException(
+          s"${Employments.name} ${summaryType.name} is not implemented")
     }
   }
 }

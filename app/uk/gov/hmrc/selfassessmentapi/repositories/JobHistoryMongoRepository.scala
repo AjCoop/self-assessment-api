@@ -36,43 +36,61 @@ object JobHistoryRepository extends MongoDbConnection {
 }
 
 class JobHistoryMongoRepository(implicit mongo: () => DB)
-  extends ReactiveRepository[JobHistory, BSONObjectID](
-  collectionName = "jobHistory", mongo = mongo, domainFormat = JobHistory.mongoFormats){
-
+    extends ReactiveRepository[JobHistory, BSONObjectID](
+      collectionName = "jobHistory",
+      mongo = mongo,
+      domainFormat = JobHistory.mongoFormats) {
 
   override def indexes: Seq[Index] = {
-    Seq(Index(key = Seq("jobNumber" -> IndexType.Ascending), name = Some("job_number"), unique = true))
+    Seq(
+      Index(key = Seq("jobNumber" -> IndexType.Ascending),
+            name = Some("job_number"),
+            unique = true))
   }
 
   def startJob(): Future[JobHistory] =
     findLatestJob.flatMap {
-      case Some(latestJob) if latestJob.isInProgress => throw JobAlreadyInProgressException()
+      case Some(latestJob) if latestJob.isInProgress =>
+        throw JobAlreadyInProgressException()
       case latestJob =>
         val nextJobNumber = latestJob.map(_.jobNumber + 1).getOrElse(1)
         val mongoJobHistory = JobHistory(nextJobNumber, InProgress)
         insert(mongoJobHistory).map {
-          case result if result.n == 0 => throw CannotStartJobException(result.getCause)
+          case result if result.n == 0 =>
+            throw CannotStartJobException(result.getCause)
           case _ => mongoJobHistory
         }
     }
 
   def updateJobProgress(jobNumber: Int, recordsDeleted: Int): Future[Unit] =
     collection
-      .update(Json.obj("jobNumber" -> jobNumber), Json.obj("$inc" -> Json.obj("recordsDeleted" -> recordsDeleted)))
-      .map(writeResult => if (writeResult.n == 0) throw JobNotFoundException(jobNumber))
+      .update(Json.obj("jobNumber" -> jobNumber),
+              Json.obj("$inc" -> Json.obj("recordsDeleted" -> recordsDeleted)))
+      .map(writeResult =>
+        if (writeResult.n == 0) throw JobNotFoundException(jobNumber))
 
   def completeJob(jobNumber: Int, recordsDeleted: Int): Future[Unit] =
     collection
-      .update(Json.obj("jobNumber" -> jobNumber), Json.obj("$set" -> Json.obj("status" ->  Success, "finishedAt" -> DateTime.now, "recordsDeleted" -> recordsDeleted)))
-      .map(writeResult => if (writeResult.n == 0) throw new JobNotFoundException(jobNumber))
+      .update(Json.obj("jobNumber" -> jobNumber),
+              Json.obj(
+                "$set" -> Json.obj("status" -> Success,
+                                   "finishedAt" -> DateTime.now,
+                                   "recordsDeleted" -> recordsDeleted)))
+      .map(writeResult =>
+        if (writeResult.n == 0) throw new JobNotFoundException(jobNumber))
 
   def abortJob(jobNumber: Int): Future[Unit] = {
     collection
-      .update(Json.obj("jobNumber" -> jobNumber), Json.obj("$set" -> Json.obj("status" -> Failed, "finishedAt" -> DateTime.now)))
-      .map(writeResult => if (writeResult.n == 0) throw new JobNotFoundException(jobNumber))
+      .update(Json.obj("jobNumber" -> jobNumber),
+              Json.obj(
+                "$set" -> Json.obj("status" -> Failed,
+                                   "finishedAt" -> DateTime.now)))
+      .map(writeResult =>
+        if (writeResult.n == 0) throw new JobNotFoundException(jobNumber))
   }
 
-  def isLatestJobInProgress: Future[Boolean] = findLatestJob.map(latestJob => latestJob.exists(_.isInProgress))
+  def isLatestJobInProgress: Future[Boolean] =
+    findLatestJob.map(latestJob => latestJob.exists(_.isInProgress))
 
   private def findLatestJob: Future[Option[JobHistory]] = {
     collection
@@ -83,8 +101,12 @@ class JobHistoryMongoRepository(implicit mongo: () => DB)
 
 }
 
-case class JobNotFoundException(jobNumber: Int) extends RuntimeException(s"Job with number [$jobNumber] not found")
+case class JobNotFoundException(jobNumber: Int)
+    extends RuntimeException(s"Job with number [$jobNumber] not found")
 
-case class CannotStartJobException(t: Throwable) extends RuntimeException("Cannot start a new job", t)
+case class CannotStartJobException(t: Throwable)
+    extends RuntimeException("Cannot start a new job", t)
 
-case class JobAlreadyInProgressException() extends RuntimeException("Job not started as previous job is still running")
+case class JobAlreadyInProgressException()
+    extends RuntimeException(
+      "Job not started as previous job is still running")

@@ -8,7 +8,8 @@ class HealthSpec extends BaseFunctionalSpec {
     "return 200" in {
       given()
         .when()
-        .get("/ping/ping").withoutAcceptHeader()
+        .get("/ping/ping")
+        .withoutAcceptHeader()
         .thenAssertThat()
         .statusIs(200)
     }
@@ -18,7 +19,8 @@ class HealthSpec extends BaseFunctionalSpec {
     "return 200" in {
       given()
         .when()
-        .get("/admin/details").withoutAcceptHeader()
+        .get("/admin/details")
+        .withoutAcceptHeader()
         .thenAssertThat()
         .statusIs(200)
     }

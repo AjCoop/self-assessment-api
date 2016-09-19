@@ -8,23 +8,22 @@ class CustomerResolverControllerSpec extends BaseFunctionalSpec {
     "return a 200 response with a link to /self-assessment/utr when the customer is enrolled in SA" in {
       given()
         .userIsEnrolledInSa(saUtr)
-      .when()
+        .when()
         .get("/")
-      .thenAssertThat()
+        .thenAssertThat()
         .statusIs(200)
         .contentTypeIsHalJson()
         .bodyHasLink("self-assessment", s"/self-assessment/$saUtr")
     }
 
     "return a 401 response the customer is not enrolled in SA" in {
-      given()
-        .userIsNotEnrolledInSa
-      .when()
+      given().userIsNotEnrolledInSa
+        .when()
         .get("/")
-      .thenAssertThat()
+        .thenAssertThat()
         // TODO this error is incorrect against W3C spec, it should be 403
         .statusIs(401)
-        // TODO check body for correct format
+      // TODO check body for correct format
     }
   }
 

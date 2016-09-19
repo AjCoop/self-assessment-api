@@ -30,7 +30,10 @@ class IncomeSpec extends JsonSpec {
 
   "validate" should {
     "reject amounts with more than 2 decimal values" in {
-      Seq(BigDecimal(1000.123), BigDecimal(1000.12456), BigDecimal(1000.123454), BigDecimal(1000.123456789)).foreach { testAmount =>
+      Seq(BigDecimal(1000.123),
+          BigDecimal(1000.12456),
+          BigDecimal(1000.123454),
+          BigDecimal(1000.123456789)).foreach { testAmount =>
         val income = Income(amount = testAmount)
         assertValidationError[Income](
           income,

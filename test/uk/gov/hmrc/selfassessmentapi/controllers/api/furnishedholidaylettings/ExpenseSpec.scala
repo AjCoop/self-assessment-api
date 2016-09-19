@@ -35,8 +35,7 @@ class ExpenseSpec extends JsonSpec {
   "validate" should {
 
     "reject invalid Expense type" in {
-      val json = Json.parse(
-        """
+      val json = Json.parse("""
           |{ "type": "Blah",
           |"amount" : 10000.45
           |}
@@ -49,17 +48,22 @@ class ExpenseSpec extends JsonSpec {
     }
 
     "reject amounts with more than 2 decimal values" in {
-      Seq(BigDecimal(1000.123), BigDecimal(1000.12456), BigDecimal(1000.123454), BigDecimal(1000.123456789)).foreach { testAmount =>
+      Seq(BigDecimal(1000.123),
+          BigDecimal(1000.12456),
+          BigDecimal(1000.123454),
+          BigDecimal(1000.123456789)).foreach { testAmount =>
         assertValidationError[Expense](
           Expense(`type` = PremisesRunningCosts, amount = testAmount),
-          Map("/amount" -> INVALID_MONETARY_AMOUNT), "Expected invalid furnished-holiday-lettings-expense")
+          Map("/amount" -> INVALID_MONETARY_AMOUNT),
+          "Expected invalid furnished-holiday-lettings-expense")
       }
     }
 
     "reject negative amount" in {
       assertValidationError[Expense](
         Expense(`type` = PremisesRunningCosts, amount = BigDecimal(-1000.13)),
-        Map("/amount" -> INVALID_MONETARY_AMOUNT), "Expected negative furnished-holiday-lettings-expense")
+        Map("/amount" -> INVALID_MONETARY_AMOUNT),
+        "Expected negative furnished-holiday-lettings-expense")
     }
   }
 }

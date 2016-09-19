@@ -26,7 +26,8 @@ object JsonFormatters {
   implicit val formatAPIStatus = EnumJson.enumFormat(APIStatus)
   implicit val formatAuthType = EnumJson.enumFormat(AuthType)
   implicit val formatHttpMethod = EnumJson.enumFormat(HttpMethod)
-  implicit val formatResourceThrottlingTier = EnumJson.enumFormat(ResourceThrottlingTier)
+  implicit val formatResourceThrottlingTier =
+    EnumJson.enumFormat(ResourceThrottlingTier)
 
   implicit val formatParameter = Json.format[Parameter]
   implicit val formatEndpoint = Json.format[Endpoint]
@@ -40,28 +41,41 @@ object JsonFormatters {
 
 object EnumJson {
 
-  def enumReads[E <: Enumeration](enum: E, valueMissingMessage: Option[String] = None): Reads[E#Value] = new Reads[E#Value] {
+  def enumReads[E <: Enumeration](
+      enum: E,
+      valueMissingMessage: Option[String] = None): Reads[E#Value] =
+    new Reads[E#Value] {
 
-    def defaultValueMissingMessage(s: String)= s"Enumeration expected of type: '${enum.getClass}', but it does not contain '$s'"
+      def defaultValueMissingMessage(s: String) =
+        s"Enumeration expected of type: '${enum.getClass}', but it does not contain '$s'"
 
-    def reads(json: JsValue): JsResult[E#Value] = json match {
-      case JsString(s) => {
-        try {
-          JsSuccess(enum.withName(s))
-        } catch {
-          case _: NoSuchElementException =>
-            JsError(JsPath(), ValidationError(valueMissingMessage.getOrElse(defaultValueMissingMessage(s)), NO_VALUE_FOUND))
+      def reads(json: JsValue): JsResult[E#Value] = json match {
+        case JsString(s) => {
+          try {
+            JsSuccess(enum.withName(s))
+          } catch {
+            case _: NoSuchElementException =>
+              JsError(
+                JsPath(),
+                ValidationError(
+                  valueMissingMessage.getOrElse(defaultValueMissingMessage(s)),
+                  NO_VALUE_FOUND))
+          }
         }
+        case _ =>
+          JsError(JsPath(),
+                  ValidationError("String value expected", INVALID_TYPE))
       }
-      case _ => JsError(JsPath(), ValidationError("String value expected", INVALID_TYPE))
     }
-  }
 
-  implicit def enumWrites[E <: Enumeration]: Writes[E#Value] = new Writes[E#Value] {
-    def writes(v: E#Value): JsValue = JsString(v.toString)
-  }
+  implicit def enumWrites[E <: Enumeration]: Writes[E#Value] =
+    new Writes[E#Value] {
+      def writes(v: E#Value): JsValue = JsString(v.toString)
+    }
 
-  implicit def enumFormat[E <: Enumeration](enum: E, valueMissingMessage: Option[String] = None): Format[E#Value] = {
+  implicit def enumFormat[E <: Enumeration](
+      enum: E,
+      valueMissingMessage: Option[String] = None): Format[E#Value] = {
     Format(enumReads(enum, valueMissingMessage), enumWrites)
   }
 

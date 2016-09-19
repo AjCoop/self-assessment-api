@@ -36,23 +36,29 @@ object LiabilityRepository extends MongoDbConnection {
 }
 
 class LiabilityMongoRepository(implicit mongo: () => DB)
-    extends ReactiveRepository[LiabilityResult, BSONObjectID]("liabilities",
-                                                              mongo,
-                                                              domainFormat = LiabilityResult.liabilityResultFormat,
-                                                              idFormat = ReactiveMongoFormats.objectIdFormats) {
+    extends ReactiveRepository[LiabilityResult, BSONObjectID](
+      "liabilities",
+      mongo,
+      domainFormat = LiabilityResult.liabilityResultFormat,
+      idFormat = ReactiveMongoFormats.objectIdFormats) {
 
   override def indexes: Seq[Index] =
     Seq(
-        Index(Seq(("data.saUtr", Ascending), ("data.taxYear", Ascending)),
-              name = Some("ui_utr_taxyear"),
-              unique = true))
+      Index(Seq(("data.saUtr", Ascending), ("data.taxYear", Ascending)),
+            name = Some("ui_utr_taxyear"),
+            unique = true))
 
   def save[T <: LiabilityResult](liabilityResult: T): Future[T] = {
-    val selector = BSONDocument("data.saUtr" -> liabilityResult.saUtr.value, "data.taxYear" -> liabilityResult.taxYear.value)
-    collection.update(selector, liabilityResult, upsert = true).map(_ => liabilityResult)
+    val selector = BSONDocument(
+      "data.saUtr" -> liabilityResult.saUtr.value,
+      "data.taxYear" -> liabilityResult.taxYear.value)
+    collection
+      .update(selector, liabilityResult, upsert = true)
+      .map(_ => liabilityResult)
   }
 
   def findBy(saUtr: SaUtr, taxYear: TaxYear): Future[Option[LiabilityResult]] = {
-    find("data.saUtr" -> saUtr.value, "data.taxYear" -> taxYear.value).map(_.headOption)
+    find("data.saUtr" -> saUtr.value, "data.taxYear" -> taxYear.value)
+      .map(_.headOption)
   }
 }

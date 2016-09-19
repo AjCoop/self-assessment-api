@@ -16,75 +16,107 @@
 
 package uk.gov.hmrc.selfassessmentapi.repositories.domain.calculations
 
-import uk.gov.hmrc.selfassessmentapi.controllers.api.{SelfAssessment, AllowancesAndReliefs}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.{
+  SelfAssessment,
+  AllowancesAndReliefs
+}
 import uk.gov.hmrc.selfassessmentapi.controllers.api._
 import uk.gov.hmrc.selfassessmentapi.repositories._
 
 object Deductions {
 
-  def apply(selfAssessment: SelfAssessment) = AllowancesAndReliefs(incomeTaxRelief = Some(Deductions.IncomeTaxRelief(selfAssessment)),
-    personalAllowance = Some(Deductions.PersonalAllowance(selfAssessment)),
-    retirementAnnuityContract = Some(Deductions.RetirementAnnuityContract(selfAssessment)))
+  def apply(selfAssessment: SelfAssessment) =
+    AllowancesAndReliefs(
+      incomeTaxRelief = Some(Deductions.IncomeTaxRelief(selfAssessment)),
+      personalAllowance = Some(Deductions.PersonalAllowance(selfAssessment)),
+      retirementAnnuityContract =
+        Some(Deductions.RetirementAnnuityContract(selfAssessment)))
 
   object LossBroughtForward {
-    def apply(selfEmployment: domain.SelfEmployment): BigDecimal = selfEmployment.adjustments.flatMap(_.lossBroughtForward).getOrElse(0)
+    def apply(selfEmployment: domain.SelfEmployment): BigDecimal =
+      selfEmployment.adjustments.flatMap(_.lossBroughtForward).getOrElse(0)
   }
 
   object IncomeTaxRelief {
 
-    def apply(ukPropertyTotalLBF: BigDecimal, selfEmploymentTotalLBF: BigDecimal, furnishedHolidayLettingTotalLBF: BigDecimal): BigDecimal =
+    def apply(ukPropertyTotalLBF: BigDecimal,
+              selfEmploymentTotalLBF: BigDecimal,
+              furnishedHolidayLettingTotalLBF: BigDecimal): BigDecimal =
       ukPropertyTotalLBF + selfEmploymentTotalLBF + furnishedHolidayLettingTotalLBF
 
-    def apply(selfAssessment: SelfAssessment): BigDecimal = apply(UKProperty.CappedTotalLossBroughtForward(selfAssessment),
-      SelfEmployment.TotalLossBroughtForward(selfAssessment), FurnishedHolidayLetting.CappedTotalLossBroughtForward(selfAssessment))
+    def apply(selfAssessment: SelfAssessment): BigDecimal =
+      apply(
+        UKProperty.CappedTotalLossBroughtForward(selfAssessment),
+        SelfEmployment.TotalLossBroughtForward(selfAssessment),
+        FurnishedHolidayLetting.CappedTotalLossBroughtForward(selfAssessment))
   }
 
   object Total {
-    def apply(incomeTaxRelief: BigDecimal, personalAllowance: BigDecimal, retirementAnnuityContract: BigDecimal): BigDecimal = {
+    def apply(incomeTaxRelief: BigDecimal,
+              personalAllowance: BigDecimal,
+              retirementAnnuityContract: BigDecimal): BigDecimal = {
       incomeTaxRelief + personalAllowance + retirementAnnuityContract
     }
 
-    def apply(selfAssessment: SelfAssessment): BigDecimal = apply(Deductions.IncomeTaxRelief(selfAssessment),
-      Deductions.PersonalAllowance(selfAssessment), Deductions.RetirementAnnuityContract(selfAssessment))
+    def apply(selfAssessment: SelfAssessment): BigDecimal =
+      apply(Deductions.IncomeTaxRelief(selfAssessment),
+            Deductions.PersonalAllowance(selfAssessment),
+            Deductions.RetirementAnnuityContract(selfAssessment))
   }
 
   object PersonalAllowance {
     private val standardAllowance = BigDecimal(11000)
     private val taperingThreshold = BigDecimal(100000)
 
-    def apply(selfAssessment: SelfAssessment): BigDecimal = apply(Totals.IncomeReceived(selfAssessment), Deductions.IncomeTaxRelief(selfAssessment),
-      Deductions.PensionContribution(selfAssessment))
+    def apply(selfAssessment: SelfAssessment): BigDecimal =
+      apply(Totals.IncomeReceived(selfAssessment),
+            Deductions.IncomeTaxRelief(selfAssessment),
+            Deductions.PensionContribution(selfAssessment))
 
-    def apply(totalIncomeReceived: BigDecimal, incomeTaxRelief: BigDecimal, pensionContribution: BigDecimal): BigDecimal = {
-      RoundDownToEven(totalIncomeReceived - incomeTaxRelief - pensionContribution) match {
+    def apply(totalIncomeReceived: BigDecimal,
+              incomeTaxRelief: BigDecimal,
+              pensionContribution: BigDecimal): BigDecimal = {
+      RoundDownToEven(
+        totalIncomeReceived - incomeTaxRelief - pensionContribution) match {
         case income if income <= taperingThreshold => standardAllowance
-        case income if income > taperingThreshold => PositiveOrZero(standardAllowance - ((income - taperingThreshold) / 2))
+        case income if income > taperingThreshold =>
+          PositiveOrZero(
+            standardAllowance - ((income - taperingThreshold) / 2))
       }
     }
   }
 
   object RetirementAnnuityContract {
     def apply(selfAssessment: SelfAssessment): BigDecimal =
-      ValueOrZero(getPensionContribution(selfAssessment).map ( pensionContribution =>
-        RoundUp(Sum(pensionContribution.employerScheme, pensionContribution.overseasPension, pensionContribution.retirementAnnuity))
-      ))
+      ValueOrZero(
+        getPensionContribution(selfAssessment).map(
+          pensionContribution =>
+            RoundUp(
+              Sum(pensionContribution.employerScheme,
+                  pensionContribution.overseasPension,
+                  pensionContribution.retirementAnnuity))))
   }
 
   object PensionContribution {
     def apply(selfAssessment: SelfAssessment): BigDecimal =
-      ValueOrZero(getPensionContribution(selfAssessment).map(pensionContribution =>
-        Sum(pensionContribution.employerScheme, pensionContribution.overseasPension, pensionContribution.retirementAnnuity,
-          pensionContribution.ukRegisteredPension)
-      ))
+      ValueOrZero(
+        getPensionContribution(selfAssessment).map(
+          pensionContribution =>
+            Sum(pensionContribution.employerScheme,
+                pensionContribution.overseasPension,
+                pensionContribution.retirementAnnuity,
+                pensionContribution.ukRegisteredPension)))
   }
 
   object TotalUkPensionContributions {
     def apply(selfAssessment: SelfAssessment): BigDecimal =
-      ValueOrZero(getPensionContribution(selfAssessment).flatMap(_.ukRegisteredPension))
+      ValueOrZero(
+        getPensionContribution(selfAssessment).flatMap(_.ukRegisteredPension))
   }
 
-  private def getPensionContribution(selfAssessment: SelfAssessment) = for {
-    taxYearProps <- selfAssessment.taxYearProperties
-    pensionContribution <- taxYearProps.pensionContributions
-  } yield pensionContribution
+  private def getPensionContribution(selfAssessment: SelfAssessment) =
+    for {
+      taxYearProps <- selfAssessment.taxYearProperties
+      pensionContribution <- taxYearProps.pensionContributions
+    } yield pensionContribution
 }

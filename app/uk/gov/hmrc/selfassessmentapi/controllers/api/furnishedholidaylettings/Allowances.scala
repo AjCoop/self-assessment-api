@@ -24,7 +24,9 @@ case class Allowances(capitalAllowance: Option[BigDecimal])
 object Allowances {
   implicit val writes = Json.writes[Allowances]
 
-  implicit val reads: Reads[Allowances] = (__ \ "capitalAllowance").readNullable[BigDecimal](positiveAmountValidator("capitalAllowance")).map {
-    Allowances(_)
-  }
+  implicit val reads: Reads[Allowances] = (__ \ "capitalAllowance")
+    .readNullable[BigDecimal](positiveAmountValidator("capitalAllowance"))
+    .map {
+      Allowances(_)
+    }
 }

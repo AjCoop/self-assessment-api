@@ -13,12 +13,13 @@ class LiabilityControllerSpec extends BaseFunctionalSpec {
     "return a 202 response with a link to retrieve the liability" in {
       given()
         .userIsAuthorisedForTheResource(saUtr)
-      .when()
+        .when()
         .post(s"/$saUtr/$taxYear/liability")
-      .thenAssertThat()
+        .thenAssertThat()
         .statusIs(202)
         .contentTypeIsHalJson()
-        .bodyHasLink("self", s"""^/self-assessment/$saUtr/$taxYear/liability""".r)
+        .bodyHasLink("self",
+                     s"""^/self-assessment/$saUtr/$taxYear/liability""".r)
     }
   }
 
@@ -56,11 +57,13 @@ class LiabilityControllerSpec extends BaseFunctionalSpec {
         .thenAssertThat()
         .statusIs(201)
         .when()
-        .post(s"/$saUtr/$taxYear/employments/%sourceId%/uk-taxes-paid", Some(toJson(UkTaxPaid.example().copy(amount = -1000))))
+        .post(s"/$saUtr/$taxYear/employments/%sourceId%/uk-taxes-paid",
+              Some(toJson(UkTaxPaid.example().copy(amount = -1000))))
         .thenAssertThat()
         .statusIs(201)
         .when()
-        .post(s"/$saUtr/$taxYear/employments/%sourceId%/uk-taxes-paid", Some(toJson(UkTaxPaid.example().copy(amount = -2000))))
+        .post(s"/$saUtr/$taxYear/employments/%sourceId%/uk-taxes-paid",
+              Some(toJson(UkTaxPaid.example().copy(amount = -2000))))
         .thenAssertThat()
         .statusIs(201)
         .when()

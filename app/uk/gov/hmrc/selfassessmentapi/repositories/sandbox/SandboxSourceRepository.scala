@@ -33,7 +33,8 @@ trait SandboxSourceRepository[T] extends SourceRepository[T] {
   private def exampleJson(sourceId: SourceId) = toJson(example(sourceId))
 
   def listAsJsonItem(saUtr: SaUtr, taxYear: TaxYear): Future[Seq[JsonItem]] = {
-    def createJsonItem(sourceId: SourceId) = JsonItem(sourceId, exampleJson(sourceId))
+    def createJsonItem(sourceId: SourceId) =
+      JsonItem(sourceId, exampleJson(sourceId))
     Future.successful(
       Seq(
         createJsonItem(generateId),
@@ -47,18 +48,26 @@ trait SandboxSourceRepository[T] extends SourceRepository[T] {
 
   private def generateId: String = BSONObjectID.generate.stringify
 
-  override def create(saUtr: SaUtr, taxYear: TaxYear, source: T) = Future.successful(generateId)
+  override def create(saUtr: SaUtr, taxYear: TaxYear, source: T) =
+    Future.successful(generateId)
 
-  override def update(saUtr: SaUtr, taxYear: TaxYear, id: SourceId, source: T) = Future.successful(true)
+  override def update(saUtr: SaUtr,
+                      taxYear: TaxYear,
+                      id: SourceId,
+                      source: T) = Future.successful(true)
 
-  override def findById(saUtr: SaUtr, taxYear: TaxYear, id: SourceId): Future[Option[T]] = Future.successful(Some(example(id)))
+  override def findById(saUtr: SaUtr,
+                        taxYear: TaxYear,
+                        id: SourceId): Future[Option[T]] =
+    Future.successful(Some(example(id)))
 
-  override def delete(saUtr: SaUtr, taxYear: TaxYear, id: SourceId) = Future.successful(true)
+  override def delete(saUtr: SaUtr, taxYear: TaxYear, id: SourceId) =
+    Future.successful(true)
 
   override def delete(saUtr: SaUtr, taxYear: TaxYear) = Future.successful(true)
 
   override def list(saUtr: SaUtr, taxYear: TaxYear): Future[Seq[T]] = {
-    Future.successful{
+    Future.successful {
       Seq(
         example(generateId),
         example(generateId),

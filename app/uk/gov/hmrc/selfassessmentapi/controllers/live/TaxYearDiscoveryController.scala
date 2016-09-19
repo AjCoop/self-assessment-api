@@ -24,7 +24,12 @@ import play.api.mvc.hal._
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.selfassessmentapi.config.{AppContext, FeatureConfig}
 import uk.gov.hmrc.selfassessmentapi.controllers._
-import uk.gov.hmrc.selfassessmentapi.controllers.api.{FeatureSwitchedTaxProperties, SourceTypes, TaxYear, TaxYearProperties}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.{
+  FeatureSwitchedTaxProperties,
+  SourceTypes,
+  TaxYear,
+  TaxYearProperties
+}
 import uk.gov.hmrc.selfassessmentapi.services.live.TaxYearPropertiesService
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -34,14 +39,18 @@ object TaxYearDiscoveryController extends BaseController with Links {
   override val context: String = AppContext.apiGatewayLinkContext
   private val taxYearPropertiesService = TaxYearPropertiesService()
 
-  final def discoverTaxYear(utr: SaUtr, taxYear: TaxYear) = Action.async { request =>
-    val halLinks = buildSourceHalLinks(utr, taxYear) + HalLink("self", discoverTaxYearHref(utr, taxYear))
-    taxYearPropertiesService.findTaxYearProperties(utr, taxYear).map(taxYearProperties =>
-        Ok(halResource(taxYearProperties match {
-          case Some(t) => toJson(t)
-          case None => obj()
-        }, halLinks))
-    )
+  final def discoverTaxYear(utr: SaUtr, taxYear: TaxYear) = Action.async {
+    request =>
+      val halLinks = buildSourceHalLinks(utr, taxYear) + HalLink(
+          "self",
+          discoverTaxYearHref(utr, taxYear))
+      taxYearPropertiesService
+        .findTaxYearProperties(utr, taxYear)
+        .map(taxYearProperties =>
+          Ok(halResource(taxYearProperties match {
+            case Some(t) => toJson(t)
+            case None => obj()
+          }, halLinks)))
   }
 
   private def buildSourceHalLinks(utr: SaUtr, taxYear: TaxYear) = {
@@ -55,15 +64,17 @@ object TaxYearDiscoveryController extends BaseController with Links {
   }
 
   final def updateTaxYearProperties(utr: SaUtr, taxYear: TaxYear) =
-    Action.async(parse.json) {
-      implicit request =>
-        if (FeatureSwitchedTaxProperties.atLeastOnePropertyIsEnabled)
-          withJsonBody[TaxYearProperties] { taxYearProperties =>
-            taxYearPropertiesService.updateTaxYearProperties(utr, taxYear, taxYearProperties).map { updated =>
-              if (updated) Ok(halResource(obj(), buildSourceHalLinks(utr, taxYear)))
+    Action.async(parse.json) { implicit request =>
+      if (FeatureSwitchedTaxProperties.atLeastOnePropertyIsEnabled)
+        withJsonBody[TaxYearProperties] { taxYearProperties =>
+          taxYearPropertiesService
+            .updateTaxYearProperties(utr, taxYear, taxYearProperties)
+            .map { updated =>
+              if (updated)
+                Ok(halResource(obj(), buildSourceHalLinks(utr, taxYear)))
               else BadRequest(Json.toJson(ErrorFeatureSwitched))
             }
-          }
-        else Future.successful(NotImplemented(Json.toJson(ErrorNotImplemented)))
-  }
+        } else
+        Future.successful(NotImplemented(Json.toJson(ErrorNotImplemented)))
+    }
 }

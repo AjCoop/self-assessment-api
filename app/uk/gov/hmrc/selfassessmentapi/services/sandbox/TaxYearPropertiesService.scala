@@ -23,11 +23,15 @@ import uk.gov.hmrc.selfassessmentapi.controllers.api.TaxYearProperties
 import scala.concurrent.Future
 
 class TaxYearPropertiesService {
-  def findTaxYearProperties(saUtr: SaUtr, taxYear: TaxYear): TaxYearProperties = {
+  def findTaxYearProperties(saUtr: SaUtr,
+                            taxYear: TaxYear): TaxYearProperties = {
     TaxYearProperties.example()
   }
 
-  def updateTaxYearProperties(saUtr: SaUtr, taxYear: TaxYear, taxYearProperties: TaxYearProperties): Future[Boolean] = {
+  def updateTaxYearProperties(
+      saUtr: SaUtr,
+      taxYear: TaxYear,
+      taxYearProperties: TaxYearProperties): Future[Boolean] = {
     Future.successful(true)
   }
 }

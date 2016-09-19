@@ -33,17 +33,20 @@ class IncomeSpec extends JsonSpec {
 
   "validate" should {
     "reject amounts with more than 2 decimal values" in {
-      Seq(BigDecimal(1000.123), BigDecimal(1000.1234), BigDecimal(1000.12345), BigDecimal(1000.123456789)).foreach { testAmount =>
+      Seq(BigDecimal(1000.123),
+          BigDecimal(1000.1234),
+          BigDecimal(1000.12345),
+          BigDecimal(1000.123456789)).foreach { testAmount =>
         val seIncome = Income(`type` = Turnover, amount = testAmount)
         assertValidationError[Income](
           seIncome,
-          Map("/amount" -> INVALID_MONETARY_AMOUNT), "Expected invalid self-employment-income with more than 2 decimal places")
+          Map("/amount" -> INVALID_MONETARY_AMOUNT),
+          "Expected invalid self-employment-income with more than 2 decimal places")
       }
     }
 
     "reject invalid Income type" in {
-      val json = Json.parse(
-        """
+      val json = Json.parse("""
           |{ "type": "FOO",
           |"amount" : 10000.45
           |}
@@ -51,14 +54,16 @@ class IncomeSpec extends JsonSpec {
 
       assertValidationError[Income](
         json,
-        Map("/type" -> NO_VALUE_FOUND), "Expected income type not in { TURNOVER, OTHER }")
+        Map("/type" -> NO_VALUE_FOUND),
+        "Expected income type not in { TURNOVER, OTHER }")
     }
 
     "reject negative amount" in {
       val seIncome = Income(`type` = Turnover, amount = BigDecimal(-1000.12))
       assertValidationError[Income](
         seIncome,
-        Map("/amount" -> INVALID_MONETARY_AMOUNT), "should fail with INVALID_MONETARY_AMOUNT error")
+        Map("/amount" -> INVALID_MONETARY_AMOUNT),
+        "should fail with INVALID_MONETARY_AMOUNT error")
     }
   }
 }

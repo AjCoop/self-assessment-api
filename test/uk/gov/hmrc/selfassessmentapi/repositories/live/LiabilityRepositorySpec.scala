@@ -23,7 +23,9 @@ import uk.gov.hmrc.selfassessmentapi.repositories.domain.Liability
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class LiabilityRepositorySpec extends MongoEmbeddedDatabase with BeforeAndAfterEach {
+class LiabilityRepositorySpec
+    extends MongoEmbeddedDatabase
+    with BeforeAndAfterEach {
 
   private val repository = new LiabilityMongoRepository()
   private val saUtr = generateSaUtr()
@@ -53,10 +55,12 @@ class LiabilityRepositorySpec extends MongoEmbeddedDatabase with BeforeAndAfterE
     }
 
     "not replace liability for a different utr and tax year" in {
-      val liability = Liability.create(generateSaUtr(), taxYear, SelfAssessment())
+      val liability =
+        Liability.create(generateSaUtr(), taxYear, SelfAssessment())
       await(repository.save(liability))
 
-      val anotherLiability = Liability.create(generateSaUtr(), taxYear, SelfAssessment())
+      val anotherLiability =
+        Liability.create(generateSaUtr(), taxYear, SelfAssessment())
       await(repository.save(anotherLiability))
 
       await(repository.findAll()) shouldBe List(liability, anotherLiability)
@@ -74,7 +78,8 @@ class LiabilityRepositorySpec extends MongoEmbeddedDatabase with BeforeAndAfterE
     }
 
     "return None if there is no liability for given utr and tax year" in {
-      val anotherLiability = Liability.create(generateSaUtr(), taxYear, SelfAssessment())
+      val anotherLiability =
+        Liability.create(generateSaUtr(), taxYear, SelfAssessment())
       await(repository.save(anotherLiability))
 
       await(repository.findBy(saUtr, taxYear)) shouldBe None

@@ -18,34 +18,44 @@ package uk.gov.hmrc.selfassessmentapi.repositories.domain.builders
 
 import reactivemongo.bson.BSONObjectID
 import uk.gov.hmrc.selfassessmentapi.TestUtils._
-import uk.gov.hmrc.selfassessmentapi.controllers.api.employment.{BenefitType, ExpenseType, IncomeType}
+import uk.gov.hmrc.selfassessmentapi.controllers.api.employment.{
+  BenefitType,
+  ExpenseType,
+  IncomeType
+}
 import uk.gov.hmrc.selfassessmentapi.repositories.domain._
 
 case class EmploymentBuilder(objectID: BSONObjectID = BSONObjectID.generate) {
 
-  private var anEmployment: Employment = Employment(objectID, objectID.stringify, generateSaUtr(), taxYear, now, now)
+  private var anEmployment: Employment = Employment(objectID,
+                                                    objectID.stringify,
+                                                    generateSaUtr(),
+                                                    taxYear,
+                                                    now,
+                                                    now)
 
   def withIncomes(incomes: (IncomeType.IncomeType, BigDecimal)*) = {
-    anEmployment = anEmployment.copy(incomes = incomes.map (
-      income => EmploymentIncomeSummary(objectID.stringify, income._1, income._2)))
+    anEmployment = anEmployment.copy(incomes = incomes.map(income =>
+      EmploymentIncomeSummary(objectID.stringify, income._1, income._2)))
     this
   }
 
   def withExpenses(expenses: (ExpenseType.ExpenseType, BigDecimal)*) = {
-    anEmployment = anEmployment.copy(expenses = expenses.map (
-      expense => EmploymentExpenseSummary(objectID.stringify, expense._1, expense._2)))
+    anEmployment = anEmployment.copy(expenses = expenses.map(expense =>
+      EmploymentExpenseSummary(objectID.stringify, expense._1, expense._2)))
     this
   }
 
   def withBenefits(benefits: (BenefitType.BenefitType, BigDecimal)*) = {
-    anEmployment = anEmployment.copy(benefits = benefits.map (
-      benefit => EmploymentBenefitSummary(objectID.stringify, benefit._1, benefit._2)))
+    anEmployment = anEmployment.copy(benefits = benefits.map(benefit =>
+      EmploymentBenefitSummary(objectID.stringify, benefit._1, benefit._2)))
     this
   }
 
   def withUkTaxPaid(taxPaid: BigDecimal) = {
-    anEmployment = anEmployment.copy(ukTaxPaid =
-      Seq(EmploymentUkTaxPaidSummary(objectID.stringify, amount = taxPaid)))
+    anEmployment = anEmployment.copy(
+      ukTaxPaid =
+        Seq(EmploymentUkTaxPaidSummary(objectID.stringify, amount = taxPaid)))
     this
   }
 

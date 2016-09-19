@@ -23,7 +23,10 @@ import play.Logger
 import play.api.Configuration
 import uk.gov.hmrc.play.scheduling.ExclusiveScheduledJob
 import uk.gov.hmrc.selfassessmentapi.config.AppContext
-import uk.gov.hmrc.selfassessmentapi.repositories.{JobHistoryMongoRepository, JobHistoryRepository}
+import uk.gov.hmrc.selfassessmentapi.repositories.{
+  JobHistoryMongoRepository,
+  JobHistoryRepository
+}
 import uk.gov.hmrc.selfassessmentapi.services.DeleteExpiredDataService
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -32,7 +35,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 object DeleteExpiredDataJob extends ExclusiveScheduledJob {
 
-  private lazy val config = new DeleteExpiredDataJobConfig(AppContext.deleteExpiredDataJob)
+  private lazy val config = new DeleteExpiredDataJobConfig(
+    AppContext.deleteExpiredDataJob)
 
   override val name = "DeleteExpiredDataJob"
 
@@ -40,9 +44,13 @@ object DeleteExpiredDataJob extends ExclusiveScheduledJob {
 
   override lazy val interval = config.jobInterval
 
-  private lazy val deleteExpiredData = new DeleteExpiredData(DeleteExpiredDataService(), JobHistoryRepository(), config)
+  private lazy val deleteExpiredData = new DeleteExpiredData(
+    DeleteExpiredDataService(),
+    JobHistoryRepository(),
+    config)
 
-  override lazy val isRunning = super.isRunning.flatMap(isRunning => if (isRunning) Future(true) else deleteExpiredData.isLatestJobInProgress)
+  override lazy val isRunning = super.isRunning.flatMap(isRunning =>
+    if (isRunning) Future(true) else deleteExpiredData.isLatestJobInProgress)
 
   override def executeInMutex(implicit ec: ExecutionContext): Future[Result] = {
     deleteExpiredData.deleteExpiredData(config.latestModifiedDate).map { msg =>
@@ -51,15 +59,28 @@ object DeleteExpiredDataJob extends ExclusiveScheduledJob {
     }
   }
 
-
   private[jobs] class DeleteExpiredDataJobConfig(config: Configuration) {
-    def latestModifiedDate = DateTime.now.minusHours(config.getInt("timeToLiveInHours").getOrElse(throw new IllegalStateException("Config key not found: timeToLiveInHours")))
+    def latestModifiedDate =
+      DateTime.now.minusHours(
+        config
+          .getInt("timeToLiveInHours")
+          .getOrElse(throw new IllegalStateException(
+            "Config key not found: timeToLiveInHours")))
 
-    lazy val jobInterval = config.getMilliseconds("interval").getOrElse(throw new IllegalStateException("Config key not found: interval")) millisecond
+    lazy val jobInterval = config
+      .getMilliseconds("interval")
+      .getOrElse(throw new IllegalStateException(
+        "Config key not found: interval")) millisecond
 
-    lazy val jobInitialDelay = config.getMilliseconds("initialDelay").getOrElse(calculateJobInitialDelay(stringFromConfig("startAt"))) milliseconds
+    lazy val jobInitialDelay = config
+      .getMilliseconds("initialDelay")
+      .getOrElse(calculateJobInitialDelay(stringFromConfig("startAt"))) milliseconds
 
-    private def stringFromConfig(key: String) = config.getString(key).getOrElse(throw new IllegalStateException(s"Config key not found: $key"))
+    private def stringFromConfig(key: String) =
+      config
+        .getString(key)
+        .getOrElse(
+          throw new IllegalStateException(s"Config key not found: $key"))
 
     private def calculateJobInitialDelay(startAt: String): Long = {
       val startTimeToday = LocalTime.parse(startAt).toDateTimeToday
@@ -72,7 +93,9 @@ object DeleteExpiredDataJob extends ExclusiveScheduledJob {
     }
   }
 
-  private[jobs] class DeleteExpiredData(service: DeleteExpiredDataService, jobRepo: JobHistoryMongoRepository, config: DeleteExpiredDataJobConfig) {
+  private[jobs] class DeleteExpiredData(service: DeleteExpiredDataService,
+                                        jobRepo: JobHistoryMongoRepository,
+                                        config: DeleteExpiredDataJobConfig) {
 
     class IntegerGauge(var value: Int) extends Gauge[Int] {
       def update(numberOfEntities: Int) = this.value = numberOfEntities
@@ -93,21 +116,25 @@ object DeleteExpiredDataJob extends ExclusiveScheduledJob {
     }
 
     def deleteExpiredData(latestModifiedDate: DateTime): Future[String] = {
-      Logger.info(s"Starting $name to delete expired data older than [$latestModifiedDate]")
-      service.deleteExpiredData(config.latestModifiedDate).map { recordsDeleted =>
-        monitorGauge("Gauge-RowsDeleted", new IntegerGauge(recordsDeleted))
-        monitorGauge("Gauge-JobStatus", JobSuccess)
+      Logger.info(
+        s"Starting $name to delete expired data older than [$latestModifiedDate]")
+      service
+        .deleteExpiredData(config.latestModifiedDate)
+        .map { recordsDeleted =>
+          monitorGauge("Gauge-RowsDeleted", new IntegerGauge(recordsDeleted))
+          monitorGauge("Gauge-JobStatus", JobSuccess)
 
-        if (recordsDeleted > 0)
-          s"$name Completed. Total count of self assessment records deleted [$recordsDeleted]"
-        else
-          s"$name Completed. No expired records found."
-      }.recover {
-        case ex: Throwable =>
-          monitorGauge("Gauge-JobStatus", JobFailure)
-          Logger.warn(ex.getMessage)
-          ex.getMessage
-      }
+          if (recordsDeleted > 0)
+            s"$name Completed. Total count of self assessment records deleted [$recordsDeleted]"
+          else
+            s"$name Completed. No expired records found."
+        }
+        .recover {
+          case ex: Throwable =>
+            monitorGauge("Gauge-JobStatus", JobFailure)
+            Logger.warn(ex.getMessage)
+            ex.getMessage
+        }
     }
 
     private def monitorGauge(name: String, gauge: Gauge[_]) = {

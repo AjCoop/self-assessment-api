@@ -20,19 +20,28 @@ import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.selfassessmentapi.config.{AppContext, FeatureSwitch}
 import uk.gov.hmrc.selfassessmentapi.controllers.api.TaxYear
 import uk.gov.hmrc.selfassessmentapi.controllers.api.TaxYearProperties
-import uk.gov.hmrc.selfassessmentapi.repositories.{SelfAssessmentMongoRepository, SelfAssessmentRepository}
+import uk.gov.hmrc.selfassessmentapi.repositories.{
+  SelfAssessmentMongoRepository,
+  SelfAssessmentRepository
+}
 import uk.gov.hmrc.selfassessmentapi.services.SwitchedTaxYearProperties
 
 import scala.concurrent.Future
 
-class TaxYearPropertiesService(saRepository: SelfAssessmentMongoRepository, override val featureSwitch: FeatureSwitch)
-  extends SwitchedTaxYearProperties {
+class TaxYearPropertiesService(saRepository: SelfAssessmentMongoRepository,
+                               override val featureSwitch: FeatureSwitch)
+    extends SwitchedTaxYearProperties {
 
-  def findTaxYearProperties(saUtr: SaUtr, taxYear: TaxYear): Future[Option[TaxYearProperties]] = featureSwitched {
+  def findTaxYearProperties(
+      saUtr: SaUtr,
+      taxYear: TaxYear): Future[Option[TaxYearProperties]] = featureSwitched {
     saRepository.findTaxYearProperties(saUtr, taxYear)
   }
 
-  def updateTaxYearProperties(saUtr: SaUtr, taxYear: TaxYear, taxYearProperties: TaxYearProperties): Future[Boolean] = {
+  def updateTaxYearProperties(
+      saUtr: SaUtr,
+      taxYear: TaxYear,
+      taxYearProperties: TaxYearProperties): Future[Boolean] = {
     val switchedProperties = switchedTaxYearProperties(taxYearProperties)
 
     // If nothing has been removed (i.e. switched off), update, otherwise return an error.
@@ -46,8 +55,9 @@ class TaxYearPropertiesService(saRepository: SelfAssessmentMongoRepository, over
 }
 
 object TaxYearPropertiesService {
-  private val taxYearPropertiesService = new TaxYearPropertiesService(SelfAssessmentRepository(),
-                                                                      FeatureSwitch(AppContext.featureSwitch))
+  private val taxYearPropertiesService = new TaxYearPropertiesService(
+    SelfAssessmentRepository(),
+    FeatureSwitch(AppContext.featureSwitch))
 
   def apply() = taxYearPropertiesService
 }

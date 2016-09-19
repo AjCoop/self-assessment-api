@@ -30,23 +30,34 @@ class PensionContributionSpec extends JsonSpec {
 
   "validate" should {
     "reject amounts with more than 2 decimal values" in {
-      Seq(BigDecimal(1000.123), BigDecimal(1000.1234), BigDecimal(1000.12345), BigDecimal(1000.123456789)).foreach { testAmount =>
+      Seq(BigDecimal(1000.123),
+          BigDecimal(1000.1234),
+          BigDecimal(1000.12345),
+          BigDecimal(1000.123456789)).foreach { testAmount =>
         assertValidationError[PensionContribution](
           PensionContribution(ukRegisteredPension = Some(testAmount)),
-          Map("/ukRegisteredPension" -> INVALID_MONETARY_AMOUNT), "Expected invalid uk registered pension with more than 2 decimal places")
+          Map("/ukRegisteredPension" -> INVALID_MONETARY_AMOUNT),
+          "Expected invalid uk registered pension with more than 2 decimal places")
         assertValidationError[PensionContribution](
           PensionContribution(retirementAnnuity = Some(testAmount)),
-          Map("/retirementAnnuity" -> INVALID_MONETARY_AMOUNT), "Expected invalid retirement annuity with more than 2 decimal places")
+          Map("/retirementAnnuity" -> INVALID_MONETARY_AMOUNT),
+          "Expected invalid retirement annuity with more than 2 decimal places")
         assertValidationError[PensionContribution](
           PensionContribution(employerScheme = Some(testAmount)),
-          Map("/employerScheme" -> INVALID_MONETARY_AMOUNT), "Expected invalid employer annuity with more than 2 decimal places")
+          Map("/employerScheme" -> INVALID_MONETARY_AMOUNT),
+          "Expected invalid employer annuity with more than 2 decimal places")
         assertValidationError[PensionContribution](
           PensionContribution(overseasPension = Some(testAmount)),
-          Map("/overseasPension" -> INVALID_MONETARY_AMOUNT), "Expected invalid overseas pension with more than 2 decimal places")
-        assertValidationError[PensionSaving](PensionSaving(Some(testAmount), None),
-          Map("/excessOfAnnualAllowance" -> INVALID_MONETARY_AMOUNT), "Expected invalid excess of annual allowance with more than 2 decimal places")
-        assertValidationError[PensionSaving](PensionSaving(None, Some(testAmount)),
-          Map("/taxPaidByPensionScheme" -> INVALID_MONETARY_AMOUNT), "Expected invalid tax paid by pension scheme with more than 2 decimal places")
+          Map("/overseasPension" -> INVALID_MONETARY_AMOUNT),
+          "Expected invalid overseas pension with more than 2 decimal places")
+        assertValidationError[PensionSaving](
+          PensionSaving(Some(testAmount), None),
+          Map("/excessOfAnnualAllowance" -> INVALID_MONETARY_AMOUNT),
+          "Expected invalid excess of annual allowance with more than 2 decimal places")
+        assertValidationError[PensionSaving](
+          PensionSaving(None, Some(testAmount)),
+          Map("/taxPaidByPensionScheme" -> INVALID_MONETARY_AMOUNT),
+          "Expected invalid tax paid by pension scheme with more than 2 decimal places")
       }
     }
 
@@ -54,49 +65,67 @@ class PensionContributionSpec extends JsonSpec {
       Seq(BigDecimal(-1000.12), BigDecimal(-1000)).foreach { testAmount =>
         assertValidationError[PensionContribution](
           PensionContribution(ukRegisteredPension = Some(testAmount)),
-          Map("/ukRegisteredPension" -> INVALID_MONETARY_AMOUNT), "Expected invalid uk registered pension with more than 2 decimal places")
+          Map("/ukRegisteredPension" -> INVALID_MONETARY_AMOUNT),
+          "Expected invalid uk registered pension with more than 2 decimal places")
         assertValidationError[PensionContribution](
           PensionContribution(retirementAnnuity = Some(testAmount)),
-          Map("/retirementAnnuity" -> INVALID_MONETARY_AMOUNT), "Expected invalid retirement annuity with more than 2 decimal places")
+          Map("/retirementAnnuity" -> INVALID_MONETARY_AMOUNT),
+          "Expected invalid retirement annuity with more than 2 decimal places")
         assertValidationError[PensionContribution](
           PensionContribution(employerScheme = Some(testAmount)),
-          Map("/employerScheme" -> INVALID_MONETARY_AMOUNT), "Expected invalid employer annuity with more than 2 decimal places")
+          Map("/employerScheme" -> INVALID_MONETARY_AMOUNT),
+          "Expected invalid employer annuity with more than 2 decimal places")
         assertValidationError[PensionContribution](
           PensionContribution(overseasPension = Some(testAmount)),
-          Map("/overseasPension" -> INVALID_MONETARY_AMOUNT), "Expected invalid overseas pension with more than 2 decimal places")
+          Map("/overseasPension" -> INVALID_MONETARY_AMOUNT),
+          "Expected invalid overseas pension with more than 2 decimal places")
         assertValidationError[PensionSaving](
           PensionSaving(Some(testAmount), None),
-          Map("/excessOfAnnualAllowance" -> INVALID_MONETARY_AMOUNT), "Expected invalid excess of annual allowance with more than 2 decimal places")
+          Map("/excessOfAnnualAllowance" -> INVALID_MONETARY_AMOUNT),
+          "Expected invalid excess of annual allowance with more than 2 decimal places")
         assertValidationError[PensionSaving](
           PensionSaving(None, Some(testAmount)),
-          Map("/taxPaidByPensionScheme" -> INVALID_MONETARY_AMOUNT), "Expected invalid tax paid by pension scheme with more than 2 decimal places")
+          Map("/taxPaidByPensionScheme" -> INVALID_MONETARY_AMOUNT),
+          "Expected invalid tax paid by pension scheme with more than 2 decimal places")
       }
     }
 
     "reject pensionSavings when there are no pension contributions" in {
       assertValidationError[PensionContribution](
-        PensionContribution(pensionSavings = Some(PensionSaving(excessOfAnnualAllowance = None, taxPaidByPensionScheme = None))),
-        Map("" -> UNDEFINED_REQUIRED_ELEMENT), "pensionSavings may only exist if there is at least one pension contribution")
+        PensionContribution(
+          pensionSavings = Some(PensionSaving(excessOfAnnualAllowance = None,
+                                              taxPaidByPensionScheme = None))),
+        Map("" -> UNDEFINED_REQUIRED_ELEMENT),
+        "pensionSavings may only exist if there is at least one pension contribution")
     }
 
     "reject pensionSavings when the sum of pensionSavings exceeds the sum of all other pension contributions" in {
       assertValidationError[PensionContribution](
-        PensionContribution(employerScheme = Some(100), pensionSavings = Some(PensionSaving(excessOfAnnualAllowance = Some(500), taxPaidByPensionScheme = Some(500)))),
-        Map("" -> MAXIMUM_AMOUNT_EXCEEDED), "excessOfAnnualAllowance may not exceed the sum of all pension contributions")
+        PensionContribution(
+          employerScheme = Some(100),
+          pensionSavings = Some(
+            PensionSaving(excessOfAnnualAllowance = Some(500),
+                          taxPaidByPensionScheme = Some(500)))),
+        Map("" -> MAXIMUM_AMOUNT_EXCEEDED),
+        "excessOfAnnualAllowance may not exceed the sum of all pension contributions")
     }
   }
 
   "PensionSavings" should {
     "reject taxPaidByPensionScheme when excessOfAnnualAllowance is undefined" in {
       assertValidationError[PensionSaving](
-        PensionSaving(excessOfAnnualAllowance = None, taxPaidByPensionScheme = Some(500)),
-        Map("" -> UNDEFINED_REQUIRED_ELEMENT), "taxPaidByPensionScheme can not exist when there is no excessOfAnnualAllowance")
+        PensionSaving(excessOfAnnualAllowance = None,
+                      taxPaidByPensionScheme = Some(500)),
+        Map("" -> UNDEFINED_REQUIRED_ELEMENT),
+        "taxPaidByPensionScheme can not exist when there is no excessOfAnnualAllowance")
     }
 
     "reject taxPaidByPensionScheme when its value exceeds the value of the excessOfAnnualAllowance" in {
       assertValidationError[PensionSaving](
-        PensionSaving(excessOfAnnualAllowance = Some(200), taxPaidByPensionScheme = Some(500)),
-        Map("" -> MAXIMUM_AMOUNT_EXCEEDED), "the value of taxPaidByPensionScheme may not exceed the excessOfAnnualAllowance")
+        PensionSaving(excessOfAnnualAllowance = Some(200),
+                      taxPaidByPensionScheme = Some(500)),
+        Map("" -> MAXIMUM_AMOUNT_EXCEEDED),
+        "the value of taxPaidByPensionScheme may not exceed the excessOfAnnualAllowance")
     }
   }
 }

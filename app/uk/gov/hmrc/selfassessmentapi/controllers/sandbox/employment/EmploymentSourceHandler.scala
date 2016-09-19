@@ -17,16 +17,24 @@
 package uk.gov.hmrc.selfassessmentapi.controllers.sandbox.employment
 
 import uk.gov.hmrc.selfassessmentapi.controllers.api.{SummaryType, SourceTypes}
-import uk.gov.hmrc.selfassessmentapi.controllers.{SourceHandler, SummaryHandler}
+import uk.gov.hmrc.selfassessmentapi.controllers.{
+  SourceHandler,
+  SummaryHandler
+}
 import SourceTypes.Employments
 import uk.gov.hmrc.selfassessmentapi.controllers.api.employment._
 import uk.gov.hmrc.selfassessmentapi.controllers.api.employment.SummaryTypes._
 import uk.gov.hmrc.selfassessmentapi.controllers.api.{SourceId, SummaryId}
-import uk.gov.hmrc.selfassessmentapi.repositories.sandbox.{SandboxSourceRepository, SandboxSummaryRepository}
+import uk.gov.hmrc.selfassessmentapi.repositories.sandbox.{
+  SandboxSourceRepository,
+  SandboxSummaryRepository
+}
 
-object EmploymentSourceHandler extends SourceHandler(Employment, Employments.name) {
+object EmploymentSourceHandler
+    extends SourceHandler(Employment, Employments.name) {
 
-  override def summaryHandler(summaryType: SummaryType): Option[SummaryHandler[_]] = {
+  override def summaryHandler(
+      summaryType: SummaryType): Option[SummaryHandler[_]] = {
     summaryType match {
       case Incomes =>
         Some(SummaryHandler(new SandboxSummaryRepository[Income] {
@@ -54,6 +62,7 @@ object EmploymentSourceHandler extends SourceHandler(Employment, Employments.nam
 
   override val repository = new SandboxSourceRepository[Employment] {
     override implicit val writes = Employment.writes
-    override def example(id: SourceId) = Employment.example().copy(id = Some(id))
+    override def example(id: SourceId) =
+      Employment.example().copy(id = Some(id))
   }
 }

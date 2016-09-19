@@ -5,15 +5,15 @@ import play.api.test.FakeApplication
 import uk.gov.hmrc.support.BaseFunctionalSpec
 
 class SwitchPensionContributionOnSpec extends BaseFunctionalSpec {
-  override lazy val app: FakeApplication = FakeApplication(additionalConfiguration = Map(
-    "Test.feature-switch.pensionContributions.enabled" -> true,
-    "Test.feature-switch.childBenefit.enabled" -> true))
+  override lazy val app: FakeApplication = FakeApplication(
+    additionalConfiguration =
+      Map("Test.feature-switch.pensionContributions.enabled" -> true,
+          "Test.feature-switch.childBenefit.enabled" -> true))
 
   "if pension contribution is turned on then tax year resource" should {
     "return 200" in {
 
-      val payload = Json.parse(
-        s"""
+      val payload = Json.parse(s"""
            |{
            | 	"pensionContributions": {
            | 		"ukRegisteredPension": 1000.45,
@@ -40,15 +40,15 @@ class SwitchPensionContributionOnSpec extends BaseFunctionalSpec {
 }
 
 class SwitchPensionContributionOffSpec extends BaseFunctionalSpec {
-  override lazy val app: FakeApplication = FakeApplication(additionalConfiguration = Map(
-    "Test.feature-switch.pensionContributions.enabled" -> false,
-    "Test.feature-switch.childBenefit.enabled" -> true))
+  override lazy val app: FakeApplication = FakeApplication(
+    additionalConfiguration =
+      Map("Test.feature-switch.pensionContributions.enabled" -> false,
+          "Test.feature-switch.childBenefit.enabled" -> true))
 
   "if pension contribution is turned off then tax year resource" should {
     "return 400 bad request with the correct error code" in {
 
-      val payload = Json.parse(
-        s"""
+      val payload = Json.parse(s"""
            |{
            | 	"pensionContributions": {
            | 		"ukRegisteredPension": 1000.45,
@@ -75,15 +75,15 @@ class SwitchPensionContributionOffSpec extends BaseFunctionalSpec {
 }
 
 class SwitchCharitableGivingsOnSpec extends BaseFunctionalSpec {
-  override lazy val app: FakeApplication = FakeApplication(additionalConfiguration = Map(
-    "Test.feature-switch.charitableGivings.enabled" -> true,
-    "Test.feature-switch.childBenefit.enabled" -> true))
+  override lazy val app: FakeApplication = FakeApplication(
+    additionalConfiguration =
+      Map("Test.feature-switch.charitableGivings.enabled" -> true,
+          "Test.feature-switch.childBenefit.enabled" -> true))
 
   "if charitable givings are turned on then tax year resource" should {
     "return 200" in {
 
-      val payload = Json.parse(
-        s"""
+      val payload = Json.parse(s"""
            |{
            | 	"charitableGivings": {
            |     "giftAidPayments": {
@@ -121,15 +121,15 @@ class SwitchCharitableGivingsOnSpec extends BaseFunctionalSpec {
 }
 
 class SwitchCharitableGivingsOffSpec extends BaseFunctionalSpec {
-  override lazy val app: FakeApplication = FakeApplication(additionalConfiguration = Map(
-    "Test.feature-switch.charitableGivings.enabled" -> false,
-    "Test.feature-switch.childBenefit.enabled" -> true))
+  override lazy val app: FakeApplication = FakeApplication(
+    additionalConfiguration =
+      Map("Test.feature-switch.charitableGivings.enabled" -> false,
+          "Test.feature-switch.childBenefit.enabled" -> true))
 
   "if charitable givings are turned off then tax year resource" should {
     "return 400 bad request with the correct error code" in {
 
-      val payload = Json.parse(
-        s"""
+      val payload = Json.parse(s"""
            |{
            | 	"charitableGivings": {
            |     "giftAidPayments": {
@@ -167,15 +167,15 @@ class SwitchCharitableGivingsOffSpec extends BaseFunctionalSpec {
 }
 
 class SwitchBlindPersonOnSpec extends BaseFunctionalSpec {
-  override lazy val app: FakeApplication = FakeApplication(additionalConfiguration = Map(
-    "Test.feature-switch.blindPerson.enabled" -> true,
-    "Test.feature-switch.childBenefit.enabled" -> true))
+  override lazy val app: FakeApplication = FakeApplication(
+    additionalConfiguration =
+      Map("Test.feature-switch.blindPerson.enabled" -> true,
+          "Test.feature-switch.childBenefit.enabled" -> true))
 
   "if blind person is turned on then tax year resource" should {
     "return 200" in {
 
-      val payload = Json.parse(
-        s"""
+      val payload = Json.parse(s"""
            |{
            | 	"blindPerson": {
            | 		"country": "Wales",
@@ -202,15 +202,15 @@ class SwitchBlindPersonOnSpec extends BaseFunctionalSpec {
 }
 
 class SwitchBlindPersonOffSpec extends BaseFunctionalSpec {
-  override lazy val app: FakeApplication = FakeApplication(additionalConfiguration = Map(
-    "Test.feature-switch.blindPerson.enabled" -> false,
-    "Test.feature-switch.childBenefit.enabled" -> true))
+  override lazy val app: FakeApplication = FakeApplication(
+    additionalConfiguration =
+      Map("Test.feature-switch.blindPerson.enabled" -> false,
+          "Test.feature-switch.childBenefit.enabled" -> true))
 
   "if blind person is turned off then tax year resource" should {
     "return 400 bad request with the correct error code" in {
 
-      val payload = Json.parse(
-        s"""
+      val payload = Json.parse(s"""
            |{
            | 	"blindPerson": {
            | 		"country": "Wales",
@@ -237,15 +237,15 @@ class SwitchBlindPersonOffSpec extends BaseFunctionalSpec {
 }
 
 class SwitchStudentLoanOnSpec extends BaseFunctionalSpec {
-  override lazy val app: FakeApplication = FakeApplication(additionalConfiguration = Map(
-    "Test.feature-switch.studentLoan.enabled" -> true,
-    "Test.feature-switch.childBenefit.enabled" -> true))
+  override lazy val app: FakeApplication = FakeApplication(
+    additionalConfiguration =
+      Map("Test.feature-switch.studentLoan.enabled" -> true,
+          "Test.feature-switch.childBenefit.enabled" -> true))
 
   "if student loan is turned on then tax year resource" should {
     "return 200" in {
 
-      val payload = Json.parse(
-        s"""
+      val payload = Json.parse(s"""
            |{
            | 	"studentLoan": {
            |     "planType": "Plan1",
@@ -270,15 +270,15 @@ class SwitchStudentLoanOnSpec extends BaseFunctionalSpec {
 }
 
 class SwitchStudentLoanOffSpec extends BaseFunctionalSpec {
-  override lazy val app: FakeApplication = FakeApplication(additionalConfiguration = Map(
-    "Test.feature-switch.studentLoan.enabled" -> false,
-    "Test.feature-switch.childBenefit.enabled" -> true))
+  override lazy val app: FakeApplication = FakeApplication(
+    additionalConfiguration =
+      Map("Test.feature-switch.studentLoan.enabled" -> false,
+          "Test.feature-switch.childBenefit.enabled" -> true))
 
   "if student loan is turned off then tax year resource" should {
     "return 400 bad request with the correct error code" in {
 
-      val payload = Json.parse(
-        s"""
+      val payload = Json.parse(s"""
            |{
            | 	"studentLoan": {
            |     "planType": "Plan1",
@@ -303,15 +303,15 @@ class SwitchStudentLoanOffSpec extends BaseFunctionalSpec {
 }
 
 class SwitchTaxRefundedOrSetOffOnSpec extends BaseFunctionalSpec {
-  override lazy val app: FakeApplication = FakeApplication(additionalConfiguration = Map(
-    "Test.feature-switch.taxRefundedOrSetOff.enabled" -> true,
-    "Test.feature-switch.childBenefit.enabled" -> true))
+  override lazy val app: FakeApplication = FakeApplication(
+    additionalConfiguration =
+      Map("Test.feature-switch.taxRefundedOrSetOff.enabled" -> true,
+          "Test.feature-switch.childBenefit.enabled" -> true))
 
   "if student loan is turned on then tax year resource" should {
     "return 200" in {
 
-      val payload = Json.parse(
-        s"""
+      val payload = Json.parse(s"""
            |{
            | 	"taxRefundedOrSetOff": {
            |     "amount": 2000.00
@@ -335,15 +335,15 @@ class SwitchTaxRefundedOrSetOffOnSpec extends BaseFunctionalSpec {
 }
 
 class SwitchTaxRefundedOrSetOffOffSpec extends BaseFunctionalSpec {
-  override lazy val app: FakeApplication = FakeApplication(additionalConfiguration = Map(
-    "Test.feature-switch.taxRefundedOrSetOff.enabled" -> false,
-    "Test.feature-switch.childBenefit.enabled" -> true))
+  override lazy val app: FakeApplication = FakeApplication(
+    additionalConfiguration =
+      Map("Test.feature-switch.taxRefundedOrSetOff.enabled" -> false,
+          "Test.feature-switch.childBenefit.enabled" -> true))
 
   "if student loan is turned off then tax year resource" should {
     "return 400 bad request with the correct error code" in {
 
-      val payload = Json.parse(
-        s"""
+      val payload = Json.parse(s"""
            |{
            | 	"taxRefundedOrSetOff": {
            |     "amount": 2000.00
@@ -367,15 +367,15 @@ class SwitchTaxRefundedOrSetOffOffSpec extends BaseFunctionalSpec {
 }
 
 class SwitchChildBenefitOnSpec extends BaseFunctionalSpec {
-  override lazy val app: FakeApplication = FakeApplication(additionalConfiguration = Map(
-    "Test.feature-switch.taxRefundedOrSetOff.enabled" -> true,
-    "Test.feature-switch.childBenefit.enabled" -> true))
+  override lazy val app: FakeApplication = FakeApplication(
+    additionalConfiguration =
+      Map("Test.feature-switch.taxRefundedOrSetOff.enabled" -> true,
+          "Test.feature-switch.childBenefit.enabled" -> true))
 
   "if student loan is turned on then tax year resource" should {
     "return 200" in {
 
-      val payload = Json.parse(
-        s"""
+      val payload = Json.parse(s"""
            |{
            | 	"taxRefundedOrSetOff": {
            |     "amount": 2000.00
@@ -399,15 +399,15 @@ class SwitchChildBenefitOnSpec extends BaseFunctionalSpec {
 }
 
 class SwitchChildBenefitOffSpec extends BaseFunctionalSpec {
-  override lazy val app: FakeApplication = FakeApplication(additionalConfiguration = Map(
-    "Test.feature-switch.taxRefundedOrSetOff.enabled" -> true,
-    "Test.feature-switch.childBenefit.enabled" -> false))
+  override lazy val app: FakeApplication = FakeApplication(
+    additionalConfiguration =
+      Map("Test.feature-switch.taxRefundedOrSetOff.enabled" -> true,
+          "Test.feature-switch.childBenefit.enabled" -> false))
 
   "if student loan is turned off then tax year resource" should {
     "return 400 bad request with the correct error code" in {
 
-      val payload = Json.parse(
-        s"""
+      val payload = Json.parse(s"""
            |{
            | 	"taxRefundedOrSetOff": {
            |     "amount": 2000.00

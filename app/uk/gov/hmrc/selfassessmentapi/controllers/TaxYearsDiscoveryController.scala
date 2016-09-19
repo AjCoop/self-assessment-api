@@ -28,11 +28,14 @@ import uk.gov.hmrc.selfassessmentapi.controllers.api.TaxYear
 import scala.concurrent.Future
 
 trait TaxYearsDiscoveryController
-    extends BaseController with HeaderValidator with Links {
+    extends BaseController
+    with HeaderValidator
+    with Links {
 
   final def discoverTaxYears(utr: SaUtr) = Action.async { request =>
-      val taxYearLinks = AppContext.supportedTaxYears.map(taxYear => HalLink(taxYear, discoverTaxYearHref(utr, TaxYear(taxYear))))
-      val links = taxYearLinks + HalLink("self", discoverTaxYearsHref(utr))
-     Future.successful(Ok(halResource(JsObject(Nil), links)))
-    }
+    val taxYearLinks = AppContext.supportedTaxYears.map(taxYear =>
+      HalLink(taxYear, discoverTaxYearHref(utr, TaxYear(taxYear))))
+    val links = taxYearLinks + HalLink("self", discoverTaxYearsHref(utr))
+    Future.successful(Ok(halResource(JsObject(Nil), links)))
+  }
 }

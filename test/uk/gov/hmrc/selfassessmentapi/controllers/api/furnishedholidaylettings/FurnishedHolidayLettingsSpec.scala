@@ -25,32 +25,41 @@ class FurnishedHolidayLettingsSpec extends JsonSpec {
   "FurnishedHolidayLettings" should {
 
     "make a valid json round trip" in {
-      roundTripJson(FurnishedHolidayLetting(None, PropertyLocationType.UK, None, None))
+      roundTripJson(
+        FurnishedHolidayLetting(None, PropertyLocationType.UK, None, None))
 
-      roundTripJson(FurnishedHolidayLetting(None, PropertyLocationType.UK,
-        Some(Allowances(Some(BigDecimal(1000.00)))),
-        Some(Adjustments(Some(BigDecimal(500.00))))))
+      roundTripJson(
+        FurnishedHolidayLetting(None,
+                                PropertyLocationType.UK,
+                                Some(Allowances(Some(BigDecimal(1000.00)))),
+                                Some(Adjustments(Some(BigDecimal(500.00))))))
     }
 
     "reject capitalAllowance with negative amounts" in {
       Seq(BigDecimal(-1213.00), BigDecimal(-2243434.00)).foreach { amount =>
-        val fhl = FurnishedHolidayLetting(None, PropertyLocationType.UK,
-          Some(Allowances(Some(amount))),
-          Some(Adjustments(Some(BigDecimal(500.00)))))
-          assertValidationError[FurnishedHolidayLetting](
+        val fhl =
+          FurnishedHolidayLetting(None,
+                                  PropertyLocationType.UK,
+                                  Some(Allowances(Some(amount))),
+                                  Some(Adjustments(Some(BigDecimal(500.00)))))
+        assertValidationError[FurnishedHolidayLetting](
           fhl,
-          Map("/allowances/capitalAllowance" -> INVALID_MONETARY_AMOUNT), "Expected invalid furnished-holiday-lettings")
+          Map("/allowances/capitalAllowance" -> INVALID_MONETARY_AMOUNT),
+          "Expected invalid furnished-holiday-lettings")
       }
     }
 
     "reject lossBroughtForward with negative amounts" in {
       Seq(BigDecimal(-1213.00), BigDecimal(-2243434.00)).foreach { amount =>
-        val fhl = FurnishedHolidayLetting(None, PropertyLocationType.UK,
-          Some(Allowances(Some(BigDecimal(500.00)))),
-          Some(Adjustments(Some(amount))))
-          assertValidationError[FurnishedHolidayLetting](
+        val fhl =
+          FurnishedHolidayLetting(None,
+                                  PropertyLocationType.UK,
+                                  Some(Allowances(Some(BigDecimal(500.00)))),
+                                  Some(Adjustments(Some(amount))))
+        assertValidationError[FurnishedHolidayLetting](
           fhl,
-          Map("/adjustments/lossBroughtForward" -> INVALID_MONETARY_AMOUNT), "Expected invalid furnished-holiday-lettings")
+          Map("/adjustments/lossBroughtForward" -> INVALID_MONETARY_AMOUNT),
+          "Expected invalid furnished-holiday-lettings")
       }
     }
 

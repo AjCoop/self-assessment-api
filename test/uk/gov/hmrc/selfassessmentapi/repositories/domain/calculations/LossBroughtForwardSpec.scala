@@ -24,14 +24,13 @@ class LossBroughtForwardSpec extends UnitSpec {
   "Loss brought forward" should {
     "be equal self employment loss brought forward" in {
       val selfEmployment = SelfEmploymentBuilder()
-        .withAdjustments(
-          lossBroughtForward = 999,
-          outstandingBusinessIncome = 0,
-          averagingAdjustment = 0,
-          overlapReliefUsed = 0,
-          basisAdjustment = 0,
-          includedNonTaxableProfits = 0,
-          accountingAdjustment = 0)
+        .withAdjustments(lossBroughtForward = 999,
+                         outstandingBusinessIncome = 0,
+                         averagingAdjustment = 0,
+                         overlapReliefUsed = 0,
+                         basisAdjustment = 0,
+                         includedNonTaxableProfits = 0,
+                         accountingAdjustment = 0)
         .create()
 
       Deductions.LossBroughtForward(selfEmployment) shouldBe 999

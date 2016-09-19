@@ -20,24 +20,41 @@ import play.api.Play._
 import uk.gov.hmrc.play.config.ServicesConfig
 
 object AppContext extends ServicesConfig {
-  lazy val appName = current.configuration.getString("appName").getOrElse(throw new RuntimeException("appName is not configured"))
-  lazy val appUrl = current.configuration.getString("appUrl").getOrElse(throw new RuntimeException("appUrl is not configured"))
-  lazy val apiGatewayContext = current.configuration.getString("api.gateway.context")
-  lazy val apiGatewayRegistrationContext = apiGatewayContext.getOrElse(throw new RuntimeException("api.gateway.context is not configured"))
-  lazy val apiGatewayLinkContext = apiGatewayContext.map(x => if(x.isEmpty) x else s"/$x").getOrElse("")
-  lazy val apiStatus = current.configuration.getString("api.status").getOrElse(throw new RuntimeException("api.status is not configured"))
+  lazy val appName = current.configuration
+    .getString("appName")
+    .getOrElse(throw new RuntimeException("appName is not configured"))
+  lazy val appUrl = current.configuration
+    .getString("appUrl")
+    .getOrElse(throw new RuntimeException("appUrl is not configured"))
+  lazy val apiGatewayContext =
+    current.configuration.getString("api.gateway.context")
+  lazy val apiGatewayRegistrationContext = apiGatewayContext.getOrElse(
+    throw new RuntimeException("api.gateway.context is not configured"))
+  lazy val apiGatewayLinkContext =
+    apiGatewayContext.map(x => if (x.isEmpty) x else s"/$x").getOrElse("")
+  lazy val apiStatus = current.configuration
+    .getString("api.status")
+    .getOrElse(throw new RuntimeException("api.status is not configured"))
   lazy val serviceLocatorUrl: String = baseUrl("service-locator")
   lazy val authUrl: String = baseUrl("auth")
   lazy val desUrl: String = baseUrl("des")
-  lazy val registrationEnabled: Boolean = current.configuration.getBoolean(s"$env.microservice.services.service-locator.enabled").getOrElse(true)
-  lazy val featureSwitch = current.configuration.getConfig(s"$env.feature-switch")
-  lazy val updateTaxYearPropertiesEnabled: Boolean = current.configuration.getBoolean(s"update-tax-year-properties.enabled").getOrElse(true)
-  lazy val authEnabled: Boolean = current.configuration.getBoolean(s"auth.enabled").getOrElse(true)
-  lazy val auditEnabled: Boolean = current.configuration.getBoolean(s"audit.enabled").getOrElse(true)
-  def deleteExpiredDataJob = current.configuration.getConfig(s"$env.scheduling.deleteExpiredDataJob").getOrElse(throw new RuntimeException(s"$env.scheduling.deleteExpiredDataJob is not configured"))
+  lazy val registrationEnabled: Boolean = current.configuration
+    .getBoolean(s"$env.microservice.services.service-locator.enabled")
+    .getOrElse(true)
+  lazy val featureSwitch =
+    current.configuration.getConfig(s"$env.feature-switch")
+  lazy val updateTaxYearPropertiesEnabled: Boolean = current.configuration
+    .getBoolean(s"update-tax-year-properties.enabled")
+    .getOrElse(true)
+  lazy val authEnabled: Boolean =
+    current.configuration.getBoolean(s"auth.enabled").getOrElse(true)
+  lazy val auditEnabled: Boolean =
+    current.configuration.getBoolean(s"audit.enabled").getOrElse(true)
+  def deleteExpiredDataJob =
+    current.configuration
+      .getConfig(s"$env.scheduling.deleteExpiredDataJob")
+      .getOrElse(throw new RuntimeException(
+        s"$env.scheduling.deleteExpiredDataJob is not configured"))
 
   val supportedTaxYears: Set[String] = Set("2016-17")
 }
-
-
-

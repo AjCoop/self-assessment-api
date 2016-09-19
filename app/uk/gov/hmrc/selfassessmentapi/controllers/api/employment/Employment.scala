@@ -19,14 +19,13 @@ package uk.gov.hmrc.selfassessmentapi.controllers.api.employment
 import play.api.libs.json._
 import uk.gov.hmrc.selfassessmentapi.controllers.api._
 
-
 case class Employment(id: Option[SourceId] = None)
 
-object Employment extends JsonMarshaller[Employment]{
+object Employment extends JsonMarshaller[Employment] {
 
   implicit val writes = Json.writes[Employment]
 
   implicit val reads = Reads.pure(None).map(Employment(_))
 
-  override def example(id : Option[SourceId]) = Employment(id)
+  override def example(id: Option[SourceId]) = Employment(id)
 }

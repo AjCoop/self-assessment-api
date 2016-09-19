@@ -19,15 +19,24 @@ package uk.gov.hmrc.selfassessmentapi.controllers.live
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.play.auth.microservice.connectors.ConfidenceLevel
 import uk.gov.hmrc.play.http.HeaderCarrier
-import uk.gov.hmrc.selfassessmentapi.config.{AppContext, MicroserviceAuthFilter}
+import uk.gov.hmrc.selfassessmentapi.config.{
+  AppContext,
+  MicroserviceAuthFilter
+}
 import uk.gov.hmrc.selfassessmentapi.connectors.AuthConnector
 
 import scala.concurrent.Future
 
-case object CustomerResolverController extends uk.gov.hmrc.selfassessmentapi.controllers.CustomerResolverController {
-  override val confidenceLevel: ConfidenceLevel = MicroserviceAuthFilter.authParamsConfig.authConfig(this.productPrefix).confidenceLevel
+case object CustomerResolverController
+    extends uk.gov.hmrc.selfassessmentapi.controllers.CustomerResolverController {
+  override val confidenceLevel: ConfidenceLevel =
+    MicroserviceAuthFilter.authParamsConfig
+      .authConfig(this.productPrefix)
+      .confidenceLevel
   override val context: String = AppContext.apiGatewayLinkContext
 
-  override def saUtr(confidenceLevel: ConfidenceLevel)(implicit hc: HeaderCarrier): Future[Option[SaUtr]] =
-    if(AppContext.authEnabled) AuthConnector.saUtr(confidenceLevel) else super.saUtr(confidenceLevel)
+  override def saUtr(confidenceLevel: ConfidenceLevel)(
+      implicit hc: HeaderCarrier): Future[Option[SaUtr]] =
+    if (AppContext.authEnabled) AuthConnector.saUtr(confidenceLevel)
+    else super.saUtr(confidenceLevel)
 }

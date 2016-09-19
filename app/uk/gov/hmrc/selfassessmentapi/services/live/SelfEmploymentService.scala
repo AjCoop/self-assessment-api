@@ -23,22 +23,34 @@ import uk.gov.hmrc.selfassessmentapi.repositories.live.SelfEmploymentRepository
 
 import scala.concurrent.Future
 
-object SelfEmploymentService extends uk.gov.hmrc.selfassessmentapi.services.SourceService[SelfEmployment] {
+object SelfEmploymentService
+    extends uk.gov.hmrc.selfassessmentapi.services.SourceService[
+      SelfEmployment] {
 
   val repo = SelfEmploymentRepository()
 
-  override def create(saUtr: SaUtr, taxYear: TaxYear, source: SelfEmployment): Future[SourceId] = {
+  override def create(saUtr: SaUtr,
+                      taxYear: TaxYear,
+                      source: SelfEmployment): Future[SourceId] = {
     repo.create(saUtr, taxYear, source)
   }
 
-  override def findById(saUtr: SaUtr, taxYear: TaxYear, sourceId: SourceId): Future[Option[SelfEmployment]] = {
+  override def findById(saUtr: SaUtr,
+                        taxYear: TaxYear,
+                        sourceId: SourceId): Future[Option[SelfEmployment]] = {
     repo.findById(saUtr, taxYear, sourceId)
   }
 
-  override def list(saUtr: SaUtr, taxYear: TaxYear): Future[Seq[SelfEmployment]] = ???
+  override def list(saUtr: SaUtr,
+                    taxYear: TaxYear): Future[Seq[SelfEmployment]] = ???
 
-  override def update(saUtr: SaUtr, taxYear: TaxYear, sourceId: SourceId, source: SelfEmployment): Future[Boolean] = ???
+  override def update(saUtr: SaUtr,
+                      taxYear: TaxYear,
+                      sourceId: SourceId,
+                      source: SelfEmployment): Future[Boolean] = ???
 
-  override def delete(saUtr: SaUtr, taxYear: TaxYear, sourceId: SourceId): Future[Boolean] = ???
+  override def delete(saUtr: SaUtr,
+                      taxYear: TaxYear,
+                      sourceId: SourceId): Future[Boolean] = ???
 
 }
