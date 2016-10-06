@@ -138,6 +138,7 @@ class SelfAssessmentApiDefinition(apiContext: String, apiStatus: APIStatus) {
       case SourceTypes.UKProperties => UKProperties
       case SourceTypes.FurnishedHolidayLettings => FurnishedHolidayLettings
       case SourceTypes.UnearnedIncomes => UnearnedIncomes
+      case SourceTypes.Savings => Savings
     }
   }
 
